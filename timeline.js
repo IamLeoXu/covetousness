@@ -1,6 +1,6 @@
-/* DEAD AIR v0.15: kept objects, erased people, and restored close-up flashbacks. */
+/* DEAD AIR v0.16: redraw anatomy while retaining each original pose orientation. */
 window.TIMELINE = {
-  "version": "0.15",
+  "version": "0.16",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -29,10 +29,10 @@ window.TIMELINE = {
     "petalCut": "assets/props/print/petal-cut.webp",
     "printShutter": "assets/props/print/print-shutter.webp",
     "sobClose": "assets/character/details/sob-close-v15.png",
-    "letterClose": "assets/character/details/letter-close-v15.png",
-    "reachClose": "assets/character/details/reach-close-v15.png",
+    "letterClose": "assets/character/details/letter-close-v16.png",
+    "reachClose": "assets/character/details/reach-close-v16.png",
     "palmClose": "assets/character/details/absence-close-v15.png",
-    "keysClose": "assets/character/details/keys-close-v15.png",
+    "keysClose": "assets/character/details/keys-close-v16.png",
     "absenceClose": "assets/character/details/absence-close-v15.png",
     "roomKeys": "assets/props/kept/room-keys.png",
     "repairLedger": "assets/props/kept/repair-ledger.png",
@@ -49,10 +49,11 @@ window.TIMELINE = {
     "withdrawn": "assets/portraits/withdrawn.webp",
     "pleading": "assets/portraits/pleading.webp",
     "wistful": "assets/portraits/wistful.webp",
-    "reachShadow": "assets/character/shadows/reach-shadow-v15.png",
+    "reachShadow": "assets/character/shadows/reach-shadow-v16.png",
     "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-kneel-v15.png",
-    "keysHeld": "assets/character/shadows/keys-held-v15.png"
+    "letterSit": "assets/character/shadows/letter-kneel-v16.png",
+    "keysHeld": "assets/character/shadows/keys-held-v16.png",
+    "letterFront": "assets/character/shadows/letter-sit-v14.webp"
   },
   "animations": {
     "walk": {
@@ -1518,10 +1519,11 @@ window.TIMELINE = {
     "withdrawn": "assets/character/seated/withdrawn.png",
     "pleading": "assets/character/seated/pleading.png",
     "wistful": "assets/character/seated/wistful.png",
-    "reachShadow": "assets/character/shadows/reach-shadow-v15.png",
+    "reachShadow": "assets/character/shadows/reach-shadow-v16.png",
     "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-kneel-v15.png",
-    "keysHeld": "assets/character/shadows/keys-held-v15.png"
+    "letterSit": "assets/character/shadows/letter-kneel-v16.png",
+    "keysHeld": "assets/character/shadows/keys-held-v16.png",
+    "letterFront": "assets/character/shadows/letter-sit-v14.webp"
   },
   "character": {
     "name": "Koharu",
@@ -1607,10 +1609,11 @@ window.TIMELINE = {
   ],
   "standingSprite": "assets/character/stand.png",
   "shadowSprites": {
-    "reachShadow": "assets/character/shadows/reach-shadow-v15.png",
+    "reachShadow": "assets/character/shadows/reach-shadow-v16.png",
     "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-kneel-v15.png",
-    "keysHeld": "assets/character/shadows/keys-held-v15.png"
+    "letterSit": "assets/character/shadows/letter-kneel-v16.png",
+    "keysHeld": "assets/character/shadows/keys-held-v16.png",
+    "letterFront": "assets/character/shadows/letter-sit-v14.webp"
   },
   "hdSprites": {
     "stand": "assets/character/hd/stand.webp",
