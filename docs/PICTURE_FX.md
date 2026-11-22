@@ -1,37 +1,27 @@
-# 显影、叠印与首尾闸门
+# 处决演出的两个推子 / v0.15
 
-REVEAL / 显影控制画好的纸面残物层。初值 settings.pictureReveal，范围 0–1。每个 scenes 节点可改 revealLayer：
+界面为英文 ARCHIVE / OBJECTS、ERASE / PEOPLE。它们对应小春保存旧物、却留不住人的处决反讽。
 
-```json
-"revealLayer": {
-  "asset": "memoryTrace",
-  "x": 25, "y": 31, "height": 36,
-  "rotation": -7, "opacity": 0.8
-}
-```
+- ARCHIVE：逐层加入封存套、住客纸条、小楼钥匙、维修账簿、遗留杯子和空房门。使用实际绘制的透明图，位于人物和场景贴纸之后。
+- ERASE：从上向下抹去主角色、人物特写和照片中的人形，用已有印刷纸闸素材形成缺失边缘；相框、独立旧物、背景和字幕保留。
+- 两者独立，也可同时拉满，让旧物完整留存、人物全部消失。暂停时立即重绘，不改变音乐、字幕时间和剧情判定。
 
-坐标、大小和角度与 stickers 相同，这一层固定在人物背后。显影推到 0 时隐藏，推到 100 时按 opacity 显示。revealLayer: false 让当前节点不使用显影层，它独立于 stickers: []。
-
-SHIFT / 叠印控制几个宽印刷带的硬边错位，初值 settings.pictureShift，范围 0–1。0 是干净画面，1 是最大错位；字幕在独立文字层，不参与错位。两个推子均可在暂停时调整，不进入音频链路。
-
-首尾闸门使用 props.printShutter 的绘制透明素材。可在 settings.printTransitions 改起止时间：
+timeline.js 的 settings 设置初值，取值 0–1：
 
 ```json
-"printTransitions": [
-  { "kind": "open", "start": 0, "duration": 1.35, "asset": "printShutter" },
-  { "kind": "close", "start": 210.5, "duration": 3.18, "asset": "printShutter" }
-]
+"executionMix": { "archive": 0, "erase": 0 }
 ```
 
-删除某项取消那一次闸门，空数组关闭全部。open 从黑场显出画面，close 最后收到黑场。动画按歌曲时间取值，暂停、倒带、跳转不会留下残影。系统减少动态效果时取消短促位移，只保留遮挡与淡变。
-
-大字在当前节点编辑，例如：
+根级 executionAssets.archiveObjects 控制 ARCHIVE 的素材、位置、大小与叠放顺序。例如：
 
 ```json
-"wordmark": {
-  "text": "STAY", "x": 6, "y": 44, "size": 31,
-  "start": 31, "end": 39, "fadeOut": 1.2
-}
+{ "asset": "roomKeys", "x": 28, "y": 20, "height": 22, "rotation": 10, "opacity": 0.94 }
 ```
 
-x 是从左侧起的百分比，y 是文字基线从顶部起的百分比，size 是字号相对画面高度的百分比。删除 wordmark 即取消。
+x / y 为图层中心百分比，height 为画面高度百分比；越靠后的物件需要更高推子值才出现。需要这些物件固定出现在某一时段，改对应 scenes.stickers；ARCHIVE 列表是交互增添的独立图层。
+
+executionAssets.subjectProps 列出接受 ERASE 的人物贴图名称；erasureMask 指向缺失边缘素材 printShutter。新增人物特写后应把 props 名称加入 subjectProps。普通主角色和相框内容自动接受 ERASE。若人物与钥匙画在同一张图里，ERASE 会抹去整张人物图；独立 roomKeys 贴纸保留。
+
+字幕字号仍由 settings.lyricFontScale 控制。首尾印刷纸闸仍在 settings.printTransitions：kind 为 open / close，start / duration 使用歌曲秒数。删除一项取消该次纸闸，空数组关闭全部。Solo 短纸闸用 flashbacks 各项的 splice。
+
+原 TAPE FX / ECHO、REVEAL / SHIFT、CAPTION / LIGHT 控件不再使用。本版没有调试面板。

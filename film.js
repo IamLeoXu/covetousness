@@ -15,9 +15,13 @@
       this.ctx = this.canvas.getContext('2d', { alpha: false });
       this.next = document.createElement('canvas');
       this.nextCtx = this.next.getContext('2d', { alpha: false });
-      this.printCopy = document.createElement('canvas');
       this.expressionLayer = document.createElement('canvas');
       this.expressionShadow = document.createElement('canvas');
+      this.subjectLayer = document.createElement('canvas');
+      this.executionMix = {
+        archive: clamp(Number(data.settings.executionMix?.archive) || 0),
+        erase: clamp(Number(data.settings.executionMix?.erase) || 0),
+      };
       this.lyric = document.getElementById('lyric');
       this.lines = ['lyricOne', 'lyricTwo'].map(id => document.getElementById(id));
       this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -32,7 +36,6 @@
       this.hdPortraits = this.loadGroup(data.hdSprites);
       this.animations = this.loadAnimations(data.animations);
       this.silhouettes = new Map();
-      this.effects = { reveal: data.settings.pictureReveal ?? .18, shift: data.settings.pictureShift ?? 0 };
       this.resize();
     }
 
@@ -73,17 +76,12 @@
       const ratio = clamp(window.devicePixelRatio || 1, 1, 2);
       if (w === this.width && h === this.height && ratio === this.pixelRatio) return;
       this.width = w; this.height = h; this.pixelRatio = ratio;
-      for (const surface of [this.canvas, this.next, this.printCopy]) {
+      for (const surface of [this.canvas, this.next]) {
         surface.width = Math.round(w * ratio); surface.height = Math.round(h * ratio);
         const context = surface.getContext('2d');
         context.setTransform(ratio, 0, 0, ratio, 0, 0);
         context.imageSmoothingQuality = 'high';
       }
-      this.needsPaint = true;
-    }
-
-    setEffects(values) {
-      for (const key of ['reveal', 'shift']) if (values[key] !== undefined) this.effects[key] = clamp(Number(values[key]) || 0);
       this.needsPaint = true;
     }
 
@@ -144,7 +142,6 @@
         this.ctx.save(); this.ctx.globalAlpha = smooth(local / fade);
         this.ctx.drawImage(this.next, 0, 0, this.width, this.height); this.ctx.restore();
       } else this.drawShot(this.ctx, scene, t);
-      this.registration(this.ctx);
       this.printTransition(this.ctx, t);
       this.updateLyrics(t, scene);
       this.needsPaint = false;
@@ -165,7 +162,8 @@
     prop(ctx, name, x, y, height, angle = 0, opacity = 1, ghost = true) {
       const asset = this.props[name];
       if (!asset?.ready || opacity <= 0) return;
-      const img = asset.image, h = height * this.height, w = h * img.width / img.height;
+      const img = this.data.executionAssets?.subjectProps?.includes(name) ? this.subjectImage(asset.image) : asset.image;
+      const h = height * this.height, w = h * img.width / img.height;
       ctx.save(); ctx.translate(x * this.width, y * this.height); ctx.rotate(angle);
       ctx.globalAlpha = opacity; ctx.drawImage(img, -w / 2, -h / 2, w, h); ctx.restore();
     }
@@ -184,7 +182,8 @@
       if (photo?.ready && fade > 0) {
         ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
         ctx.globalAlpha = alpha * fade;
-        this.cover(ctx, photo.image, px, py, pw, ph); ctx.restore();
+        const subject = this.data.executionAssets?.subjectProps?.includes(content);
+        this.cover(ctx, subject ? this.subjectImage(photo.image) : photo.image, px, py, pw, ph); ctx.restore();
       }
       ctx.globalAlpha = alpha; ctx.drawImage(img, -w * .5, -h * .5, w, h); ctx.restore();
     }
@@ -212,8 +211,8 @@
       if (motion.preset === 'faces') {
         const index = Number(motion.index) || 0, depth = Number(motion.depth) || 1;
         const clock = this.reducedMotion ? 72 : 69 + Math.max(0, t - motionStart);
-        const anchor = Number(motion.anchorX ?? mix(-20, 125, fract(index / 4)));
-        x += this.facePosition(clock, depth, index) * 100 - anchor;
+        const anchor = Number(motion.anchorX ?? mix(-20, 125, fract(index / (motion.count || 4))));
+        x += this.facePosition(clock, depth, index, motion.count || 4) * 100 - anchor;
       } else if (motion.preset === 'archive') {
         const index = Number(motion.index) || 0;
         const clock = t - motionStart + (Number(motion.offset) || 0);
@@ -249,16 +248,57 @@
     portraitAsset(shot) {
       const animation = this.animations[shot.pose];
       if (animation) return animation.frames[shot._animationFrame ?? 0];
-      if (shot.framing === 'full' && shot.quality !== 'original' && this.data.settings.characterHD !== false) {
+      // Complete figures are the default. Old face-anchored crops require an explicit portrait shot.
+      if (shot.framing !== 'portrait' && shot.quality !== 'original' && this.data.settings.characterHD !== false) {
         const hd = this.hdPortraits[shot.pose];
         if (hd?.ready) return hd;
       }
-      return (shot.framing === 'full' ? this.fullPortraits : this.portraits)[shot.pose];
+      return (shot.framing === 'portrait' ? this.portraits : this.fullPortraits)[shot.pose];
+    }
+
+    setExecutionMix(name, value) {
+      if (name !== 'archive' && name !== 'erase') return;
+      this.executionMix[name] = clamp(Number(value) || 0);
+      this.needsPaint = true;
+    }
+
+    subjectImage(image) {
+      const amount = this.executionMix.erase;
+      if (amount <= 0) return image;
+      const layer = this.subjectLayer;
+      if (layer.width !== image.width || layer.height !== image.height) {
+        layer.width = image.width; layer.height = image.height;
+      }
+      const ctx = layer.getContext('2d');
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, layer.width, layer.height);
+      if (amount >= 1) return layer;
+      ctx.drawImage(image, 0, 0);
+      ctx.globalCompositeOperation = 'destination-out';
+      const edge = layer.height * .24, front = (layer.height + edge) * amount - edge;
+      if (front > 0) ctx.fillRect(0, 0, layer.width, front);
+      const mask = this.props[this.data.executionAssets?.erasureMask || 'printShutter'];
+      if (mask?.ready) ctx.drawImage(mask.image, 0, front, layer.width, edge);
+      else { ctx.globalAlpha = amount; ctx.fillRect(0, 0, layer.width, layer.height); }
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      return layer;
+    }
+
+    archiveLayer(ctx) {
+      const amount = this.executionMix.archive;
+      if (amount <= 0) return;
+      const objects = this.data.executionAssets?.archiveObjects || [];
+      objects.forEach((item, index) => {
+        const presence = smooth((amount - index * .12) / .22);
+        if (presence <= 0) return;
+        this.prop(ctx, item.asset, item.x / 100, item.y / 100, item.height / 100,
+          (item.rotation || 0) * Math.PI / 180, presence * (item.opacity ?? .82), false);
+      });
     }
 
     silhouette(shot, mixed = null) {
       const color = shot.silhouetteColor ?? shot.color ?? '#261522';
-      const key = JSON.stringify([shot.framing || 'portrait', shot.pose, color]);
+      const key = JSON.stringify([shot.framing || 'full', shot.pose, color]);
       const image = mixed || this.portraitAsset(shot).image;
       const cached = mixed ? null : this.silhouettes.get(key);
       if (cached?.image === image) return cached.layer;
@@ -312,8 +352,9 @@
       const asset = this.portraitAsset(shot);
       if (!asset?.ready) return;
       const isSilhouette = shot.treatment === 'silhouette';
-      const img = isSilhouette ? this.silhouette(shot) : mixed || asset.image;
-      const h = this.height * (shot.scale ?? 1), w = h * img.width / img.height;
+      const img = this.subjectImage(isSilhouette ? this.silhouette(shot) : mixed || asset.image);
+      const defaultScale = !this.animations[shot.pose] && shot.framing !== 'portrait' ? .82 : 1;
+      const h = this.height * (shot.scale ?? defaultScale), w = h * img.width / img.height;
       const motion = shot.motion ?? this.data.settings.motion ?? 1;
       const drift = this.reducedMotion ? 0 : Math.sin(t * .6) * this.height * .002 * motion;
       // x is the sprite's horizontal centre; y is its bottom's distance above the frame bottom.
@@ -323,7 +364,7 @@
       ctx.save(); ctx.globalAlpha = opacity;
       // Hard printed shadow, not an airbrushed halo.
       if (!isSilhouette && shot.printShadow !== false && !this.data.shadowSprites?.[shot.pose]) {
-        ctx.drawImage(this.silhouette(shot, mixed), x + 8, y + 4, w, h);
+        ctx.drawImage(this.silhouette(shot, this.executionMix.erase > 0 ? img : mixed), x + 8, y + 4, w, h);
       }
       ctx.globalAlpha = opacity; ctx.drawImage(img, x, y, w, h); ctx.restore();
     }
@@ -360,13 +401,13 @@
       const rect = this.backgroundRect(scene, t, asset.image);
       ctx.drawImage(asset.image, rect.x, rect.y, rect.width, rect.height);
       if (scene.backgroundTint) fill(ctx, this.width, this.height, scene.backgroundTint);
+      this.archiveLayer(ctx);
       return true;
     }
 
     city(ctx, scene, t) {
       this.background(ctx, scene, t, 'city');
       this.polygon(ctx, [[.48, 0], [1, 0], [1, 1], [.74, 1]], '#30132270');
-      this.revealMemory(ctx, scene);
       this.drawStickers(ctx, scene, t, 'back');
       this.portrait(ctx, scene, t);
       if (!this.reducedMotion) {
@@ -383,48 +424,25 @@
       this.drawStickers(ctx, scene, t, 'front');
     }
 
-    facePosition(t, depth, i) {
+    facePosition(t, depth, i, count = 4) {
       // Integral of a ramped speed: motion stays continuous at 73.5s and 77s.
       const dt = Math.max(0, t - 69), ramp = clamp(t - 73.5, 0, 3.5);
-      const distance = dt * .036 + .5 * .1 / 3.5 * ramp * ramp + Math.max(0, t - 77) * .1;
-      const phase = fract(i / 4 - distance * depth);
+      const distance = dt * .065 + .5 * .25 / 3.5 * ramp * ramp + Math.max(0, t - 77) * .25;
+      const phase = fract(i / count - distance * depth);
       return mix(-.2, 1.25, phase);
-    }
-
-    revealMemory(ctx, scene) {
-      const layer = scene.revealLayer === false ? null : (scene.revealLayer || {});
-      if (!layer || this.effects.reveal <= 0) return;
-      this.prop(ctx, layer.asset || 'memoryTrace', (layer.x ?? 25) / 100, (layer.y ?? 31) / 100,
-        (layer.height ?? 36) / 100, (layer.rotation ?? -7) * Math.PI / 180,
-        this.effects.reveal * (layer.opacity ?? .8), false);
-    }
-
-    wordmark(ctx, scene, t) {
-      const item = scene.wordmark;
-      if (!item?.text || t < (item.start ?? scene.t) || t >= (item.end ?? Infinity)) return;
-      let alpha = item.opacity ?? .9;
-      if (item.fadeIn) alpha *= smooth((t - (item.start ?? scene.t)) / item.fadeIn);
-      if (item.fadeOut && item.end) alpha *= smooth((item.end - t) / item.fadeOut);
-      ctx.save(); ctx.globalAlpha = alpha;
-      ctx.fillStyle = item.color || '#f1dfc7';
-      ctx.textBaseline = 'alphabetic';
-      ctx.font = '900 ' + this.height * (item.size ?? 29) / 100 + 'px "Arial Black", Impact, sans-serif';
-      ctx.fillText(item.text, this.width * (item.x ?? 6) / 100, this.height * (item.y ?? 43) / 100, this.width * .46);
-      ctx.restore();
     }
 
     collage(ctx, scene, t) {
       this.background(ctx, scene, t);
-      this.revealMemory(ctx, scene);
-      this.wordmark(ctx, scene, t);
       this.drawStickers(ctx, scene, t, 'back');
       this.portrait(ctx, scene, t);
       this.drawStickers(ctx, scene, t, 'front');
     }
 
-    drawShot(ctx, scene, t) {
+    drawShot(ctx, scene, t, nested = false) {
       ctx.save(); fill(ctx, this.width, this.height, '#17131b');
-      if (scene.stage === 'rain' || scene.stage === 'departure') this.city(ctx, scene, t);
+      if (scene.flashbacks?.length && !nested) this.flashback(ctx, scene, t);
+      else if (scene.stage === 'rain' || scene.stage === 'departure') this.city(ctx, scene, t);
       else this.collage(ctx, scene, t);
       // A readability wash is composition, not a generated illustration.
       const shade = ctx.createLinearGradient(0, this.height * .7, 0, this.height);
@@ -433,18 +451,35 @@
       ctx.restore();
     }
 
-    registration(ctx) {
-      const amount = this.effects.shift;
-      if (amount <= 0) return;
-      const w = this.width, h = this.height;
-      const copy = this.printCopy.getContext('2d');
-      copy.drawImage(this.canvas, 0, 0, w, h);
-      // Broad hard print bands slip in opposite directions. The lyric DOM stays sharp.
-      for (const [top, height, direction] of [[.13, .19, 1], [.43, .26, -1], [.8, .11, 1]]) {
-        ctx.save(); ctx.beginPath(); ctx.rect(0, h * top, w, h * height); ctx.clip();
-        ctx.globalAlpha = .52 * amount;
-        ctx.drawImage(this.printCopy, direction * w * .025 * amount, direction * h * .006 * amount, w, h);
-        ctx.restore();
+    flashbackAt(scene, t) {
+      const track = this.reducedMotion ? scene.flashbacks.filter((_,i) => i % 3 === 0) : scene.flashbacks;
+      let index=0;
+      while (index+1 < track.length && track[index+1].t <= t) index++;
+      const cue=track[index], end=track[index+1]?.t ?? this.data.scenes.find(s=>s.t>scene.t)?.t ?? this.data.duration;
+      return { cue, end };
+    }
+
+    flashback(ctx, scene, t) {
+      const {cue,end}=this.flashbackAt(scene,t);
+      const source=this.data.scenes.find(s=>s.id===cue.sourceScene && !s.flashbacks);
+      if (source) {
+        const sourceTime=(cue.sourceTime??source.t) + (this.reducedMotion?0:Math.max(0,t-cue.t)*(cue.sourceSpeed??.15));
+        this.drawShot(ctx,{...source,...(cue.sceneOverrides||{})},sourceTime,true);
+      } else {
+        const shot={...scene,...cue,flashbacks:null,pose:null,stickers:[],t:cue.t};
+        this.background(ctx,shot,t);
+        for (const layer of cue.layers||[]) {
+          const state=this.stickerState({...layer,start:cue.t,end},scene,t);
+          if (!state) continue;
+          if (state.asset==='frame') this.framed(ctx,state.x,state.y,state.height,state.content,{angle:state.angle,alpha:state.opacity,fade:state.contentOpacity});
+          else this.prop(ctx,state.asset,state.x,state.y,state.height,state.angle,state.opacity,false);
+        }
+      }
+      const length=cue.splice??0, local=t-cue.t;
+      const matte=this.props.printShutter;
+      if (!this.reducedMotion && length>0 && local<length && matte?.ready) {
+        const p=smooth(local/length);ctx.save();ctx.globalAlpha=.7*(1-p);ctx.translate(this.width*p*.12,0);
+        this.cover(ctx,matte.image,0,0,this.width,this.height);ctx.restore();
       }
     }
 

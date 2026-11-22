@@ -1,0 +1,17 @@
+{
+  "completedAt": "2026-11-22T13:51:17.217Z",
+  "target": "C:\\Users\\Leo Xu\\Documents\\Codex\\2026-11-21\\codex-workspace-cg-cg-trial-js\\DEAD_AIR_CG",
+  "version": "0.14",
+  "updateFiles": 51,
+  "backup": "C:\\Users\\Leo Xu\\Documents\\Codex\\2026-11-21\\codex-workspace-cg-cg-trial-js\\DEAD_AIR_CG_Backups\\v0.14-2026-11-22T13-43-28-435Z-8369d5",
+  "mergeConflicts": 0,
+  "originalAssetsVerified": 119,
+  "lyricsPreserved": true,
+  "manualOpeningPreserved": true,
+  "artMappingsVerified": true,
+  "soloFullFiguresVerified": true,
+  "syntaxChecks": 8,
+  "windowsBrowserVerified": false,
+  "browserLimitation": "Headless Chrome exits during crashpad startup inside the current application container; actual browser playback has not been verified.",
+  "sourcePackageSha256": "b77384475178025e1a604d29c00a73d3a370e390e54a5a61a941f639d3644530"
+}

@@ -1,4 +1,4 @@
-/* 磁带机、调音台与音乐共用播放位置。镜头和字幕在 timeline.js 中编排。 */
+/* The deck and picture share the song clock; edit the performance in timeline.js. */
 (() => {
   'use strict';
 
@@ -10,7 +10,7 @@
   const message = $('message');
   if (!data?.scenes?.length || !data?.lyrics?.length) {
     message.hidden = false;
-    message.textContent = '时间轴无法读取，请检查 timeline.js。';
+    message.textContent = 'Timeline unavailable. Check timeline.js.';
     return;
   }
 
@@ -24,6 +24,13 @@
   const scrub = $('seek');
   const start = $('play');
   const phaseScope = $('phaseScope');
+  const cassetteConfig = { ...data.cassette, duration: data.duration };
+  const tape = new window.CharacterCassette($('cassetteMount'), 'deck', cassetteConfig);
+  new window.CharacterCassette($('handCassette'), 'selected', cassetteConfig);
+  new window.CharacterCassette($('bayCassette'), 'bay', cassetteConfig);
+  const loadingScene = new window.TapeLoadingScene({ root: $('opening'), game, target: $('cassetteMount'),
+    config: data.settings.intro, unlock: async () => { await signal.resume(); signal.pauseOutput(); } });
+
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const pad = value => String(value).padStart(2, '0');
@@ -45,15 +52,14 @@
     $('volumeLabel').value = value;
   };
   setVolume(Math.round(clamp(data.settings.volume ?? .75, 0, 1) * 100));
-  function setEffect(id, key, value) {
-    const n = clamp(Number(value) || 0, 0, 100);
-    $(id).value = String(n);
-    $(id + 'Label').value = String(n);
-    film.setEffects({ [key]: n / 100 });
+  function setExecution(name, value) {
+    const n=clamp(Number(value)||0,0,100);
+    $(name+'Fx').value=String(n); $(name+'Label').value=n+'%';
+    film.setExecutionMix(name,n/100);
   }
-  setEffect('revealFx', 'reveal', Math.round((data.settings.pictureReveal ?? .12) * 100));
-  setEffect('shiftFx', 'shift', Math.round((data.settings.pictureShift ?? 0) * 100));
-  $('lyric').style.setProperty('--lyric-scale', clamp(data.settings.lyricFontScale ?? 1, .65, 1.2));
+  $('lyric').style.setProperty('--lyric-scale',data.settings.lyricFontScale??1);
+  setExecution('archive',Math.round((data.settings.executionMix?.archive??0)*100));
+  setExecution('erase',Math.round((data.settings.executionMix?.erase??0)*100));
 
   function notify(text) {
     clearTimeout(messageTimer);
@@ -77,7 +83,7 @@
     $('deckState').textContent = completed ? 'END OF TAPE' : labels[state];
     $('playIcon').setAttribute('d', playing ? 'M8 3h6v18H8zm11 0h6v18h-6z' : 'M9 2 26 12 9 22z');
     $('playLabel').textContent = playing ? 'PAUSE' : 'PLAY';
-    start.setAttribute('aria-label', playing ? '暂停' : '播放');
+    start.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     start.setAttribute('aria-pressed', String(playing));
     $('rew').classList.toggle('selected', rate < 0);
     $('forward').classList.toggle('selected', rate > 1);
@@ -93,6 +99,7 @@
   }
 
   function seek(value, reveal = true) {
+    if (!loadingScene.loaded) return;
     const stateChanged = completed || (reveal && !entered);
     completed = false;
     $('ending').hidden = true;
@@ -104,6 +111,7 @@
   }
 
   async function play() {
+    if (!loadingScene.loaded && !(await loadingScene.insert())) return;
     if (rate === 1) {
       command++;
       rate = 0;
@@ -129,11 +137,12 @@
       rate = 0;
       pauseAudio();
       updateState();
-      notify(audio.error ? '音乐无法读取，请检查 assets/bgm.mp3。' : '点击 PLAY 继续播放音乐。');
+      notify(audio.error ? 'Audio unavailable. Check assets/bgm.mp3.' : 'Press PLAY to continue.');
     }
   }
 
   function stop() {
+    if (!loadingScene.loaded) return;
     command++;
     rate = 0;
     pauseAudio();
@@ -142,6 +151,7 @@
   }
 
   function scan(speed) {
+    if (!loadingScene.loaded) return;
     showFilm();
     command++;
     pauseAudio();
@@ -173,7 +183,7 @@
 
   function fullscreen() {
     if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
-    else viewport.requestFullscreen?.().catch(() => notify('可以使用浏览器的全屏键观看。'));
+    else viewport.requestFullscreen?.().catch(() => notify("Use your browser's fullscreen shortcut."));
   }
 
   function showTime() {
@@ -185,15 +195,7 @@
     scrub.setAttribute('aria-valuetext', `${text} / ${format(duration)}`);
     const fraction = time / duration;
     $('playhead').style.left = `calc(${fraction * 100}% - ${fraction * 2}px)`;
-    const maxRadius = 22, minRadius = 16.5, area = maxRadius ** 2 - minRadius ** 2;
-    const leftRadius = Math.sqrt(maxRadius ** 2 - fraction * area);
-    const rightRadius = Math.sqrt(minRadius ** 2 + fraction * area);
-    const turns = 88 * duration * 2 / area * 180 / Math.PI;
-    $('reelL').style.transform = `rotate(${turns * (maxRadius - leftRadius)}deg)`;
-    $('reelR').style.transform = `rotate(${turns * (rightRadius - minRadius)}deg)`;
-    $('rollL').style.transform = `scale(${leftRadius / maxRadius})`;
-    $('rollR').style.transform = `scale(${rightRadius / maxRadius})`;
-    $('tapeStrip').setAttribute('d', `M 50 ${25 - leftRadius} L 150 ${25 - rightRadius}`);
+    tape.update(fraction);
   }
 
   function showSignal(values, delta) {
@@ -244,7 +246,7 @@
     signal.setMuted(!signal.muted);
     const mute = $('mute');
     mute.classList.toggle('muted', signal.muted);
-    mute.setAttribute('aria-label', signal.muted ? '取消静音' : '静音');
+    mute.setAttribute('aria-label', signal.muted ? 'Unmute' : 'Mute');
     mute.setAttribute('aria-pressed', String(signal.muted));
   }
 
@@ -256,8 +258,8 @@
   $('replay').onclick = () => { stop(); play(); };
   scrub.oninput = event => seek(event.target.value);
   $('volume').oninput = event => setVolume(Number(event.target.value));
-  $('revealFx').oninput = event => setEffect('revealFx', 'reveal', event.target.value);
-  $('shiftFx').oninput = event => setEffect('shiftFx', 'shift', event.target.value);
+  $('archiveFx').oninput = event => setExecution('archive',event.target.value);
+  $('eraseFx').oninput = event => setExecution('erase',event.target.value);
   $('mute').onclick = toggleMute;
   $('cinema').onclick = cinema;
   $('exitCinema').onclick = cinema;
@@ -270,7 +272,7 @@
     rate = 0;
     signal.pauseOutput();
     updateState();
-    notify('音乐无法读取，请检查 assets/bgm.mp3。');
+    notify('Audio unavailable. Check assets/bgm.mp3.');
   });
   audio.addEventListener('waveformready', () => { waveformTime = -1; });
   if (audio.readyState >= 1) updateDuration();
@@ -278,6 +280,10 @@
   document.addEventListener('keydown', event => {
     if (event.ctrlKey || event.metaKey || event.altKey || event.target instanceof HTMLInputElement) return;
     const key = event.key.toLowerCase();
+    if (!loadingScene.loaded) {
+      if (key === ' ' && !(event.target instanceof HTMLButtonElement)) { event.preventDefault(); play(); }
+      return;
+    }
     if (key === ' ' && !(event.target instanceof HTMLButtonElement)) { event.preventDefault(); play(); }
     else if (key === 'arrowleft') { event.preventDefault(); seek(time - 3); }
     else if (key === 'arrowright') { event.preventDefault(); seek(time + 3); }

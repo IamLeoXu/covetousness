@@ -1,0 +1,232 @@
+{
+  "target": "C:\\Users\\Leo Xu\\Documents\\Codex\\2026-11-21\\codex-workspace-cg-cg-trial-js\\DEAD_AIR_CG",
+  "version": "0.14",
+  "startedAt": "2026-11-22T13:43:28.437Z",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "568dac832a0d7927f03be8cea9d49691529421115358cd61332d6fe5453ca4a7"
+    },
+    {
+      "path": "app.js",
+      "sha256": "8586daa011ba0db795826a7569339a03bfaeb1a6f5f05cc3c96c7f0ecccee85f"
+    },
+    {
+      "path": "assets/character/README.md",
+      "sha256": "52ca560b82a2d488877866b8021d464df41d838f69bc26949b1e57f1b4e8fba9"
+    },
+    {
+      "path": "assets/character/details/envelope-close.webp",
+      "sha256": "90933315b02dd6fe6a396b56e156e639d6a24b42f2093b4e4bab554a8d759a6b"
+    },
+    {
+      "path": "assets/character/details/palm-close.webp",
+      "sha256": "cb52f4b7b2cd03250fa634d561ddb50fe3f51f30951238161e3b0f9fb85e1c0b"
+    },
+    {
+      "path": "assets/character/details/reach-close.webp",
+      "sha256": "ce60dfa8188eac61c6b5fd800d2b143dbdc7fa7c1e42c53f4adfa2f54d9b9ef6"
+    },
+    {
+      "path": "assets/character/details/sob-close.webp",
+      "sha256": "b0b8e376be4dd50cf1a97e59d095bd444da56b53297d56f4afd8234589ef5f7b"
+    },
+    {
+      "path": "assets/character/shadows/letter-sit-v14.webp",
+      "sha256": "836f1988e04978f04965e49ec1a9785729a3412484a669635aeabca191e07185"
+    },
+    {
+      "path": "assets/character/shadows/reach-shadow-v13.webp",
+      "sha256": "f2d50be3d6c5924c681c2b3b941ff619afbfff4cfac1f7b208c0b96c5af4c41d"
+    },
+    {
+      "path": "assets/character/shadows/reach-shadow-v14.webp",
+      "sha256": "0b9c58b0bdd7b1672c3277fceb2a2db52fd437d5f96858fae03fd44c06f026f0"
+    },
+    {
+      "path": "assets/character/shadows/sob-shadow-v14.webp",
+      "sha256": "80b74e7d787806e0b94bcd451b5c0eb55f099639074d9755e73855038f651e82"
+    },
+    {
+      "path": "assets/character/sources/reach-approved-v12.png",
+      "sha256": "9f755ec44595e83797741104ab5ee38cff9b213dd40939b7a9d7272df2ce8aa6"
+    },
+    {
+      "path": "assets/ui/koharu-tape-decal.png",
+      "sha256": "eec3c5189eca7b0570fddf5899dbbffc909f4f7ffe13b98e2c2790104382c96d"
+    },
+    {
+      "path": "assets/ui/koharu-tape-decal.webp",
+      "sha256": "8ff4a67593a0a4dbfe1c14a5d666a37b09774267da93fd1a971d17b668a80c9d"
+    },
+    {
+      "path": "cassette.js",
+      "sha256": "d3eed15e7aacd25a45eaffe804d5b3edd13e4dd861331b1c81b855e60b4482b0"
+    },
+    {
+      "path": "docs/ART_PRODUCTION_v0.13.json",
+      "sha256": "94f1feb649ed7d748dcf58e1235ed1087ace8b572f87d005f3261f6ebce26255"
+    },
+    {
+      "path": "docs/ART_PRODUCTION_v0.14.json",
+      "sha256": "b04eec3b1fbb83f286f8bd867984eabce02a8fa71bbd9506005c2f26d6555483"
+    },
+    {
+      "path": "docs/AUDIO_FX.md",
+      "sha256": "b8a407fc54b5faafc395781efb5fc6277c9340213e8db7b083117b87035589c9"
+    },
+    {
+      "path": "docs/BACKGROUND_MOTION.md",
+      "sha256": "3bea06a65853147d79f35da75ef458cb75c8afd4a2105399e021c14fd40f12de"
+    },
+    {
+      "path": "docs/EXPRESSIONS.md",
+      "sha256": "2b831af38300bcffc3b39f1f015ed6b308113e1be250e38324c493cc5c4a26f2"
+    },
+    {
+      "path": "docs/FLASHBACKS.md",
+      "sha256": "7e2209df10c5cccc2301409afa7d01c6bc000059cf7f9e6a3e98a2c63b40975d"
+    },
+    {
+      "path": "docs/LOADING_AND_TAPE.md",
+      "sha256": "30035871ba05e3e820c4d541f1e22170ac03a0b2e0cd48e63bd079bae253c560"
+    },
+    {
+      "path": "docs/PICTURE_FX.md",
+      "sha256": "c3a275c506a0e06de5b139463b1c3bba26b66741041833e14076c1122a853c37"
+    },
+    {
+      "path": "docs/PROJECT_CONTEXT.md",
+      "sha256": "0ebaf9577c0cebe90f10cf6f399380815741519d95b9b20be685de4f8cc06784"
+    },
+    {
+      "path": "docs/SCENE_PARAMETERS.md",
+      "sha256": "437ad07d7c5e307876306691ee08968e186740d79ac6639fa6d1dfaedb14253f"
+    },
+    {
+      "path": "docs/STICKERS.md",
+      "sha256": "035e6c09197af9c892410c9e43b4aac1d234f0aee9fb4cb708e6f51af96e6109"
+    },
+    {
+      "path": "docs/STORYBOARD.md",
+      "sha256": "a12b61597965aa7e2b4508b4f5c6b40b3619367e1e84c1578b67421046500b2c"
+    },
+    {
+      "path": "docs/VALIDATION.md",
+      "sha256": "6060473bd01363b8b6c9ea460bc48ce26663d4f27b236eaba3861fb1ad6f8902"
+    },
+    {
+      "path": "docs/WORKSPACE_SYNC.md",
+      "sha256": "accaa7bef528f5d22569b476bb24c61b1dd6e153a3726675ee29211665f47bdd"
+    },
+    {
+      "path": "docs/preview/v13-114-8.jpg",
+      "sha256": "2326fc302a76a86cfcb2e97c249aff9f9ea0a4278df61f76d84845ff13ffe20f"
+    },
+    {
+      "path": "docs/preview/v13-124.jpg",
+      "sha256": "1f610a23220dddf74a830ff358f17fbdae1e776e7f2d1362a14dc772895b84aa"
+    },
+    {
+      "path": "docs/preview/v13-143.jpg",
+      "sha256": "b9d2365b60779970612f581ecf3fb043702eeede7c7604c6a1b58fcc94a2d75a"
+    },
+    {
+      "path": "docs/preview/v13-43.jpg",
+      "sha256": "c09a5ecb7d2e816e117e8990c54e60532a076545d5a07d0cb4aa2756564def99"
+    },
+    {
+      "path": "docs/preview/v13-77-4.jpg",
+      "sha256": "9cb782dd3a60e5f61fbea0c9baf9932fd45feb52f8f937791f60045fad337f8b"
+    },
+    {
+      "path": "docs/preview/v13-storyboard.jpg",
+      "sha256": "bbcf7c91bf97def76e0b37eea10163a3d88d5cd0ff003e4826123ed02d9d22cf"
+    },
+    {
+      "path": "docs/preview/v13-tape.jpg",
+      "sha256": "db30ed82adb71109dfbebd03e660c0635ca3ff6f72f6d300379a202b607a5eb4"
+    },
+    {
+      "path": "docs/preview/v14-114-8.jpg",
+      "sha256": "4a12548c5424c5f9d4ecae3945d830df4edbdc0d6514994c3bd09780fa921892"
+    },
+    {
+      "path": "docs/preview/v14-124.jpg",
+      "sha256": "07d59e95a8796007f1930cbe2db9708886e4629d02b33e88b28b1ec7be50f40f"
+    },
+    {
+      "path": "docs/preview/v14-143.jpg",
+      "sha256": "fde4dd4cc2c4e1de971bccbcd0539ab7532739547466d5841c38a26f4b4e9d65"
+    },
+    {
+      "path": "docs/preview/v14-43.jpg",
+      "sha256": "b1fc71f436dbc53459d6e1b2e1c2996f38af08c8c7890ecf68c84bed7cdb0f5b"
+    },
+    {
+      "path": "docs/preview/v14-77-4.jpg",
+      "sha256": "9cb782dd3a60e5f61fbea0c9baf9932fd45feb52f8f937791f60045fad337f8b"
+    },
+    {
+      "path": "docs/preview/v14-storyboard.jpg",
+      "sha256": "1d3eb5e28bc6dd03c9e11e0619d1532aad9feb8a947d6b2c58300220f1910cc8"
+    },
+    {
+      "path": "docs/preview/v14-tape.jpg",
+      "sha256": "db30ed82adb71109dfbebd03e660c0635ca3ff6f72f6d300379a202b607a5eb4"
+    },
+    {
+      "path": "film.js",
+      "sha256": "b71df670ce8b97737e722f2ee151525753031d452d5b7f68d04549d44a19d1db"
+    },
+    {
+      "path": "index.html",
+      "sha256": "5478c65a32044a16f883d463c2ed1d35dab87c0bf1a95a42ad8f93076799109b"
+    },
+    {
+      "path": "opening.js",
+      "sha256": "d22ea6abe38899e2a79ec780aec4cbbd82ec1ed5d085206ab0b69d7d9af06628"
+    },
+    {
+      "path": "source/timeline.before-v0.13.js",
+      "sha256": "e6d9763e3df4a665576b9f7961f257d54f00b692b9fdba5c9a49c986afc78b95"
+    },
+    {
+      "path": "source/timeline.before-v0.14.js",
+      "sha256": "25ed39dba34ad3fc5c2946748845c4d958bbef7932e82f87b7df677a65246a13"
+    },
+    {
+      "path": "source/timeline.sync-base-v0.9.js",
+      "sha256": "1248023033981ec3374c65f4284dfef72151c95c25b0b0ea9df0842907feee96"
+    },
+    {
+      "path": "style.css",
+      "sha256": "73192aa7aeb8524fdcd2a1ea919f63a477b86ac567894c66c893971a5e000e0b"
+    },
+    {
+      "path": "timeline.js",
+      "sha256": "b19d55e3429af0b919207c92887814f96b5a5982b62ca0affb3f8d3a513f5a99"
+    }
+  ],
+  "conflicts": [],
+  "completedAt": "2026-11-22T13:43:28.697Z",
+  "complete": true,
+  "finalVerification": {
+    "completedAt": "2026-11-22T13:51:17.217Z",
+    "target": "C:\\Users\\Leo Xu\\Documents\\Codex\\2026-11-21\\codex-workspace-cg-cg-trial-js\\DEAD_AIR_CG",
+    "version": "0.14",
+    "updateFiles": 51,
+    "backup": "C:\\Users\\Leo Xu\\Documents\\Codex\\2026-11-21\\codex-workspace-cg-cg-trial-js\\DEAD_AIR_CG_Backups\\v0.14-2026-11-22T13-43-28-435Z-8369d5",
+    "mergeConflicts": 0,
+    "originalAssetsVerified": 119,
+    "lyricsPreserved": true,
+    "manualOpeningPreserved": true,
+    "artMappingsVerified": true,
+    "soloFullFiguresVerified": true,
+    "syntaxChecks": 8,
+    "windowsBrowserVerified": false,
+    "browserLimitation": "Headless Chrome exits during crashpad startup inside the current application container; actual browser playback has not been verified.",
+    "sourcePackageSha256": "b77384475178025e1a604d29c00a73d3a370e390e54a5a61a941f639d3644530"
+  },
+  "backup": "C:\\Users\\Leo Xu\\Documents\\Codex\\2026-11-21\\codex-workspace-cg-cg-trial-js\\DEAD_AIR_CG_Backups\\v0.14-2026-11-22T13-43-28-435Z-8369d5"
+}

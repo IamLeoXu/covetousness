@@ -1,0 +1,32 @@
+{
+  "version": "0.14",
+  "assets": [
+    {
+      "key": "reach-crossleg-full",
+      "path": "assets/character/shadows/reach-shadow-v14.webp",
+      "prompt": "Precise character/pose revision. Image 1 supplies the upper-body reach, head angle and approved ink style. Image 2 supplies the LOWER BODY ANATOMY AND SEATED LEG ARRANGEMENT. Image 3 is a style check only, NOT a skin color reference. Draw the girl sitting PROPERLY CROSS-LEGGED ON THE GROUND, like image 2: both knees open outward and below the hips, two long thighs extend toward the knees, two shins fold naturally across the foreground, the two booted ankles loosely cross in front. Anatomically coherent adult-length legs folded rather than shortened. Copy image 2's leg proportions and construction faithfully, NOT the bent-upright knees of the last attempt. NOT kneeling or sitting on heels, NOT feet on top of thighs, NOT short stubby legs. Her torso leans upward slightly, ONE arm raised diagonally high to the upper right, open empty five-finger hand trying to hold onto something offscreen. Other hand rests on a knee. Keep the head modest in size relative to torso and legs, same slender adult proportions as the reference, no oversized head. The SAME young adult girl and the SAME approved sharp Japanese graphic-game style: confident angular near-black plum ink, dusty-rose hair/clothing panels, ivory fabric, broad hard cel-cut shadows, big side ribbon, crossed hairclips and heart earring. Exposed shoulders, thighs, knees and shins are ALL NATURAL LIGHT PEACH #f0c7b0, NEVER pink/rose/magenta, never dark rose skin. Face stays a featureless near-black shadow, no eyes or smile. Hands may have plum shadow facets. No realism, no soft airbrush, no chibi or child proportions, no new accessories, braids, wires, chair or scenery. A COMPLETE BODY production sprite with entire hair silhouette, both knees, both boots and hands visible; NO bust crop, NO waist-up image. Transparent alpha background, comfortable transparent margin.",
+      "width": 1111,
+      "height": 1416,
+      "sha256": "0b9c58b0bdd7b1672c3277fceb2a2db52fd437d5f96858fae03fd44c06f026f0",
+      "export": "Lossless WebP; no resizing, retouching or palette processing after drawing"
+    },
+    {
+      "key": "sob-peach-full",
+      "path": "assets/character/shadows/sob-shadow-v14.webp",
+      "prompt": "Edit target is image 1, the FULL sitting sobbing figure. Change ONLY the exposed-skin palette: shoulders, knees and lower legs become NATURAL LIGHT PEACH #f0c7b0, matching the light skin idea in image 2. Keep all hair, clothes, dark featureless face and crying-hands gesture, body proportions and curled seated pose from image 1. Both whole boots stay visible. Her head remains bowed with BOTH HANDS covering the face. Do not change the hair or sleeve into peach, only exposed skin. Remove the gray reference matte and output transparent alpha. This is a complete figure, do not turn it into a close-up. The SAME young adult girl and the SAME approved sharp Japanese graphic-game style: confident angular near-black plum ink, dusty-rose hair/clothing panels, ivory fabric, broad hard cel-cut shadows, big side ribbon, crossed hairclips and heart earring. Exposed shoulders, thighs, knees and shins are ALL NATURAL LIGHT PEACH #f0c7b0, NEVER pink/rose/magenta, never dark rose skin. Face stays a featureless near-black shadow, no eyes or smile. Hands may have plum shadow facets. No realism, no soft airbrush, no chibi or child proportions, no new accessories, braids, wires, chair or scenery. A COMPLETE BODY production sprite with entire hair silhouette, both knees, both boots and hands visible; NO bust crop, NO waist-up image. Transparent alpha background, comfortable transparent margin.",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "80b74e7d787806e0b94bcd451b5c0eb55f099639074d9755e73855038f651e82",
+      "export": "Lossless WebP; no resizing, retouching or palette processing after drawing"
+    },
+    {
+      "key": "letter-crossleg-full",
+      "path": "assets/character/shadows/letter-sit-v14.webp",
+      "prompt": "A new COMPLETE BODY seated pose of this SAME girl. Use image 1's proper cross-legged ground-sitting anatomy and adult proportions exactly: knees open outward, long thighs, naturally folded shins, two booted ankles loosely crossed in front. She now holds a small folded ivory envelope with BOTH hands close to her sternum; shoulders curl inward, head lowered slightly, a restrained grieving pose with a completely dark featureless face. Keep the full body and both booted feet, no waist-up crop. Hair and costume follow images 2/3's bold simplified shadow-print style rather than the detailed facial rendering of image 1. Skin is pale natural peach on shoulders and legs; hair and dress accents stay dusty rose. This will be used as a full-figure memory silhouette in the CG. The SAME young adult girl and the SAME approved sharp Japanese graphic-game style: confident angular near-black plum ink, dusty-rose hair/clothing panels, ivory fabric, broad hard cel-cut shadows, big side ribbon, crossed hairclips and heart earring. Exposed shoulders, thighs, knees and shins are ALL NATURAL LIGHT PEACH #f0c7b0, NEVER pink/rose/magenta, never dark rose skin. Face stays a featureless near-black shadow, no eyes or smile. Hands may have plum shadow facets. No realism, no soft airbrush, no chibi or child proportions, no new accessories, braids, wires, chair or scenery. A COMPLETE BODY production sprite with entire hair silhouette, both knees, both boots and hands visible; NO bust crop, NO waist-up image. Transparent alpha background, comfortable transparent margin.",
+      "width": 1100,
+      "height": 1430,
+      "sha256": "836f1988e04978f04965e49ec1a9785729a3412484a669635aeabca191e07185",
+      "export": "Lossless WebP; no resizing, retouching or palette processing after drawing"
+    }
+  ]
+}

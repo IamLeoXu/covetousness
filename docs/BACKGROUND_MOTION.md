@@ -1,5 +1,7 @@
 # 背景缩放与缓慢移动
 
+v0.13 在 77–90 秒复用 blackStrings 作为 Wind in the wires 的背景；112–135 秒由 flashbacks 各项选择回忆背景，具体剪辑在 FLASHBACKS.md 编辑。普通 backgroundMotion 字段保持有效。
+
 v0.12 后段默认使用三张新绘制版画底板：memoryCut（纸面回忆）、archiveCut（无脸窗口）、voidCut（不可及窄光），路径在 assets/backgrounds/print。旧五张仍保留供手动选择，backgroundMotion 字段和下面的相机用法不变。开场 0–31 秒手动节点未改动。
 
 背景镜头独立于人物：人物可以固定 x 播放 walk / walk2，而背景向左移动，形成向右走的感觉。当前开场已设为 2 倍背景、缓慢左移；开场与离场共用同一条 31 秒镜头运动，跨场景不会重置。保留了你改过的离场起点与走路速度。

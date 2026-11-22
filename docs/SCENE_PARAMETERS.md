@@ -1,5 +1,7 @@
 # 场景参数：完整人物、位置与剪影
 
+v0.15 的 reachShadow 是保留原上身的完整侧收跪坐抬手，sobShadow 是掩面蜷坐，letterSit 是跪坐握信，keysHeld 是侧坐握钥匙。四张在 assets/character/shadows 的 *-v15.png，露肤统一中性象牙色。Solo 恢复半身特写，在 flashbacks.layers 编辑；完整人物回放可用 sceneOverrides，详见 FLASHBACKS.md。
+
 v0.12 新增 reachShadow（坐着仰头伸手）、sobShadow（掩面痛哭）。两张是画好的遮面剪影，framing: "full"、treatment: "color" 保留双色层次，treatment: "silhouette" 可改成纯色。静态人物 framing: "full" 默认选择七张高清清线版，quality: "original" 单独切回旧图，settings.characterHD: false 全局切回。
 
 人物位置也可能来自根级 expressions 的 layout。若正在跟随表情轨，修改对应 layout，或写 followExpressions: false 固定本节点。printShadow: false 关闭额外印刷投影。
@@ -41,12 +43,12 @@ v0.12 新增 reachShadow（坐着仰头伸手）、sobShadow（掩面痛哭）�
 
 | 字段 | 写法 | 含义 |
 |---|---|---|
-| pose | "stand" | 站姿。六个坐姿为 neutral、sweet、defensive、withdrawn、pleading、wistful；walk / walk2 为走路帧动画；null 表示不显示人物 |
-| framing | "full" / "portrait" | full 使用完整透明 PNG；portrait 使用现有半身排版。不填沿用 portrait |
+| pose | "stand" | 站姿。六个原坐姿为 neutral、sweet、defensive、withdrawn、pleading、wistful；新版遮面姿势为 reachShadow、sobShadow、letterSit、keysHeld；walk / walk2 为走路帧动画；null 表示不显示人物 |
+| framing | "full" / "portrait" | full 使用完整透明素材；portrait 使用旧半身排版。v0.15 不填默认 full |
 | followExpressions | false / true | false 固定使用本段 pose；静态姿态不填或 true 跟随 expressions。动画姿态默认固定，显式 true 才跟随 expressions |
 | x | 70 | 人物图像的水平中心距画面左边 70%。增大往右，减小往左 |
 | y | 4 | 人物图像底边距画面底边 4%。增大往上，减小往下；负数会移到画面下方 |
-| scale | 0.85 | 人物图像高度为画面高度的 85%。0.5 为一半高，1 为等高；宽度等比计算 |
+| scale | 0.85 | 人物图像高度为画面高度的 85%。0.5 为一半高，1 为等高；宽度等比计算。静态完整人物不填时默认 0.82 |
 | opacity | 1 | 不透明度，0–1 |
 | treatment | "color" / "silhouette" | color 显示原图；silhouette 用单色填充原图轮廓。这里的 color 是模式名，不是颜色值 |
 | silhouetteColor | "#000000" | 剪影颜色。可改为任意有效 CSS 颜色，如 #15131b、#fff。缺省保留原来的 #261522；也兼容单独的 color 颜色字段，优先使用 silhouetteColor |
@@ -78,4 +80,4 @@ v0.12 新增 reachShadow（坐着仰头伸手）、sobShadow（掩面痛哭）�
 | subtitleY | 字幕离画面底部的百分比，当前有效范围 4–28 |
 | transition | "fade" 淡入下一场，其余值直接切换；淡入时长由 settings.transitionSeconds 决定 |
 
-keepsakes、faces、fracture、outro 是物件或手部演出，本身不调用角色绘制；要放入角色，需在 film.js 对应场景加入 this.portrait(ctx, scene, t)。overload 的人物还会随堆积进度淡出。quiet 与 collection 的位置和缩放已改为直接读取本段配置，原来的实际构图数值已移入 timeline.js。
+当前普通场景均读取 pose；pose: null 即没有人物，不需要修改 film.js。flashback 节点读取 flashbacks；完整人物用 sourceScene / sceneOverrides，独立物件用 layers。
