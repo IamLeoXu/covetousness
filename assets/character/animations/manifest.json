@@ -1,0 +1,26 @@
+{
+  "animations": {
+    "walk": {
+      "src": "assets/character/animations/walk/{frame}.webp",
+      "frameCount": 30,
+      "fps": 10.0,
+      "width": 720,
+      "height": 1280,
+      "duration": 3.0,
+      "source": "walk.mov",
+      "sourceSha256": "964ab6738497e9fb03fc985df9721cbb4b56dab753b2853f832e0970f57eda62",
+      "method": "Original decoded frames, BGRA lossless WebP; no redraw, resize or frame interpolation; audio omitted"
+    },
+    "walk2": {
+      "src": "assets/character/animations/walk2/{frame}.webp",
+      "frameCount": 30,
+      "fps": 10.0,
+      "width": 720,
+      "height": 1280,
+      "duration": 3.0,
+      "source": "walk2.mov",
+      "sourceSha256": "60a3abe6e2b57d672b91bee2de42fcc4567e0a64b281937b20f59c12ebf97795",
+      "method": "Original decoded frames, BGRA lossless WebP; no redraw, resize or frame interpolation; audio omitted"
+    }
+  }
+}

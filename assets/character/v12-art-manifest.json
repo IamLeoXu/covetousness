@@ -1,0 +1,149 @@
+{
+  "note": "New generated high-resolution restorations and painted print assets; approved originals are preserved in character/native and character/sources.",
+  "assets": [
+    {
+      "key": "neutral-hd",
+      "path": "assets/character/hd/neutral.webp",
+      "width": 1066,
+      "height": 1475,
+      "alpha": true,
+      "bytes": 761664,
+      "sha256": "ceb51a1c0d7c7cf892712a163997235cb3a34ca980c25db439fa3f1580958922"
+    },
+    {
+      "key": "sweet-hd",
+      "path": "assets/character/hd/sweet.webp",
+      "width": 1100,
+      "height": 1430,
+      "alpha": true,
+      "bytes": 1053610,
+      "sha256": "aced2fe58d4959462efa9bad26e00440ccd0bc16682d8a50102de7eab0e2cb5b"
+    },
+    {
+      "key": "defensive-hd",
+      "path": "assets/character/hd/defensive.webp",
+      "width": 1092,
+      "height": 1440,
+      "alpha": true,
+      "bytes": 722826,
+      "sha256": "05634eb1be3d95739e81d3ac320cf6b2e09f07dceb06c622de074f2b45d83f14"
+    },
+    {
+      "key": "withdrawn-hd",
+      "path": "assets/character/hd/withdrawn.webp",
+      "width": 1043,
+      "height": 1508,
+      "alpha": true,
+      "bytes": 1007144,
+      "sha256": "cfa82b9e1f10d193cf5d657b1e4e13003b26ce6e0dbb51c858a9f45e6c3faaf3"
+    },
+    {
+      "key": "pleading-hd",
+      "path": "assets/character/hd/pleading.webp",
+      "width": 1134,
+      "height": 1387,
+      "alpha": true,
+      "bytes": 953836,
+      "sha256": "84a58d91ea7a4d5c3008340a90b3c8909fd9f5a8dd260879bdf9d0f54a4bfe40"
+    },
+    {
+      "key": "wistful-hd",
+      "path": "assets/character/hd/wistful.webp",
+      "width": 1139,
+      "height": 1381,
+      "alpha": true,
+      "bytes": 917278,
+      "sha256": "af1f7af739e15fa6526fa835c1d7a862c29a349b9d71982eb99d5959b7a669f7"
+    },
+    {
+      "key": "stand-hd",
+      "path": "assets/character/hd/stand.webp",
+      "width": 779,
+      "height": 2019,
+      "alpha": true,
+      "bytes": 1063824,
+      "sha256": "3d67a860459f36d1db9d6e648802d9677ba59e44ce65653573b6c2490a8c193d"
+    },
+    {
+      "key": "reach-shadow",
+      "path": "assets/character/shadows/reach-shadow.webp",
+      "width": 1066,
+      "height": 1475,
+      "alpha": true,
+      "bytes": 873082,
+      "sha256": "0b4c968b2e1012a3396ea5fc51450e00bd20927bd9e8f83e419632babc1b3666"
+    },
+    {
+      "key": "sob-shadow",
+      "path": "assets/character/shadows/sob-shadow.webp",
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "bytes": 913638,
+      "sha256": "4618fce40c715c572b88059bd8ba1d47f436499826a267b8f9a7b0e751b4ce38"
+    },
+    {
+      "key": "memory-cut",
+      "path": "assets/backgrounds/print/memory-cut.webp",
+      "width": 1860,
+      "height": 845,
+      "alpha": false,
+      "bytes": 858538,
+      "sha256": "453469c878dcf12ebd4619dec40ddb7d54b4c984e299131249e97d79149b6f99"
+    },
+    {
+      "key": "archive-cut",
+      "path": "assets/backgrounds/print/archive-cut.webp",
+      "width": 1859,
+      "height": 846,
+      "alpha": false,
+      "bytes": 942564,
+      "sha256": "5ed623c2a1b4e62f84ba996a4b6229a330afba98d2762e5c2fe412cc2f39b655"
+    },
+    {
+      "key": "void-cut",
+      "path": "assets/backgrounds/print/void-cut.webp",
+      "width": 1860,
+      "height": 846,
+      "alpha": false,
+      "bytes": 795170,
+      "sha256": "ff6acc6d3df96ac338a65b3cb0213c34cd3a03043dddf8cf3c6b98ae020ca3e1"
+    },
+    {
+      "key": "frame-cut",
+      "path": "assets/props/print/frame-cut.webp",
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "bytes": 492584,
+      "sha256": "194e59c857f0e52dfa12e7116af868cd7a8af34ed682b51287580891d5b39ce2"
+    },
+    {
+      "key": "memory-trace",
+      "path": "assets/props/print/memory-trace.webp",
+      "width": 1774,
+      "height": 887,
+      "alpha": true,
+      "bytes": 889426,
+      "sha256": "5477e228e26b22c268c6fb6eb70d59c12ce6f2031085ccd9bbab4b43040469f7"
+    },
+    {
+      "key": "petal-cut",
+      "path": "assets/props/print/petal-cut.webp",
+      "width": 1254,
+      "height": 1254,
+      "alpha": true,
+      "bytes": 258090,
+      "sha256": "f87398bef408c5aaa8b6fe29168cfa034cb1f7d18b74d1f6e3ff47ea2b3489c6"
+    },
+    {
+      "key": "print-shutter",
+      "path": "assets/props/print/print-shutter.webp",
+      "width": 1860,
+      "height": 846,
+      "alpha": true,
+      "bytes": 651556,
+      "sha256": "d08a474f20661852a84f77fc710e06deec3de479575d166f9c8fcd7d1800f9eb"
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "method": "Connected-background matte and component extraction; original opaque RGB retained; 2x Lanczos only",
+  "sprites": [
+    {
+      "name": "neutral",
+      "label": "平静",
+      "source": "00a53d9b-ee19-4371-aa26-532426a61cc3.png",
+      "sourceSha256": "4dbb4f5f402f069a282a5c38096b2779e9f416458df6d98f545c9e7aa208c97c",
+      "sourceBox": {
+        "left": 25,
+        "top": 6,
+        "width": 344,
+        "height": 476
+      },
+      "face": {
+        "x": 120,
+        "y": 72,
+        "height": 57
+      },
+      "upscale": 2,
+      "nativePixelsPreserved": 63134,
+      "png": "assets/character/seated/neutral.png",
+      "native": "assets/character/native/neutral.png",
+      "webp": "assets/portraits/neutral.webp",
+      "runtime": {
+        "width": 1024,
+        "height": 1000,
+        "faceX": 660,
+        "faceY": 235,
+        "faceHeight": 155
+      }
+    },
+    {
+      "name": "sweet",
+      "label": "开心",
+      "source": "00a53d9b-ee19-4371-aa26-532426a61cc3.png",
+      "sourceSha256": "4dbb4f5f402f069a282a5c38096b2779e9f416458df6d98f545c9e7aa208c97c",
+      "sourceBox": {
+        "left": 306,
+        "top": 14,
+        "width": 256,
+        "height": 333
+      },
+      "face": {
+        "x": 129,
+        "y": 70,
+        "height": 57
+      },
+      "upscale": 2,
+      "nativePixelsPreserved": 51806,
+      "png": "assets/character/seated/sweet.png",
+      "native": "assets/character/native/sweet.png",
+      "webp": "assets/portraits/sweet.webp",
+      "runtime": {
+        "width": 1024,
+        "height": 1000,
+        "faceX": 660,
+        "faceY": 235,
+        "faceHeight": 155
+      }
+    },
+    {
+      "name": "defensive",
+      "label": "抵触",
+      "source": "00a53d9b-ee19-4371-aa26-532426a61cc3.png",
+      "sourceSha256": "4dbb4f5f402f069a282a5c38096b2779e9f416458df6d98f545c9e7aa208c97c",
+      "sourceBox": {
+        "left": 19,
+        "top": 349,
+        "width": 332,
+        "height": 437
+      },
+      "face": {
+        "x": 124,
+        "y": 68,
+        "height": 57
+      },
+      "upscale": 2,
+      "nativePixelsPreserved": 55362,
+      "png": "assets/character/seated/defensive.png",
+      "native": "assets/character/native/defensive.png",
+      "webp": "assets/portraits/defensive.webp",
+      "runtime": {
+        "width": 1024,
+        "height": 1000,
+        "faceX": 660,
+        "faceY": 235,
+        "faceHeight": 155
+      }
+    },
+    {
+      "name": "withdrawn",
+      "label": "蜷缩",
+      "source": "00a53d9b-ee19-4371-aa26-532426a61cc3.png",
+      "sourceSha256": "4dbb4f5f402f069a282a5c38096b2779e9f416458df6d98f545c9e7aa208c97c",
+      "sourceBox": {
+        "left": 309,
+        "top": 355,
+        "width": 242,
+        "height": 349
+      },
+      "face": {
+        "x": 126,
+        "y": 65,
+        "height": 57
+      },
+      "upscale": 2,
+      "nativePixelsPreserved": 48485,
+      "png": "assets/character/seated/withdrawn.png",
+      "native": "assets/character/native/withdrawn.png",
+      "webp": "assets/portraits/withdrawn.webp",
+      "runtime": {
+        "width": 1024,
+        "height": 1000,
+        "faceX": 660,
+        "faceY": 235,
+        "faceHeight": 155
+      }
+    },
+    {
+      "name": "pleading",
+      "label": "恳求",
+      "source": "00a53d9b-ee19-4371-aa26-532426a61cc3.png",
+      "sourceSha256": "4dbb4f5f402f069a282a5c38096b2779e9f416458df6d98f545c9e7aa208c97c",
+      "sourceBox": {
+        "left": 18,
+        "top": 680,
+        "width": 281,
+        "height": 344
+      },
+      "face": {
+        "x": 125,
+        "y": 64,
+        "height": 57
+      },
+      "upscale": 2,
+      "nativePixelsPreserved": 46544,
+      "png": "assets/character/seated/pleading.png",
+      "native": "assets/character/native/pleading.png",
+      "webp": "assets/portraits/pleading.webp",
+      "runtime": {
+        "width": 1024,
+        "height": 1000,
+        "faceX": 660,
+        "faceY": 235,
+        "faceHeight": 155
+      }
+    },
+    {
+      "name": "wistful",
+      "label": "失落",
+      "source": "00a53d9b-ee19-4371-aa26-532426a61cc3.png",
+      "sourceSha256": "4dbb4f5f402f069a282a5c38096b2779e9f416458df6d98f545c9e7aa208c97c",
+      "sourceBox": {
+        "left": 286,
+        "top": 680,
+        "width": 284,
+        "height": 344
+      },
+      "face": {
+        "x": 141,
+        "y": 67,
+        "height": 57
+      },
+      "upscale": 2,
+      "nativePixelsPreserved": 46854,
+      "png": "assets/character/seated/wistful.png",
+      "native": "assets/character/native/wistful.png",
+      "webp": "assets/portraits/wistful.webp",
+      "runtime": {
+        "width": 1024,
+        "height": 1000,
+        "faceX": 660,
+        "faceY": 235,
+        "faceHeight": 155
+      }
+    },
+    {
+      "name": "stand",
+      "label": "站姿",
+      "source": "4c130682-29c9-48b5-b060-ae312194e605.png",
+      "sourceSha256": "b0ed99568137bab6cfe04c68ecee95385ee150226dbc6cf5d700d64c74599d63",
+      "sourceBox": {
+        "left": 125,
+        "top": 5,
+        "width": 393,
+        "height": 1019
+      },
+      "face": {
+        "x": 240,
+        "y": 86,
+        "height": 80
+      },
+      "upscale": 2,
+      "nativePixelsPreserved": 225080,
+      "png": "assets/character/stand.png",
+      "native": "assets/character/native/stand.png",
+      "webp": "assets/portraits/stand.webp",
+      "runtime": {
+        "width": 1024,
+        "height": 1000,
+        "faceX": 660,
+        "faceY": 235,
+        "faceHeight": 155
+      }
+    }
+  ]
+}
