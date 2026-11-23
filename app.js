@@ -17,7 +17,9 @@
   if (data.music && audio.getAttribute('src') !== data.music) audio.src = data.music;
   const cache = window.AUDIO_ANALYSIS?.music === data.music ? window.AUDIO_ANALYSIS : null;
   const signal = new window.AudioSignal(audio, cache);
+  const automation = new window.TapeSignalAutomation(data.settings.signalAutomation);
   const film = new window.ExecutionFilm(data);
+  const display = new window.AnalogueDisplay($('signalNoise'), $('picture'));
   const meters = new window.StereoVUMeter($('meterL'), $('meterR'));
   const overview = $('overview');
   const scope = $('scope');
@@ -52,14 +54,22 @@
     $('volumeLabel').value = value;
   };
   setVolume(Math.round(clamp(data.settings.volume ?? .75, 0, 1) * 100));
-  function setExecution(name, value) {
-    const n=clamp(Number(value)||0,0,100);
-    $(name+'Fx').value=String(n); $(name+'Label').value=n+'%';
-    film.setExecutionMix(name,n/100);
-  }
   $('lyric').style.setProperty('--lyric-scale',data.settings.lyricFontScale??1);
-  setExecution('archive',Math.round((data.settings.executionMix?.archive??0)*100));
-  setExecution('erase',Math.round((data.settings.executionMix?.erase??0)*100));
+  function updateRestoration() {
+    const values=automation.read(time);
+    for(const name of ['tracking','restoration']){
+      const value=Math.round(values[name]*100),input=$(name+'Fx');
+      if(Number(input.value)!==value)input.value=String(value);
+      $(name+'Label').value=value+'%';
+      input.setAttribute('aria-valuetext',`${value}% ${values.automatic?'automatic':'manual'}`);
+    }
+    $('signalAuto').textContent=values.automatic?'AUTO':'HOLD';
+    $('signalAuto').setAttribute('aria-pressed',String(values.automatic));
+    $('trackingState').textContent=values.tracking>.94?'SIGNAL LOCK':values.tracking>.25?'TRACKING':'SIGNAL LOST';
+    signal.setRestoration(values.restoration);
+    display.render(time,values.tracking);
+  }
+  updateRestoration();
 
   function notify(text) {
     clearTimeout(messageTimer);
@@ -105,6 +115,8 @@
     $('ending').hidden = true;
     if (reveal) showFilm();
     time = clamp(Number(value) || 0, 0, duration);
+    automation.follow(time);
+    updateRestoration();
     syncAudio();
     paintedTime = waveformTime = -1;
     if (stateChanged) updateState();
@@ -123,7 +135,8 @@
     showFilm();
     const operation = ++command;
     completed = false;
-    if (time >= duration - .03) time = 0;
+    if (time >= duration - .03) {time = 0;automation.follow(0);}
+    updateRestoration();
     syncAudio();
     rate = 1;
     updateState();
@@ -174,6 +187,7 @@
     const scale = Math.min(viewport.clientWidth / 1600, viewport.clientHeight / 900);
     game.style.transform = `scale(${scale})`;
     film.resize();
+    display.resize();
   }
 
   function cinema() {
@@ -223,6 +237,7 @@
       showTime();
       paintedTime = time;
     }
+    updateRestoration();
     showSignal(signal.read(time, audible), delta);
     if (waveformTime < 0 || Math.abs(time - waveformTime) > .07) {
       signal.drawOverview(overview, time, duration);
@@ -258,8 +273,10 @@
   $('replay').onclick = () => { stop(); play(); };
   scrub.oninput = event => seek(event.target.value);
   $('volume').oninput = event => setVolume(Number(event.target.value));
-  $('archiveFx').oninput = event => setExecution('archive',event.target.value);
-  $('eraseFx').oninput = event => setExecution('erase',event.target.value);
+  for(const name of ['tracking','restoration'])$(name+'Fx').oninput=event=>{
+    automation.hold(name,Number(event.target.value)/100);updateRestoration();
+  };
+  $('signalAuto').onclick=()=>{automation.toggle(time);updateRestoration();};
   $('mute').onclick = toggleMute;
   $('cinema').onclick = cinema;
   $('exitCinema').onclick = cinema;

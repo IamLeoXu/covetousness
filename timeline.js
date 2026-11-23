@@ -1,85 +1,72 @@
-/* DEAD AIR v0.16: redraw anatomy while retaining each original pose orientation. */
+/* DEAD AIR v0.17: faceless memories, analogue signal recovery, physical receiver. */
 window.TIMELINE = {
-  "version": "0.16",
+  "version": "0.17",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
     "city": "assets/props/city.webp",
-    "petalRoad": "assets/backgrounds/petal-road.webp",
-    "paperVault": "assets/backgrounds/paper-vault.webp",
     "emptyWindows": "assets/backgrounds/empty-windows.webp",
     "blackStrings": "assets/backgrounds/black-strings.webp",
-    "morningVault": "assets/backgrounds/morning-vault.webp",
     "memoryCut": "assets/backgrounds/print/memory-cut.webp",
     "archiveCut": "assets/backgrounds/print/archive-cut.webp",
     "voidCut": "assets/backgrounds/print/void-cut.webp"
   },
   "props": {
     "frame": "assets/props/frame.webp",
-    "faceA": "assets/props/face-a.webp",
-    "faceB": "assets/props/face-b.webp",
-    "faceC": "assets/props/face-c.webp",
+    "faceA": "assets/character/details/absence-close-v15.png",
+    "faceB": "assets/character/details/letter-close-v16.png",
+    "faceC": "assets/character/details/sob-close-v15.png",
     "faceEmpty": "assets/props/face-empty.webp",
-    "keys": "assets/props/keys.webp",
-    "envelope": "assets/props/envelope.webp",
-    "flower": "assets/props/pressed-flower.webp",
-    "hand": "assets/props/hand.webp",
     "frameCut": "assets/props/print/frame-cut.webp",
-    "memoryTrace": "assets/props/print/memory-trace.webp",
-    "petalCut": "assets/props/print/petal-cut.webp",
     "printShutter": "assets/props/print/print-shutter.webp",
     "sobClose": "assets/character/details/sob-close-v15.png",
-    "letterClose": "assets/character/details/letter-close-v16.png",
-    "reachClose": "assets/character/details/reach-close-v16.png",
-    "palmClose": "assets/character/details/absence-close-v15.png",
+    "letterClose": "assets/character/details/黑影双手紧握象牙信封.png",
+    "reachClose": "assets/character/details/仰首少女伸向画外.png",
     "keysClose": "assets/character/details/keys-close-v16.png",
     "absenceClose": "assets/character/details/absence-close-v15.png",
     "roomKeys": "assets/props/kept/room-keys.png",
     "repairLedger": "assets/props/kept/repair-ledger.png",
     "residentNote": "assets/props/kept/resident-note.png",
     "emptyCup": "assets/props/kept/empty-cup.png",
-    "vacantDoor": "assets/props/kept/vacant-door.png",
-    "archiveSleeve": "assets/props/kept/archive-sleeve.png"
+    "letterStudyClose": "assets/character/details/letter-close-v16.png",
+    "reachStudyClose": "assets/character/details/reach-close-v16.png",
+    "petalRose": "assets/props/fragments/petal-rose.webp",
+    "petalBlush": "assets/props/fragments/petal-blush.webp",
+    "petalDust": "assets/props/fragments/petal-dust.webp",
+    "petalIvory": "assets/props/fragments/petal-ivory.webp",
+    "petalFold": "assets/props/fragments/petal-fold.webp",
+    "petalCup": "assets/props/fragments/petal-cup.webp",
+    "petalWide": "assets/props/fragments/petal-wide.webp",
+    "petalCurl": "assets/props/fragments/petal-curl.webp",
+    "rentReceipt": "assets/props/fragments/rent-receipt.webp",
+    "bluePen": "assets/props/fragments/blue-pen.webp",
+    "roomTag": "assets/props/fragments/room-tag.webp",
+    "pressedNote": "assets/props/fragments/pressed-note.webp",
+    "rainBead": "assets/props/fragments/rain-bead.webp",
+    "rainSlide": "assets/props/fragments/rain-slide.webp",
+    "rainDouble": "assets/props/fragments/rain-double.webp",
+    "rainRun": "assets/props/fragments/rain-run.webp"
   },
   "portraits": {
-    "stand": "assets/portraits/stand.webp",
-    "neutral": "assets/portraits/neutral.webp",
-    "sweet": "assets/portraits/sweet.webp",
-    "defensive": "assets/portraits/defensive.webp",
-    "withdrawn": "assets/portraits/withdrawn.webp",
-    "pleading": "assets/portraits/pleading.webp",
-    "wistful": "assets/portraits/wistful.webp",
-    "reachShadow": "assets/character/shadows/reach-shadow-v16.png",
+    "standShadow": "assets/character/shadows/942fdace-12b8-4f7e-9ce5-393a34cc6ab0.png",
+    "standReachShadow": "assets/character/shadows/粉色长发礼服少女举手剪影.png",
+    "reachShadow": "assets/character/shadows/跪姿蕾丝靴粉色蝴蝶结少女.png",
+    "reachSoftShadow": "assets/character/shadows/粉黑奶油配色跪姿动漫少女.png",
     "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-kneel-v16.png",
-    "keysHeld": "assets/character/shadows/keys-held-v16.png",
-    "letterFront": "assets/character/shadows/letter-sit-v14.webp"
+    "letterSit": "assets/character/shadows/letter-sit-v14.webp"
   },
-  "animations": {
-    "walk": {
-      "src": "assets/character/animations/walk/{frame}.webp",
-      "frameCount": 30,
-      "fps": 10
-    },
-    "walk2": {
-      "src": "assets/character/animations/walk2/{frame}.webp",
-      "frameCount": 30,
-      "fps": 10
-    }
-  },
+  "animations": {},
   "scenes": [
     {
       "t": 0,
       "id": "rain-and-departure",
       "stage": "rain",
-      "pose": "walk",
-      "animationLoop": true,
-      "animationSpeed": 0.7,
-      "action": "雨夜只保留同一处空站台。她握着信封，画外的灯光和风承担离去的暗示；不新增对方的人物或背影。",
+      "pose": "standShadow",
+      "action": "空站台里只保留无脸剪影。抬手与画外灯光暗示无法挽留，不新增对方人物。",
       "x": 77,
-      "y": -3,
-      "scale": 1.01,
-      "opacity": 1,
+      "y": 6,
+      "scale": 0.84,
+      "opacity": 0.88,
       "treatment": "silhouette",
       "silhouetteColor": "#150009",
       "camera": 2,
@@ -97,7 +84,10 @@ window.TIMELINE = {
         "duration": 31,
         "ease": "linear"
       },
-      "stickers": []
+      "stickers": [],
+      "framing": "full",
+      "motion": 0,
+      "followExpressions": false
     },
     {
       "t": 17,
@@ -161,16 +151,14 @@ window.TIMELINE = {
     },
     {
       "t": 24.5,
-      "id": "half-in-the-light-2",
+      "id": "half-in-the-light-return",
       "stage": "departure",
-      "pose": "walk",
-      "animationLoop": true,
-      "animationSpeed": 0.7,
-      "action": "同一站台的光收窄，人物退场。只留下半明半暗的空框，不把歌词中的 you 具体化。",
+      "pose": "standReachShadow",
+      "action": "空站台里只保留无脸剪影。抬手与画外灯光暗示无法挽留，不新增对方人物。",
       "x": 77,
-      "y": -3,
-      "scale": 1.01,
-      "opacity": 1,
+      "y": 6,
+      "scale": 0.84,
+      "opacity": 0.88,
       "treatment": "silhouette",
       "silhouetteColor": "#150009",
       "camera": 2,
@@ -203,17 +191,20 @@ window.TIMELINE = {
           "content": "faceEmpty",
           "fadeIn": 6.5
         }
-      ]
+      ],
+      "framing": "full",
+      "motion": 0,
+      "followExpressions": false
     },
     {
       "t": 31,
       "id": "first-plea",
       "stage": "memory",
-      "pose": "neutral",
-      "action": "同一张空相片承载第一遍副歌。39 秒失落，42 秒用完整盘腿坐姿仰头伸手，不新增画外人物。",
+      "pose": "letterSit",
+      "action": "第一遍副歌由握信剪影进入挽留姿态；单片花瓣分别飘落，不整串移动。",
       "x": 74,
       "y": 6,
-      "scale": 0.78,
+      "scale": 0.73,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
@@ -225,30 +216,7 @@ window.TIMELINE = {
       "subtitleY": 8,
       "transition": "fade",
       "background": "memoryCut",
-      "stickers": [
-        {
-          "id": "first-falling-petals",
-          "asset": "petalCut",
-          "start": 31,
-          "end": 52,
-          "x": 44,
-          "y": 30,
-          "height": 29,
-          "rotation": 0,
-          "opacity": 0.78,
-          "layer": "back",
-          "fadeIn": 0.8,
-          "fadeOut": 2,
-          "motion": {
-            "xTo": 39,
-            "yTo": 51,
-            "rotationTo": -11,
-            "startTime": 31,
-            "duration": 21,
-            "ease": "smooth"
-          }
-        }
-      ],
+      "stickers": [],
       "backgroundMotion": {
         "zoom": 1.02,
         "zoomTo": 1.06,
@@ -257,14 +225,20 @@ window.TIMELINE = {
         "startTime": 31,
         "duration": 30,
         "ease": "smooth"
+      },
+      "petals": {
+        "startTime": 31,
+        "end": 61,
+        "count": 7,
+        "drift": -0.1
       }
     },
     {
       "t": 52,
       "id": "warm-recollection",
       "stage": "memory",
-      "pose": "sweet",
-      "action": "只有无歌词的温暖回忆中保留笑脸。沿用同一底板与镜头，不在每句歌词处切背景。",
+      "pose": "letterSit",
+      "action": "无歌词的回忆里仍只使用无脸角色；同一张底板保留到下一段。",
       "x": 75,
       "y": 7,
       "scale": 0.66,
@@ -293,23 +267,6 @@ window.TIMELINE = {
           "layer": "back",
           "fadeIn": 1,
           "fadeOut": 1
-        },
-        {
-          "id": "memory-petals",
-          "asset": "petalCut",
-          "start": 52,
-          "end": 61,
-          "x": 45,
-          "y": 30,
-          "height": 25,
-          "rotation": 0,
-          "opacity": 0.65,
-          "layer": "back",
-          "motion": {
-            "yTo": 39,
-            "rotationTo": -8,
-            "duration": 9
-          }
         }
       ],
       "backgroundMotion": {
@@ -320,6 +277,12 @@ window.TIMELINE = {
         "startTime": 31,
         "duration": 30,
         "ease": "smooth"
+      },
+      "petals": {
+        "startTime": 31,
+        "end": 61,
+        "count": 7,
+        "drift": -0.1
       }
     },
     {
@@ -407,6 +370,34 @@ window.TIMELINE = {
           "start": 61,
           "end": 69,
           "opacity": 0.95,
+          "layer": "front",
+          "fadeIn": 0.7,
+          "fadeOut": 0.4
+        },
+        {
+          "id": "folded-old-rent-receipt",
+          "asset": "rentReceipt",
+          "start": 65,
+          "end": 69,
+          "x": 48,
+          "y": 58,
+          "height": 26,
+          "rotation": 8,
+          "opacity": 0.94,
+          "layer": "front",
+          "fadeIn": 0.7,
+          "fadeOut": 0.4
+        },
+        {
+          "id": "cracked-blue-pen",
+          "asset": "bluePen",
+          "start": 65,
+          "end": 69,
+          "x": 59,
+          "y": 72,
+          "height": 22,
+          "rotation": -12,
+          "opacity": 0.94,
           "layer": "front",
           "fadeIn": 0.7,
           "fadeOut": 0.4
@@ -607,30 +598,13 @@ window.TIMELINE = {
         "duration": 13,
         "ease": "smooth"
       },
-      "stickers": [
-        {
-          "id": "wind-petals",
-          "asset": "petalCut",
-          "start": 77,
-          "end": 90,
-          "x": 67,
-          "y": 34,
-          "height": 28,
-          "rotation": -12,
-          "opacity": 0.7,
-          "fadeIn": 0.3,
-          "fadeOut": 1.4,
-          "layer": "front",
-          "motion": {
-            "xTo": 49,
-            "yTo": 44,
-            "rotationTo": 6,
-            "startTime": 77,
-            "duration": 13,
-            "ease": "smooth"
-          }
-        }
-      ]
+      "stickers": [],
+      "petals": {
+        "startTime": 77,
+        "end": 90,
+        "count": 8,
+        "drift": -0.27
+      }
     },
     {
       "t": 90,
@@ -652,28 +626,7 @@ window.TIMELINE = {
       "subtitleY": 8,
       "transition": "fade",
       "background": "memoryCut",
-      "stickers": [
-        {
-          "id": "second-petals",
-          "asset": "petalCut",
-          "start": 90,
-          "end": 112,
-          "x": 43,
-          "y": 25,
-          "height": 30,
-          "rotation": 0,
-          "opacity": 0.7,
-          "layer": "back",
-          "fadeOut": 3,
-          "motion": {
-            "xTo": 37,
-            "yTo": 57,
-            "rotationTo": -12,
-            "duration": 22,
-            "ease": "smooth"
-          }
-        }
-      ],
+      "stickers": [],
       "backgroundMotion": {
         "zoom": 1.1,
         "zoomTo": 1.16,
@@ -682,6 +635,12 @@ window.TIMELINE = {
         "startTime": 90,
         "duration": 22,
         "ease": "smooth"
+      },
+      "petals": {
+        "startTime": 90,
+        "end": 112,
+        "count": 8,
+        "drift": -0.1
       }
     },
     {
@@ -689,7 +648,7 @@ window.TIMELINE = {
       "id": "solo-memory-flashback",
       "stage": "flashback",
       "pose": null,
-      "action": "Solo 恢复半身特写：握信、空抱、伸手、掩面与握钥匙穿插站台、黑脸照片和旧物。特写只在闪回使用，常规段落保留完整坐姿。",
+      "action": "只用 shadows 与 details 中的无脸角色闪回；握信、空抱、掩面与挽留穿插站台、房间牌、收据和蓝笔。",
       "x": 75,
       "y": 8,
       "scale": 0.68,
@@ -795,12 +754,31 @@ window.TIMELINE = {
         {
           "t": 121.6,
           "id": "once-warm",
-          "sourceScene": "warm-recollection",
-          "sourceTime": 54.2,
-          "sourceSpeed": 0.12,
-          "sceneOverrides": {
-            "backgroundTint": "#17131b36"
-          }
+          "background": "memoryCut",
+          "backgroundTint": "#17131b40",
+          "layers": [
+            {
+              "asset": "letterStudyClose",
+              "x": 70,
+              "y": 53,
+              "height": 107,
+              "rotation": 3
+            },
+            {
+              "asset": "pressedNote",
+              "x": 27,
+              "y": 40,
+              "height": 35,
+              "rotation": -10
+            },
+            {
+              "asset": "roomTag",
+              "x": 36,
+              "y": 71,
+              "height": 28,
+              "rotation": 12
+            }
+          ]
         },
         {
           "t": 123.8,
@@ -911,6 +889,20 @@ window.TIMELINE = {
               "height": 58,
               "rotation": 12,
               "opacity": 1
+            },
+            {
+              "asset": "rentReceipt",
+              "x": 26,
+              "y": 43,
+              "height": 35,
+              "rotation": 7
+            },
+            {
+              "asset": "bluePen",
+              "x": 51,
+              "y": 79,
+              "height": 22,
+              "rotation": -14
             }
           ],
           "splice": 0.1
@@ -920,21 +912,16 @@ window.TIMELINE = {
           "id": "too-far",
           "background": "voidCut",
           "backgroundTint": "#17131b40",
-          "layers": [
-            {
-              "asset": "reachClose",
-              "x": 62,
-              "y": 52,
-              "height": 102,
-              "rotation": -3,
-              "opacity": 1,
-              "motion": {
-                "xTo": 60,
-                "heightTo": 104,
-                "ease": "smooth"
-              }
-            }
-          ]
+          "sourceScene": "reach-into-absence",
+          "sourceTime": 143,
+          "sourceSpeed": 0.1,
+          "sceneOverrides": {
+            "pose": "reachSoftShadow",
+            "followExpressions": false,
+            "x": 66,
+            "y": 6,
+            "scale": 0.81
+          }
         },
         {
           "t": 132.9,
@@ -972,12 +959,11 @@ window.TIMELINE = {
           "backgroundTint": "#17131b40",
           "layers": [
             {
-              "asset": "keysClose",
+              "asset": "reachStudyClose",
               "x": 67,
               "y": 51,
-              "height": 129,
-              "rotation": 0,
-              "opacity": 1
+              "height": 108,
+              "rotation": -3
             }
           ]
         }
@@ -987,7 +973,7 @@ window.TIMELINE = {
       "t": 135,
       "id": "reach-into-absence",
       "stage": "fracture",
-      "pose": "reachShadow",
+      "pose": "standReachShadow",
       "action": "黑弦不直译成触须。把断裂的纸面与画外窄光作为意象，盘腿坐着仰头伸手，手与光之间留下空隙。",
       "x": 61,
       "y": 7,
@@ -1003,27 +989,7 @@ window.TIMELINE = {
       "subtitleY": 8,
       "transition": "fade",
       "background": "voidCut",
-      "stickers": [
-        {
-          "id": "bridge-last-petals",
-          "asset": "petalCut",
-          "start": 135,
-          "end": 146,
-          "x": 40,
-          "y": 30,
-          "height": 23,
-          "rotation": 0,
-          "opacity": 0.6,
-          "layer": "back",
-          "fadeOut": 2,
-          "motion": {
-            "xTo": 34,
-            "yTo": 50,
-            "rotationTo": -14,
-            "duration": 11
-          }
-        }
-      ],
+      "stickers": [],
       "followExpressions": false,
       "backgroundMotion": {
         "zoom": 1.02,
@@ -1033,6 +999,12 @@ window.TIMELINE = {
         "startTime": 135,
         "duration": 16,
         "ease": "smooth"
+      },
+      "petals": {
+        "startTime": 135,
+        "end": 146,
+        "count": 5,
+        "drift": -0.16
       }
     },
     {
@@ -1088,28 +1060,7 @@ window.TIMELINE = {
       "subtitleY": 8,
       "transition": "fade",
       "background": "voidCut",
-      "stickers": [
-        {
-          "id": "final-falling-petals",
-          "asset": "petalCut",
-          "start": 151,
-          "end": 170,
-          "x": 43,
-          "y": 26,
-          "height": 27,
-          "rotation": 0,
-          "opacity": 0.6,
-          "layer": "back",
-          "fadeOut": 4,
-          "motion": {
-            "xTo": 35,
-            "yTo": 55,
-            "rotationTo": -15,
-            "duration": 19,
-            "ease": "smooth"
-          }
-        }
-      ],
+      "stickers": [],
       "backgroundMotion": {
         "zoom": 1.05,
         "zoomTo": 1.08,
@@ -1118,13 +1069,19 @@ window.TIMELINE = {
         "startTime": 151,
         "duration": 19,
         "ease": "smooth"
+      },
+      "petals": {
+        "startTime": 151,
+        "end": 170,
+        "count": 7,
+        "drift": -0.13
       }
     },
     {
       "t": 170,
       "id": "sealed",
       "stage": "sealed",
-      "pose": "keysHeld",
+      "pose": "letterSit",
       "action": "她攥紧小楼的钥匙，完整人物被收进同一只纸框。住客已离开，物件却被完整保留。",
       "x": 73,
       "y": 25,
@@ -1488,42 +1445,86 @@ window.TIMELINE = {
     "lyricFontScale": 1,
     "expressionTransitionSeconds": 0.22,
     "characterHD": true,
-    "printTransitions": [
-      {
-        "kind": "open",
-        "start": 0,
-        "duration": 1.35,
-        "asset": "printShutter"
-      },
-      {
-        "kind": "close",
-        "start": 210.5,
-        "duration": 3.18,
-        "asset": "printShutter"
-      }
-    ],
+    "printTransitions": [],
     "intro": {
       "insertMs": 850,
       "closeMs": 520,
       "pullbackMs": 1050
     },
-    "executionMix": {
-      "archive": 0,
-      "erase": 0
+    "petalAssets": [
+      "petalRose",
+      "petalBlush",
+      "petalDust",
+      "petalIvory",
+      "petalFold",
+      "petalCup",
+      "petalWide",
+      "petalCurl"
+    ],
+    "signalAutomation": {
+      "intro": [
+        {
+          "t": 0,
+          "tracking": 0.025,
+          "restoration": 0.025
+        },
+        {
+          "t": 0.55,
+          "tracking": 0.09,
+          "restoration": 0.12
+        },
+        {
+          "t": 1.4,
+          "tracking": 0.48,
+          "restoration": 0.5
+        },
+        {
+          "t": 2.7,
+          "tracking": 0.9,
+          "restoration": 0.88
+        },
+        {
+          "t": 4,
+          "tracking": 1,
+          "restoration": 1
+        }
+      ],
+      "outro": [
+        {
+          "t": 204.5,
+          "tracking": 1,
+          "restoration": 1
+        },
+        {
+          "t": 207.5,
+          "tracking": 0.92,
+          "restoration": 0.85
+        },
+        {
+          "t": 210,
+          "tracking": 0.45,
+          "restoration": 0.42
+        },
+        {
+          "t": 212.3,
+          "tracking": 0.08,
+          "restoration": 0.06
+        },
+        {
+          "t": 213.68,
+          "tracking": 0,
+          "restoration": 0
+        }
+      ]
     }
   },
   "seatedSprites": {
-    "neutral": "assets/character/seated/neutral.png",
-    "sweet": "assets/character/seated/sweet.png",
-    "defensive": "assets/character/seated/defensive.png",
-    "withdrawn": "assets/character/seated/withdrawn.png",
-    "pleading": "assets/character/seated/pleading.png",
-    "wistful": "assets/character/seated/wistful.png",
-    "reachShadow": "assets/character/shadows/reach-shadow-v16.png",
+    "standShadow": "assets/character/shadows/942fdace-12b8-4f7e-9ce5-393a34cc6ab0.png",
+    "standReachShadow": "assets/character/shadows/粉色长发礼服少女举手剪影.png",
+    "reachShadow": "assets/character/shadows/跪姿蕾丝靴粉色蝴蝶结少女.png",
+    "reachSoftShadow": "assets/character/shadows/粉黑奶油配色跪姿动漫少女.png",
     "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-kneel-v16.png",
-    "keysHeld": "assets/character/shadows/keys-held-v16.png",
-    "letterFront": "assets/character/shadows/letter-sit-v14.webp"
+    "letterSit": "assets/character/shadows/letter-sit-v14.webp"
   },
   "character": {
     "name": "Koharu",
@@ -1545,28 +1546,24 @@ window.TIMELINE = {
   "expressions": [
     {
       "t": 0,
-      "pose": "stand"
+      "pose": "standShadow"
     },
     {
       "t": 31,
-      "pose": "neutral"
-    },
-    {
-      "t": 39,
-      "pose": "wistful"
+      "pose": "letterSit"
     },
     {
       "t": 42,
       "pose": "reachShadow",
       "layout": {
-        "x": 70,
+        "x": 72,
         "y": 6,
-        "scale": 0.8
+        "scale": 0.82
       }
     },
     {
       "t": 52,
-      "pose": "sweet"
+      "pose": "letterSit"
     },
     {
       "t": 90,
@@ -1583,7 +1580,21 @@ window.TIMELINE = {
     },
     {
       "t": 135,
-      "pose": "reachShadow"
+      "pose": "standReachShadow",
+      "layout": {
+        "x": 70,
+        "y": 6,
+        "scale": 0.85
+      }
+    },
+    {
+      "t": 142,
+      "pose": "reachShadow",
+      "layout": {
+        "x": 66,
+        "y": 6,
+        "scale": 0.81
+      }
     },
     {
       "t": 146,
@@ -1603,94 +1614,31 @@ window.TIMELINE = {
       }
     },
     {
+      "t": 163,
+      "pose": "standShadow",
+      "layout": {
+        "x": 67,
+        "y": 6,
+        "scale": 0.82
+      }
+    },
+    {
       "t": 170,
-      "pose": "keysHeld"
+      "pose": "letterSit"
     }
   ],
-  "standingSprite": "assets/character/stand.png",
   "shadowSprites": {
-    "reachShadow": "assets/character/shadows/reach-shadow-v16.png",
+    "standShadow": "assets/character/shadows/942fdace-12b8-4f7e-9ce5-393a34cc6ab0.png",
+    "standReachShadow": "assets/character/shadows/粉色长发礼服少女举手剪影.png",
+    "reachShadow": "assets/character/shadows/跪姿蕾丝靴粉色蝴蝶结少女.png",
+    "reachSoftShadow": "assets/character/shadows/粉黑奶油配色跪姿动漫少女.png",
     "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-kneel-v16.png",
-    "keysHeld": "assets/character/shadows/keys-held-v16.png",
-    "letterFront": "assets/character/shadows/letter-sit-v14.webp"
+    "letterSit": "assets/character/shadows/letter-sit-v14.webp"
   },
-  "hdSprites": {
-    "stand": "assets/character/hd/stand.webp",
-    "neutral": "assets/character/hd/neutral.webp",
-    "sweet": "assets/character/hd/sweet.webp",
-    "defensive": "assets/character/hd/defensive.webp",
-    "withdrawn": "assets/character/hd/withdrawn.webp",
-    "pleading": "assets/character/hd/pleading.webp",
-    "wistful": "assets/character/hd/wistful.webp"
-  },
+  "hdSprites": {},
   "cassette": {
     "title": "KOHARU",
     "subtitle": "FALLING FLOWERS",
     "decal": "assets/ui/koharu-tape-decal.png"
-  },
-  "executionAssets": {
-    "erasureMask": "printShutter",
-    "subjectProps": [
-      "reachClose",
-      "sobClose",
-      "letterClose",
-      "keysClose",
-      "absenceClose",
-      "palmClose",
-      "faceA",
-      "faceB",
-      "faceC"
-    ],
-    "archiveObjects": [
-      {
-        "asset": "archiveSleeve",
-        "x": 20,
-        "y": 30,
-        "height": 42,
-        "rotation": -8,
-        "opacity": 0.72
-      },
-      {
-        "asset": "residentNote",
-        "x": 28,
-        "y": 45,
-        "height": 25,
-        "rotation": 7,
-        "opacity": 0.85
-      },
-      {
-        "asset": "roomKeys",
-        "x": 28,
-        "y": 20,
-        "height": 22,
-        "rotation": 10,
-        "opacity": 0.94
-      },
-      {
-        "asset": "repairLedger",
-        "x": 14,
-        "y": 42,
-        "height": 28,
-        "rotation": -10,
-        "opacity": 0.92
-      },
-      {
-        "asset": "emptyCup",
-        "x": 10,
-        "y": 64,
-        "height": 18,
-        "rotation": -2,
-        "opacity": 0.9
-      },
-      {
-        "asset": "vacantDoor",
-        "x": 39,
-        "y": 50,
-        "height": 43,
-        "rotation": -7,
-        "opacity": 0.75
-      }
-    ]
   }
 };

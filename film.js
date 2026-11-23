@@ -17,15 +17,11 @@
       this.nextCtx = this.next.getContext('2d', { alpha: false });
       this.expressionLayer = document.createElement('canvas');
       this.expressionShadow = document.createElement('canvas');
-      this.subjectLayer = document.createElement('canvas');
-      this.executionMix = {
-        archive: clamp(Number(data.settings.executionMix?.archive) || 0),
-        erase: clamp(Number(data.settings.executionMix?.erase) || 0),
-      };
       this.lyric = document.getElementById('lyric');
       this.lines = ['lyricOne', 'lyricTwo'].map(id => document.getElementById(id));
       this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
       this.needsPaint = true;
+      this.assetCache = new Map();
       this.art = this.loadGroup(data.art);
       this.props = this.loadGroup(data.props);
       this.portraits = this.loadGroup(data.portraits);
@@ -41,9 +37,12 @@
 
     loadGroup(group) {
       return Object.fromEntries(Object.entries(group || {}).map(([key, src]) => {
+        if(this.assetCache.has(src))return [key,this.assetCache.get(src)];
         const image = new Image();
-        const asset = { image, ready: false };
+        const asset = { image, ready: false, src };
+        this.assetCache.set(src,asset);
         image.onload = () => { asset.ready = true; this.needsPaint = true; };
+        image.onerror = () => { asset.failed=true; this.needsPaint=true; };
         image.decoding = 'async'; image.src = src;
         return [key, asset];
       }));
@@ -162,7 +161,7 @@
     prop(ctx, name, x, y, height, angle = 0, opacity = 1, ghost = true) {
       const asset = this.props[name];
       if (!asset?.ready || opacity <= 0) return;
-      const img = this.data.executionAssets?.subjectProps?.includes(name) ? this.subjectImage(asset.image) : asset.image;
+      const img = asset.image;
       const h = height * this.height, w = h * img.width / img.height;
       ctx.save(); ctx.translate(x * this.width, y * this.height); ctx.rotate(angle);
       ctx.globalAlpha = opacity; ctx.drawImage(img, -w / 2, -h / 2, w, h); ctx.restore();
@@ -182,8 +181,7 @@
       if (photo?.ready && fade > 0) {
         ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
         ctx.globalAlpha = alpha * fade;
-        const subject = this.data.executionAssets?.subjectProps?.includes(content);
-        this.cover(ctx, subject ? this.subjectImage(photo.image) : photo.image, px, py, pw, ph); ctx.restore();
+        this.cover(ctx, photo.image, px, py, pw, ph); ctx.restore();
       }
       ctx.globalAlpha = alpha; ctx.drawImage(img, -w * .5, -h * .5, w, h); ctx.restore();
     }
@@ -256,46 +254,6 @@
       return (shot.framing === 'portrait' ? this.portraits : this.fullPortraits)[shot.pose];
     }
 
-    setExecutionMix(name, value) {
-      if (name !== 'archive' && name !== 'erase') return;
-      this.executionMix[name] = clamp(Number(value) || 0);
-      this.needsPaint = true;
-    }
-
-    subjectImage(image) {
-      const amount = this.executionMix.erase;
-      if (amount <= 0) return image;
-      const layer = this.subjectLayer;
-      if (layer.width !== image.width || layer.height !== image.height) {
-        layer.width = image.width; layer.height = image.height;
-      }
-      const ctx = layer.getContext('2d');
-      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
-      ctx.clearRect(0, 0, layer.width, layer.height);
-      if (amount >= 1) return layer;
-      ctx.drawImage(image, 0, 0);
-      ctx.globalCompositeOperation = 'destination-out';
-      const edge = layer.height * .24, front = (layer.height + edge) * amount - edge;
-      if (front > 0) ctx.fillRect(0, 0, layer.width, front);
-      const mask = this.props[this.data.executionAssets?.erasureMask || 'printShutter'];
-      if (mask?.ready) ctx.drawImage(mask.image, 0, front, layer.width, edge);
-      else { ctx.globalAlpha = amount; ctx.fillRect(0, 0, layer.width, layer.height); }
-      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
-      return layer;
-    }
-
-    archiveLayer(ctx) {
-      const amount = this.executionMix.archive;
-      if (amount <= 0) return;
-      const objects = this.data.executionAssets?.archiveObjects || [];
-      objects.forEach((item, index) => {
-        const presence = smooth((amount - index * .12) / .22);
-        if (presence <= 0) return;
-        this.prop(ctx, item.asset, item.x / 100, item.y / 100, item.height / 100,
-          (item.rotation || 0) * Math.PI / 180, presence * (item.opacity ?? .82), false);
-      });
-    }
-
     silhouette(shot, mixed = null) {
       const color = shot.silhouetteColor ?? shot.color ?? '#261522';
       const key = JSON.stringify([shot.framing || 'full', shot.pose, color]);
@@ -352,7 +310,7 @@
       const asset = this.portraitAsset(shot);
       if (!asset?.ready) return;
       const isSilhouette = shot.treatment === 'silhouette';
-      const img = this.subjectImage(isSilhouette ? this.silhouette(shot) : mixed || asset.image);
+      const img = isSilhouette ? this.silhouette(shot) : mixed || asset.image;
       const defaultScale = !this.animations[shot.pose] && shot.framing !== 'portrait' ? .82 : 1;
       const h = this.height * (shot.scale ?? defaultScale), w = h * img.width / img.height;
       const motion = shot.motion ?? this.data.settings.motion ?? 1;
@@ -364,7 +322,7 @@
       ctx.save(); ctx.globalAlpha = opacity;
       // Hard printed shadow, not an airbrushed halo.
       if (!isSilhouette && shot.printShadow !== false && !this.data.shadowSprites?.[shot.pose]) {
-        ctx.drawImage(this.silhouette(shot, this.executionMix.erase > 0 ? img : mixed), x + 8, y + 4, w, h);
+        ctx.drawImage(this.silhouette(shot, mixed), x + 8, y + 4, w, h);
       }
       ctx.globalAlpha = opacity; ctx.drawImage(img, x, y, w, h); ctx.restore();
     }
@@ -401,8 +359,44 @@
       const rect = this.backgroundRect(scene, t, asset.image);
       ctx.drawImage(asset.image, rect.x, rect.y, rect.width, rect.height);
       if (scene.backgroundTint) fill(ctx, this.width, this.height, scene.backgroundTint);
-      this.archiveLayer(ctx);
       return true;
+    }
+
+    petalField(ctx, scene, t) {
+      const field=scene.petals;
+      if(!field)return;
+      const names=this.data.settings.petalAssets||[],count=field.count??7;
+      if(!names.length)return;
+      const clock=this.reducedMotion?4:Math.max(0,t-(field.startTime??scene.t));
+      const presence=Math.min(smooth((t-scene.t)/.8),smooth(((field.end??this.data.duration)-t)/1.5));
+      for(let i=0;i<count;i++){
+        const seed=fract((i+1)*.6180339),life=12+seed*8;
+        const p=fract(clock/life+fract(i*.38197));
+        const x=.12+fract(i*.7231)*.78+(p-.5)*(field.drift??-.12)+Math.sin(clock*.34+i*2.17)*.022;
+        const y=-.08+p*1.16;
+        const alpha=presence*Math.min(smooth(p/.12),smooth((1-p)/.18))*(.46+seed*.3);
+        const angle=(i*1.7+clock*(i%2?-.18:.13));
+        this.prop(ctx,names[i%names.length],x,y,.021+seed*.024,angle,alpha,false);
+      }
+    }
+
+    rainOnGlass(ctx, scene, t) {
+      if(scene.weather==='none')return;
+      const names=['rainBead','rainSlide','rainDouble','rainRun'];
+      const clock=this.reducedMotion?3:t;
+      // Sparse illustrated beads move on the glass; the street carries the rain's atmosphere.
+      for(let i=0;i<15;i++){
+        const depth=fract(i*.61813),asset=this.props[names[i%4]];
+        if(!asset?.ready)continue;
+        const x=fract(.07+i*.38197+Math.sin(clock*.075+i)*.003);
+        const y=fract(i*.71213+clock*(.002+depth*.006));
+        const h=this.height*(i%4===3?.06:.011+depth*.018),w=h*asset.image.width/asset.image.height;
+        ctx.save();ctx.globalAlpha=.10+depth*.10;
+        ctx.drawImage(asset.image,x*this.width,y*this.height,w,h);ctx.restore();
+      }
+      const haze=ctx.createLinearGradient(0,0,0,this.height);
+      haze.addColorStop(0,'#c0adba05');haze.addColorStop(.52,'#12132000');haze.addColorStop(1,'#b58b9c0d');
+      fill(ctx,this.width,this.height,haze);
     }
 
     city(ctx, scene, t) {
@@ -410,13 +404,7 @@
       this.polygon(ctx, [[.48, 0], [1, 0], [1, 1], [.74, 1]], '#30132270');
       this.drawStickers(ctx, scene, t, 'back');
       this.portrait(ctx, scene, t);
-      if (!this.reducedMotion) {
-        ctx.strokeStyle = '#f5dcd54a'; ctx.lineWidth = .8;
-        for (let i = 0; i < 42; i++) {
-          const x = fract(i * .6181) * this.width, y = fract(t * .57 + i * .379) * this.height;
-          ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 5, y + 21); ctx.stroke();
-        }
-      }
+      this.rainOnGlass(ctx,scene,t);
       if (scene.stage === 'departure') {
         const p = smooth((t - 24.5) / 6.5);
         this.polygon(ctx, [[.48, 0], [.54, 0], [.33, .68], [.25, .68]], '#f9dfb0' + Math.round(mix(80, 15, p)).toString(16).padStart(2, '0'));
@@ -435,6 +423,7 @@
     collage(ctx, scene, t) {
       this.background(ctx, scene, t);
       this.drawStickers(ctx, scene, t, 'back');
+      this.petalField(ctx,scene,t);
       this.portrait(ctx, scene, t);
       this.drawStickers(ctx, scene, t, 'front');
     }

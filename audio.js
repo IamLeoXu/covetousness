@@ -1,10 +1,11 @@
-/* Original track and master volume; the picture faders never enter the audio graph. */
+/* Meter the original track; restoration and hiss are audible only on the listening bus. */
 (() => {
   'use strict';
   class AudioSignal {
     constructor(audio,cache){
       this.audio=audio;this.cache=cache;this.volume=.75;this.muted=false;this.running=false;
       this.context=null;this.analysers=null;this.source=null;this.gain=null;this.initializing=null;
+      this.restoration=1;this.analysisGain=null;this.restoreNodes=null;
       this.localReady=null;
       this.originalMusic=audio.getAttribute?.('src')||audio.src;
       this.overview=cache?.overview||null;this.buffers=[new Float32Array(1024),new Float32Array(1024)];
@@ -20,10 +21,26 @@
     setVolume(v){
       this.volume=Math.max(0,Math.min(1,Number(v)||0));
       const gain=this.muted?0:this.volume;
-      if(this.gain){this.audio.volume=1;this.gain.gain.setTargetAtTime(this.running?gain:0,this.context.currentTime,.012);}
+      if(this.gain){
+        this.audio.volume=1;const value=this.running?gain:0;
+        this.gain.gain.setTargetAtTime(value,this.context.currentTime,.012);
+        this.analysisGain?.gain.setTargetAtTime(value,this.context.currentTime,.012);
+      }
       else this.audio.volume=gain;
     }
     setMuted(v){this.muted=!!v;this.setVolume(this.volume);}
+    setRestoration(value,immediate=false){
+      const amount=Math.max(0,Math.min(1,Number(value)||0));
+      if(!immediate&&Math.abs(amount-this.restoration)<.001)return;
+      this.restoration=amount;
+      const n=this.restoreNodes;if(!n)return;
+      const now=this.context.currentTime;
+      const set=(param,value)=>immediate?param.setValueAtTime(value,now):param.setTargetAtTime(value,now,.045);
+      set(n.dry.gain,amount);set(n.wet.gain,1-amount);
+      set(n.high.frequency,22+230*(1-amount));
+      set(n.low.frequency,1400+17000*amount*amount);
+      set(n.hiss.gain,.062*Math.pow(1-amount,1.5));
+    }
     prepareLocalMedia(){
       if(this.localReady)return this.localReady;
       this.localReady=new Promise((resolve,reject)=>{
@@ -56,13 +73,39 @@
         if(location.protocol==='file:')await this.prepareLocalMedia();
         this.source=this.context.createMediaElementSource(this.audio);
         this.gain=this.context.createGain();
-        this.source.connect(this.gain);this.gain.connect(this.context.destination);
-        const splitter=this.context.createChannelSplitter(2);this.gain.connect(splitter);
+        this.analysisGain=this.context.createGain();
+        const dry=this.context.createGain(),wet=this.context.createGain();
+        const high=this.context.createBiquadFilter(),low=this.context.createBiquadFilter();
+        high.type='highpass';high.Q.value=.55;low.type='lowpass';low.Q.value=.55;
+        const colour=this.context.createWaveShaper(),curve=new Float32Array(4096);
+        for(let i=0;i<curve.length;i++){const x=i*2/(curve.length-1)-1;curve[i]=Math.tanh(x*1.45)/Math.tanh(1.45);}
+        colour.curve=curve;colour.oversample='2x';
+        this.source.connect(dry);dry.connect(this.gain);
+        this.source.connect(high);high.connect(low);low.connect(colour);colour.connect(wet);wet.connect(this.gain);
+        // This analysis branch never receives filtering, saturation or generated noise.
+        this.source.connect(this.analysisGain);
+        const splitter=this.context.createChannelSplitter(2);this.analysisGain.connect(splitter);
         this.analysers=[0,1].map(channel=>{const analyser=this.context.createAnalyser();analyser.fftSize=1024;analyser.smoothingTimeConstant=.65;splitter.connect(analyser,channel);return analyser;});
+        const hiss=this.context.createGain(),noise=this.context.createBufferSource();
+        const noiseBuffer=this.context.createBuffer(2,this.context.sampleRate*4,this.context.sampleRate);
+        let seed=0x63ab17;
+        for(let ch=0;ch<2;ch++){
+          const pcm=noiseBuffer.getChannelData(ch);
+          for(let i=0;i<pcm.length;i++){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;pcm[i]=(seed>>>0)/2147483648-1;}
+        }
+        const noiseHigh=this.context.createBiquadFilter(),noiseLow=this.context.createBiquadFilter();
+        noiseHigh.type='highpass';noiseHigh.frequency.value=580;noiseHigh.Q.value=.5;
+        noiseLow.type='lowpass';noiseLow.frequency.value=6200;noiseLow.Q.value=.5;
+        noise.buffer=noiseBuffer;noise.loop=true;noise.connect(noiseHigh);noiseHigh.connect(noiseLow);noiseLow.connect(hiss);hiss.connect(this.gain);
+        this.restoreNodes={dry,wet,high,low,hiss,noise};
+        this.setRestoration(this.restoration,true);this.setVolume(this.volume);
+        this.gain.connect(this.context.destination);noise.start();
         this.setVolume(this.volume);this.loadActualOverview();
       }catch(error){
+        try{this.restoreNodes?.noise.stop();this.restoreNodes?.noise.disconnect();}catch{}
+        this.gain?.disconnect();this.analysisGain?.disconnect();
         if(this.source){try{this.source.disconnect();this.source.connect(this.context.destination);}catch{}}
-        this.gain=null;this.analysers=null;this.setVolume(this.volume);
+        this.gain=null;this.analysisGain=null;this.restoreNodes=null;this.analysers=null;this.setVolume(this.volume);
       }
     }
     async resume(){
