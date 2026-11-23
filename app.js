@@ -17,6 +17,7 @@
   if (data.music && audio.getAttribute('src') !== data.music) audio.src = data.music;
   const cache = window.AUDIO_ANALYSIS?.music === data.music ? window.AUDIO_ANALYSIS : null;
   const signal = new window.AudioSignal(audio, cache);
+  new window.ToneControls(signal,data.settings.eq);
   const automation = new window.TapeSignalAutomation(data.settings.signalAutomation);
   const film = new window.ExecutionFilm(data);
   const display = new window.AnalogueDisplay($('signalNoise'), $('picture'));
@@ -26,6 +27,7 @@
   const scrub = $('seek');
   const start = $('play');
   const phaseScope = $('phaseScope');
+  const spectrum = $('spectrum');
   const cassetteConfig = { ...data.cassette, duration: data.duration };
   const tape = new window.CharacterCassette($('cassetteMount'), 'deck', cassetteConfig);
   new window.CharacterCassette($('handCassette'), 'selected', cassetteConfig);
@@ -226,10 +228,11 @@
     tape.update(fraction);
   }
 
-  function showSignal(values, delta) {
+  function showSignal(values, delta, audible) {
     meters.update(values.rms, delta);
     signal.drawScope(scope, values);
     signal.drawPhase(phaseScope, values);
+    signal.drawSpectrum(spectrum,audible);
     $('signalLamp').classList.toggle('lit', Math.max(...values.rms) > .005);
   }
 
@@ -252,7 +255,7 @@
       paintedTime = time;
     }
     updateRestoration();
-    showSignal(signal.read(time, audible), delta);
+    showSignal(signal.read(time, audible), delta, audible);
     if (waveformTime < 0 || Math.abs(time - waveformTime) > .07) {
       signal.drawOverview(overview, time, duration);
       waveformTime = time;

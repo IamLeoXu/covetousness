@@ -1,6 +1,6 @@
-/* DEAD AIR v0.20: continuous actions, two turns, walking memories and the last platform. */
+/* DEAD AIR v0.21: tone controls, real spectrum, recessed hardware and fine rain. */
 window.TIMELINE = {
-  "version": "0.20",
+  "version": "0.21",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -45,10 +45,6 @@ window.TIMELINE = {
     "bluePen": "assets/props/fragments/blue-pen.webp",
     "roomTag": "assets/props/fragments/room-tag.webp",
     "pressedNote": "assets/props/fragments/pressed-note.webp",
-    "rainBead": "assets/props/fragments/rain-bead.webp",
-    "rainSlide": "assets/props/fragments/rain-slide.webp",
-    "rainDouble": "assets/props/fragments/rain-double.webp",
-    "rainRun": "assets/props/fragments/rain-run.webp",
     "envelope": "assets/props/envelope.webp",
     "looseKeys": "assets/props/keys.webp",
     "pressedFlower": "assets/props/pressed-flower.webp",
@@ -67,7 +63,8 @@ window.TIMELINE = {
     "reachSoftShadow": "assets/character/shadows/kneel-reaching-soft.png",
     "sobShadow": "assets/character/shadows/sit-sobbing.png",
     "letterSit": "assets/character/shadows/sit-letter.webp",
-    "coveredFace": "assets/character/details/covered-face.png"
+    "coveredFace": "assets/character/details/covered-face.png",
+    "openPalms": "assets/character/details/open-hands.png"
   },
   "animations": {
     "walk": {
@@ -762,9 +759,9 @@ window.TIMELINE = {
       "id": "wind-in-the-wires",
       "stage": "wind",
       "pose": "walk2",
-      "action": "Wind in the wires 的场景与字幕提前半秒；继续上一镜步行，83 秒 You turned your head 才开始回头。",
+      "action": "76.5 秒用列车窗框扫过背景，从匿名相片过渡到电线风景；步行前景只绘制一次，保持动作连续。",
       "camera": 1,
-      "transition": "cut",
+      "transition": "window-wipe",
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
@@ -801,7 +798,8 @@ window.TIMELINE = {
       "animationLoop": true,
       "treatment": "silhouette",
       "silhouetteColor": "#170f1c",
-      "rimColor": "#d69aa4"
+      "rimColor": "#d69aa4",
+      "transitionDuration": 0.72
     },
     {
       "t": 83,
@@ -940,7 +938,7 @@ window.TIMELINE = {
       "t": 106,
       "id": "nothing-left-in-the-palms",
       "stage": "afterimage",
-      "pose": null,
+      "pose": "reachShadow",
       "followExpressions": false,
       "background": "voidCut",
       "backgroundTint": "#17131b33",
@@ -956,20 +954,8 @@ window.TIMELINE = {
         "duration": 6,
         "ease": "smooth"
       },
-      "action": "106–112 秒：放大的空掌细节伸向离开的信封，单片花瓣从掌前穿过。人物局部在独奏开始前全部离场。",
+      "action": "106–112 秒改为跪姿举手，信封仍向画外离开；独奏开始前人物退场。",
       "stickers": [
-        {
-          "id": "empty-palms",
-          "asset": "absenceClose",
-          "start": 106,
-          "end": 112,
-          "x": 74,
-          "y": 57,
-          "height": 104,
-          "rotation": 0,
-          "opacity": 1,
-          "layer": "back"
-        },
         {
           "id": "letter-leaving-palms",
           "asset": "envelope",
@@ -998,14 +984,22 @@ window.TIMELINE = {
         "end": 112,
         "count": 5,
         "drift": -0.18
-      }
+      },
+      "x": 70,
+      "y": 6,
+      "scale": 0.86,
+      "framing": "full",
+      "treatment": "color",
+      "printShadow": false,
+      "motion": 0,
+      "opacity": 1
     },
     {
       "t": 112,
       "id": "solo-memory-flashback",
       "stage": "flashback",
       "pose": null,
-      "action": "112–136.5 秒纯物件硬切闪回，每秒约 3.27 张；不出现 Koharu 或她的身体局部。",
+      "action": "112–135.5 秒纯物件硬切记忆，约每秒 3.4 张，不出现 Koharu 或她的身体局部。",
       "x": 75,
       "y": 8,
       "scale": 0.68,
@@ -1056,7 +1050,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 112.30625,
+          "t": 112.29375,
           "id": "memory-cut-002",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1088,7 +1082,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 112.6125,
+          "t": 112.5875,
           "id": "memory-cut-003",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1119,7 +1113,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 112.91875,
+          "t": 112.88125,
           "id": "memory-cut-004",
           "background": "morningVault",
           "layout": "aperture",
@@ -1149,7 +1143,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 113.225,
+          "t": 113.175,
           "id": "memory-cut-005",
           "background": "paperVault",
           "layout": "contact",
@@ -1170,7 +1164,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 113.53125,
+          "t": 113.46875,
           "id": "memory-cut-006",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1200,7 +1194,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 113.8375,
+          "t": 113.7625,
           "id": "memory-cut-007",
           "background": "paperVault",
           "layout": "aperture",
@@ -1230,7 +1224,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 114.14375,
+          "t": 114.05625,
           "id": "memory-cut-008",
           "background": "blackStrings",
           "layout": "split",
@@ -1252,7 +1246,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 114.45,
+          "t": 114.35,
           "id": "memory-cut-009",
           "background": "voidCut",
           "layout": "strips",
@@ -1274,7 +1268,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 114.75625,
+          "t": 114.64375,
           "id": "memory-cut-010",
           "background": "morningVault",
           "layout": "split",
@@ -1304,7 +1298,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 115.0625,
+          "t": 114.9375,
           "id": "memory-cut-011",
           "background": "emptyWindows",
           "layout": "split",
@@ -1336,7 +1330,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 115.36875,
+          "t": 115.23125,
           "id": "memory-cut-012",
           "background": "petalRoad",
           "layout": "split",
@@ -1366,7 +1360,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 115.675,
+          "t": 115.525,
           "id": "memory-cut-013",
           "background": "voidCut",
           "layout": "aperture",
@@ -1388,7 +1382,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 115.98125,
+          "t": 115.81875,
           "id": "memory-cut-014",
           "background": "archiveCut",
           "layout": "split",
@@ -1418,7 +1412,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 116.2875,
+          "t": 116.1125,
           "id": "memory-cut-015",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1448,7 +1442,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 116.59375,
+          "t": 116.40625,
           "id": "memory-cut-016",
           "background": "paperVault",
           "layout": "contact",
@@ -1469,7 +1463,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 116.9,
+          "t": 116.7,
           "id": "memory-cut-017",
           "background": "voidCut",
           "layout": "aperture",
@@ -1499,7 +1493,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 117.20625,
+          "t": 116.99375,
           "id": "memory-cut-018",
           "background": "paperVault",
           "layout": "contact",
@@ -1520,7 +1514,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 117.5125,
+          "t": 117.2875,
           "id": "memory-cut-019",
           "background": "voidCut",
           "layout": "aperture",
@@ -1550,7 +1544,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 117.81875,
+          "t": 117.58125,
           "id": "memory-cut-020",
           "background": "city",
           "layout": "strips",
@@ -1582,7 +1576,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 118.125,
+          "t": 117.875,
           "id": "memory-cut-021",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1614,7 +1608,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 118.43125,
+          "t": 118.16875,
           "id": "memory-cut-022",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1645,7 +1639,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 118.7375,
+          "t": 118.4625,
           "id": "memory-cut-023",
           "background": "morningVault",
           "layout": "aperture",
@@ -1675,7 +1669,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 119.04375,
+          "t": 118.75625,
           "id": "memory-cut-024",
           "background": "paperVault",
           "layout": "contact",
@@ -1696,7 +1690,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 119.35,
+          "t": 119.05,
           "id": "memory-cut-025",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1726,7 +1720,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 119.65625,
+          "t": 119.34375,
           "id": "memory-cut-026",
           "background": "paperVault",
           "layout": "aperture",
@@ -1756,7 +1750,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 119.9625,
+          "t": 119.6375,
           "id": "memory-cut-027",
           "background": "blackStrings",
           "layout": "split",
@@ -1778,7 +1772,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 120.26875,
+          "t": 119.93125,
           "id": "memory-cut-028",
           "background": "voidCut",
           "layout": "strips",
@@ -1800,7 +1794,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 120.575,
+          "t": 120.225,
           "id": "memory-cut-029",
           "background": "morningVault",
           "layout": "split",
@@ -1830,7 +1824,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 120.88125,
+          "t": 120.51875,
           "id": "memory-cut-030",
           "background": "emptyWindows",
           "layout": "split",
@@ -1862,7 +1856,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 121.1875,
+          "t": 120.8125,
           "id": "memory-cut-031",
           "background": "petalRoad",
           "layout": "split",
@@ -1892,7 +1886,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 121.49375,
+          "t": 121.10625,
           "id": "memory-cut-032",
           "background": "voidCut",
           "layout": "aperture",
@@ -1914,7 +1908,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 121.8,
+          "t": 121.4,
           "id": "memory-cut-033",
           "background": "archiveCut",
           "layout": "split",
@@ -1944,7 +1938,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 122.10625,
+          "t": 121.69375,
           "id": "memory-cut-034",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1974,7 +1968,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 122.4125,
+          "t": 121.9875,
           "id": "memory-cut-035",
           "background": "archiveCut",
           "layout": "split",
@@ -2004,7 +1998,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 122.71875,
+          "t": 122.28125,
           "id": "memory-cut-036",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2034,7 +2028,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 123.025,
+          "t": 122.575,
           "id": "memory-cut-037",
           "background": "paperVault",
           "layout": "contact",
@@ -2055,7 +2049,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 123.33125,
+          "t": 122.86875,
           "id": "memory-cut-038",
           "background": "voidCut",
           "layout": "aperture",
@@ -2085,7 +2079,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 123.6375,
+          "t": 123.1625,
           "id": "memory-cut-039",
           "background": "city",
           "layout": "strips",
@@ -2117,7 +2111,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 123.94375,
+          "t": 123.45625,
           "id": "memory-cut-040",
           "background": "emptyWindows",
           "layout": "strips",
@@ -2149,7 +2143,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 124.25,
+          "t": 123.75,
           "id": "memory-cut-041",
           "background": "emptyWindows",
           "layout": "strips",
@@ -2180,7 +2174,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 124.55625,
+          "t": 124.04375,
           "id": "memory-cut-042",
           "background": "morningVault",
           "layout": "aperture",
@@ -2210,7 +2204,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 124.8625,
+          "t": 124.3375,
           "id": "memory-cut-043",
           "background": "paperVault",
           "layout": "contact",
@@ -2231,7 +2225,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 125.16875,
+          "t": 124.63125,
           "id": "memory-cut-044",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2261,7 +2255,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 125.475,
+          "t": 124.925,
           "id": "memory-cut-045",
           "background": "paperVault",
           "layout": "aperture",
@@ -2291,7 +2285,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 125.78125,
+          "t": 125.21875,
           "id": "memory-cut-046",
           "background": "blackStrings",
           "layout": "split",
@@ -2313,7 +2307,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 126.0875,
+          "t": 125.5125,
           "id": "memory-cut-047",
           "background": "voidCut",
           "layout": "strips",
@@ -2335,7 +2329,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 126.39375,
+          "t": 125.80625,
           "id": "memory-cut-048",
           "background": "morningVault",
           "layout": "split",
@@ -2365,7 +2359,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 126.7,
+          "t": 126.1,
           "id": "memory-cut-049",
           "background": "emptyWindows",
           "layout": "split",
@@ -2397,7 +2391,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 127.00625,
+          "t": 126.39375,
           "id": "memory-cut-050",
           "background": "petalRoad",
           "layout": "split",
@@ -2427,7 +2421,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 127.3125,
+          "t": 126.6875,
           "id": "memory-cut-051",
           "background": "voidCut",
           "layout": "aperture",
@@ -2449,7 +2443,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 127.61875,
+          "t": 126.98125,
           "id": "memory-cut-052",
           "background": "petalRoad",
           "layout": "split",
@@ -2479,7 +2473,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 127.925,
+          "t": 127.275,
           "id": "memory-cut-053",
           "background": "voidCut",
           "layout": "aperture",
@@ -2501,7 +2495,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 128.23125,
+          "t": 127.56875,
           "id": "memory-cut-054",
           "background": "archiveCut",
           "layout": "split",
@@ -2531,7 +2525,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 128.5375,
+          "t": 127.8625,
           "id": "memory-cut-055",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2561,7 +2555,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 128.84375,
+          "t": 128.15625,
           "id": "memory-cut-056",
           "background": "paperVault",
           "layout": "contact",
@@ -2582,7 +2576,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 129.15,
+          "t": 128.45,
           "id": "memory-cut-057",
           "background": "voidCut",
           "layout": "aperture",
@@ -2612,7 +2606,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 129.45625,
+          "t": 128.74375,
           "id": "memory-cut-058",
           "background": "city",
           "layout": "strips",
@@ -2644,7 +2638,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 129.7625,
+          "t": 129.0375,
           "id": "memory-cut-059",
           "background": "emptyWindows",
           "layout": "strips",
@@ -2676,7 +2670,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.06875,
+          "t": 129.33125,
           "id": "memory-cut-060",
           "background": "emptyWindows",
           "layout": "strips",
@@ -2707,7 +2701,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.375,
+          "t": 129.625,
           "id": "memory-cut-061",
           "background": "morningVault",
           "layout": "aperture",
@@ -2737,7 +2731,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.68125,
+          "t": 129.91875,
           "id": "memory-cut-062",
           "background": "paperVault",
           "layout": "contact",
@@ -2758,7 +2752,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.9875,
+          "t": 130.2125,
           "id": "memory-cut-063",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2788,7 +2782,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 131.29375,
+          "t": 130.50625,
           "id": "memory-cut-064",
           "background": "paperVault",
           "layout": "aperture",
@@ -2818,7 +2812,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 131.6,
+          "t": 130.8,
           "id": "memory-cut-065",
           "background": "blackStrings",
           "layout": "split",
@@ -2840,7 +2834,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 131.90625,
+          "t": 131.09375,
           "id": "memory-cut-066",
           "background": "voidCut",
           "layout": "strips",
@@ -2862,7 +2856,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 132.2125,
+          "t": 131.3875,
           "id": "memory-cut-067",
           "background": "morningVault",
           "layout": "split",
@@ -2892,7 +2886,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 132.51875,
+          "t": 131.68125,
           "id": "memory-cut-068",
           "background": "emptyWindows",
           "layout": "split",
@@ -2924,7 +2918,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 132.825,
+          "t": 131.975,
           "id": "memory-cut-069",
           "background": "morningVault",
           "layout": "split",
@@ -2954,7 +2948,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 133.13125,
+          "t": 132.26875,
           "id": "memory-cut-070",
           "background": "emptyWindows",
           "layout": "split",
@@ -2986,7 +2980,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 133.4375,
+          "t": 132.5625,
           "id": "memory-cut-071",
           "background": "petalRoad",
           "layout": "split",
@@ -3016,7 +3010,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 133.74375,
+          "t": 132.85625,
           "id": "memory-cut-072",
           "background": "voidCut",
           "layout": "aperture",
@@ -3038,7 +3032,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 134.05,
+          "t": 133.15,
           "id": "memory-cut-073",
           "background": "archiveCut",
           "layout": "split",
@@ -3068,7 +3062,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 134.35625,
+          "t": 133.44375,
           "id": "memory-cut-074",
           "background": "petalRoad",
           "layout": "aperture",
@@ -3098,7 +3092,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 134.6625,
+          "t": 133.7375,
           "id": "memory-cut-075",
           "background": "paperVault",
           "layout": "contact",
@@ -3119,7 +3113,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 134.96875,
+          "t": 134.03125,
           "id": "memory-cut-076",
           "background": "voidCut",
           "layout": "aperture",
@@ -3149,7 +3143,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 135.275,
+          "t": 134.325,
           "id": "memory-cut-077",
           "background": "city",
           "layout": "strips",
@@ -3181,7 +3175,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 135.58125,
+          "t": 134.61875,
           "id": "memory-cut-078",
           "background": "emptyWindows",
           "layout": "strips",
@@ -3213,7 +3207,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 135.8875,
+          "t": 134.9125,
           "id": "memory-cut-079",
           "background": "emptyWindows",
           "layout": "strips",
@@ -3244,7 +3238,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 136.19375,
+          "t": 135.20625,
           "id": "memory-cut-080",
           "background": "morningVault",
           "layout": "aperture",
@@ -3278,15 +3272,15 @@ window.TIMELINE = {
       "followExpressions": false
     },
     {
-      "t": 136.5,
+      "t": 135.5,
       "id": "reach-into-absence",
       "stage": "fracture",
-      "pose": "standReachOpen",
-      "action": "Black strings crying 在 136.5 秒进入：正面强势站姿伸手，保留印刷硬影与切面；146 秒才落到掩面痛哭特写。",
-      "x": 70,
-      "y": 5,
-      "scale": 0.94,
-      "framing": "full",
+      "pose": "openPalms",
+      "action": "135.5 秒 Black strings crying 进入强段，改用之前 106 秒的摊手细节图；146 秒接掩面痛哭。",
+      "x": 74,
+      "y": -9,
+      "scale": 1.04,
+      "framing": "portrait",
       "printShadow": false,
       "motion": 0,
       "opacity": 1,
@@ -3304,12 +3298,12 @@ window.TIMELINE = {
         "zoomTo": 1.1,
         "fromX": 0,
         "toX": -1,
-        "startTime": 136.5,
-        "duration": 9.5,
+        "startTime": 135.5,
+        "duration": 10.5,
         "ease": "smooth"
       },
       "petals": {
-        "startTime": 136.5,
+        "startTime": 135.5,
         "end": 146,
         "count": 4,
         "drift": -0.2
@@ -3390,7 +3384,7 @@ window.TIMELINE = {
       "t": 167.5,
       "id": "walk-beyond-the-last-plea",
       "stage": "road",
-      "pose": "walk",
+      "pose": "walk2",
       "followExpressions": false,
       "x": 78,
       "y": 5,
@@ -3400,7 +3394,7 @@ window.TIMELINE = {
       "motion": 0,
       "opacity": 1,
       "fitVisible": true,
-      "treatment": "color",
+      "treatment": "silhouette",
       "animationTimeStart": 167.5,
       "animationStart": 0,
       "animationSpeed": 0.7,
@@ -3411,7 +3405,7 @@ window.TIMELINE = {
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "action": "167.5 秒切新场景，使用黑白印刷感更强的另一段 walk 素材；步行时间一直延续到 188 秒。",
+      "action": "167.5 秒改为较自然的 walk2 深色剪影，不再显示黑白印刷立绘。步行持续到 188 秒。",
       "backgroundMotion": {
         "zoom": 1.25,
         "fromX": 8,
@@ -3426,13 +3420,15 @@ window.TIMELINE = {
         "end": 188,
         "count": 5,
         "drift": -0.22
-      }
+      },
+      "silhouetteColor": "#211426",
+      "rimColor": "#be879c"
     },
     {
       "t": 182,
       "id": "walking-past-the-records",
       "stage": "road",
-      "pose": "walk",
+      "pose": "walk2",
       "followExpressions": false,
       "x": 78,
       "y": 5,
@@ -3442,7 +3438,7 @@ window.TIMELINE = {
       "motion": 0,
       "opacity": 1,
       "fitVisible": true,
-      "treatment": "color",
+      "treatment": "silhouette",
       "animationTimeStart": 167.5,
       "animationStart": 0,
       "animationSpeed": 0.7,
@@ -3453,7 +3449,7 @@ window.TIMELINE = {
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "action": "182 秒 You were here 换背景，人物步行相位不中断；匿名相片、信件与物件像列车窗画框一样从身后流过，不做独奏式硬切。",
+      "action": "182 秒换背景，继续相同 walk2 剪影及步行相位；记忆画框从身后流过。",
       "backgroundMotion": {
         "zoom": 1.12,
         "fromX": 2,
@@ -3623,11 +3619,13 @@ window.TIMELINE = {
         "end": 188,
         "count": 5,
         "drift": -0.22
-      }
+      },
+      "silhouetteColor": "#211426",
+      "rimColor": "#be879c"
     },
     {
       "t": 188,
-      "id": "two-seconds-of-black",
+      "id": "one-second-of-black",
       "stage": "black",
       "pose": null,
       "followExpressions": false,
@@ -3637,14 +3635,14 @@ window.TIMELINE = {
       "subtitleX": 6,
       "subtitleY": 8,
       "stickers": [],
-      "action": "188–190 秒纯黑间断，歌曲继续；不显示字幕、人物、花瓣或雪花。"
+      "action": "188–189 秒纯黑间断，歌曲继续，不显示字幕与雪花。"
     },
     {
-      "t": 190,
+      "t": 189,
       "id": "the-things-remain",
       "stage": "outro",
       "pose": null,
-      "action": "190 秒直接接原 193 秒的空框、纸面残物、钥匙与杯子，人物不再出现。",
+      "action": "189 秒结束黑屏，直接接空框、钥匙、便条和杯子的段落。",
       "x": 73,
       "y": 7,
       "scale": 0.76,
@@ -3663,7 +3661,7 @@ window.TIMELINE = {
         {
           "id": "remaining-empty-mount",
           "asset": "frameCut",
-          "start": 190,
+          "start": 189,
           "end": 213.68,
           "x": 73,
           "y": 49,
@@ -3679,7 +3677,7 @@ window.TIMELINE = {
           "y": 66,
           "height": 15,
           "rotation": 5,
-          "start": 190,
+          "start": 189,
           "end": 213.68,
           "opacity": 0.9,
           "layer": "back",
@@ -3692,7 +3690,7 @@ window.TIMELINE = {
           "y": 63,
           "height": 22,
           "rotation": -7,
-          "start": 190,
+          "start": 189,
           "end": 213.68,
           "opacity": 0.9,
           "layer": "back",
@@ -3705,7 +3703,7 @@ window.TIMELINE = {
           "y": 70,
           "height": 12,
           "rotation": -2,
-          "start": 190,
+          "start": 189,
           "end": 213.68,
           "opacity": 0.9,
           "layer": "back",
@@ -3923,7 +3921,7 @@ window.TIMELINE = {
       "end": 112
     },
     {
-      "time": 136.5,
+      "time": 135.5,
       "section": "BRIDGE",
       "text": "Black strings crying\nThrough the open air",
       "end": 139
@@ -4082,6 +4080,11 @@ window.TIMELINE = {
           "restoration": 0
         }
       ]
+    },
+    "eq": {
+      "hi": 0,
+      "mid": 0,
+      "lo": 0
     }
   },
   "seatedSprites": {

@@ -8,17 +8,18 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2310151e'/%3E%3Cpath d='M8 5h7c14 0 14 22 0 22H8z' fill='%23d2f850'/%3E%3C/svg%3E">
   <link rel="preload" as="image" href="assets/props/city.webp">
   <link rel="preload" as="image" href="assets/ui/koharu-tape-decal.png">
-  <link rel="stylesheet" href="style.css?v=0.20">
-  <link rel="stylesheet" href="receiver.css?v=0.20">
-  <script defer src="timeline.js?v=0.20"></script>
-  <script defer src="assets/audio-analysis.js?v=0.20"></script>
-  <script defer src="audio.js?v=0.20"></script>
-  <script defer src="signal.js?v=0.20"></script>
-  <script defer src="meters.js?v=0.20"></script>
-  <script defer src="film.js?v=0.20"></script>
-  <script defer src="cassette.js?v=0.20"></script>
-  <script defer src="opening.js?v=0.20"></script>
-  <script defer src="app.js?v=0.20"></script>
+  <link rel="stylesheet" href="style.css?v=0.21">
+  <link rel="stylesheet" href="receiver.css?v=0.21">
+  <script defer src="timeline.js?v=0.21"></script>
+  <script defer src="assets/audio-analysis.js?v=0.21"></script>
+  <script defer src="audio.js?v=0.21"></script>
+  <script defer src="tone.js?v=0.21"></script>
+  <script defer src="signal.js?v=0.21"></script>
+  <script defer src="meters.js?v=0.21"></script>
+  <script defer src="film.js?v=0.21"></script>
+  <script defer src="cassette.js?v=0.21"></script>
+  <script defer src="opening.js?v=0.21"></script>
+  <script defer src="app.js?v=0.21"></script>
 </head>
 <body>
   <div id="viewport">
@@ -116,6 +117,16 @@
           </div>
         </section>
 
+        <section class="tone-panel" aria-label="Three band equalizer">
+          <div class="module-header"><span>TONE CONTROL</span><b>EQ</b></div>
+          <div class="tone-controls">
+            <label class="tone-control"><span>HI</span><span id="dialHi" class="tone-dial"><i class="dial-cap"></i><input id="eqHi" type="range" min="-12" max="12" step="0.5" value="0" aria-label="High frequency gain" title="High shelf · 6 kHz. Drag, scroll or use arrow keys. Double click to reset."></span><output id="eqHiLabel" for="eqHi">0.0 dB</output></label>
+            <label class="tone-control"><span>MID</span><span id="dialMid" class="tone-dial"><i class="dial-cap"></i><input id="eqMid" type="range" min="-12" max="12" step="0.5" value="0" aria-label="Mid frequency gain" title="Mid bell · 1.2 kHz. Drag, scroll or use arrow keys. Double click to reset."></span><output id="eqMidLabel" for="eqMid">0.0 dB</output></label>
+            <label class="tone-control"><span>LO</span><span id="dialLo" class="tone-dial"><i class="dial-cap"></i><input id="eqLo" type="range" min="-12" max="12" step="0.5" value="0" aria-label="Low frequency gain" title="Low shelf · 120 Hz. Drag, scroll or use arrow keys. Double click to reset."></span><output id="eqLoLabel" for="eqLo">0.0 dB</output></label>
+          </div>
+          <div class="tone-caption"><span>−12</span><b>DIRECT EQ</b><span>+12 dB</span></div>
+        </section>
+
         <section class="wave-deck" aria-label="Audio waveform and playback position">
           <div class="timeline-head">
             <span class="timeline-name">SIDE A <strong>FALLING FLOWERS</strong></span>
@@ -127,6 +138,12 @@
             <input id="seek" type="range" min="0" max="213.68" step="0.01" value="0" aria-label="Playback position">
           </div>
           <div class="timeline-labels" aria-hidden="true"><span>00:00</span><span>01:00</span><span>02:00</span><span>03:00</span><span id="endTime">03:33</span></div>
+        </section>
+
+        <section class="spectrum-panel" aria-label="Live post equalizer programme spectrum">
+          <div class="module-header"><span>SPECTRUM</span><b>POST EQ</b></div>
+          <div class="spectrum-bezel"><canvas id="spectrum" width="420" height="216" aria-label="Live frequency bands from 35 Hz to 18 kHz"></canvas></div>
+          <div class="spectrum-scale" aria-hidden="true"><span>40</span><span>250</span><span>1k</span><span>4k</span><span>16k</span></div>
         </section>
 
         <section class="phase-panel" aria-label="Stereo phase scope">

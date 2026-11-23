@@ -97,6 +97,8 @@ button svg { display: block; fill: currentColor; }
   font-size: calc(25px * var(--lyric-scale, 1));
   font-weight: 500;
   font-style: normal;
+  font-variant-ligatures: none;
+  will-change: opacity;
   line-height: 1.3;
   letter-spacing: .015em;
   text-shadow: 0 1px 0 #17131b;

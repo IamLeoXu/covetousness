@@ -7,6 +7,8 @@
       this.context=null;this.analysers=null;this.source=null;this.gain=null;this.initializing=null;
       this.restoration=1;this.analysisGain=null;this.restoreNodes=null;
       this.mode='stop';this.musicGate=null;this.windGain=null;this.sfxMaster=null;this.sounds=new Map();
+      this.tone={lo:0,mid:0,hi:0};this.eqNodes=null;this.spectrumAnalyser=null;
+      this.spectrumBins=new Float32Array(1024);this.spectrumBands=new Float32Array(24);
       this.localReady=null;
       this.originalMusic=audio.getAttribute?.('src')||audio.src;
       this.overview=cache?.overview||null;this.buffers=[new Float32Array(1024),new Float32Array(1024)];
@@ -32,6 +34,11 @@
       else this.audio.volume=gain;
     }
     setMuted(v){this.muted=!!v;this.setVolume(this.volume);}
+    setTone(band,value){
+      if(!Object.prototype.hasOwnProperty.call(this.tone,band))return;
+      this.tone[band]=Math.max(-12,Math.min(12,Number(value)||0));
+      if(this.eqNodes)this.eqNodes[band].gain.setTargetAtTime(this.tone[band],this.context.currentTime,.025);
+    }
     setRestoration(value,immediate=false){
       const amount=Math.max(0,Math.min(1,Number(value)||0));
       if(!immediate&&Math.abs(amount-this.restoration)<.001)return;
@@ -84,11 +91,20 @@
         const dry=this.context.createGain(),wet=this.context.createGain();
         const high=this.context.createBiquadFilter(),low=this.context.createBiquadFilter();
         high.type='highpass';high.Q.value=.55;low.type='lowpass';low.Q.value=.55;
+        const eqLo=this.context.createBiquadFilter(),eqMid=this.context.createBiquadFilter(),eqHi=this.context.createBiquadFilter();
+        eqLo.type='lowshelf';eqLo.frequency.value=120;
+        eqMid.type='peaking';eqMid.frequency.value=1200;eqMid.Q.value=.8;
+        eqHi.type='highshelf';eqHi.frequency.value=6000;
+        this.eqNodes={lo:eqLo,mid:eqMid,hi:eqHi};
+        this.source.connect(eqLo);eqLo.connect(eqMid);eqMid.connect(eqHi);
+        for(const band of ['lo','mid','hi'])this.setTone(band,this.tone[band]);
         const colour=this.context.createWaveShaper(),curve=new Float32Array(4096);
         for(let i=0;i<curve.length;i++){const x=i*2/(curve.length-1)-1;curve[i]=Math.tanh(x*1.45)/Math.tanh(1.45);}
         colour.curve=curve;colour.oversample='2x';
-        this.source.connect(dry);dry.connect(this.musicGate);
-        this.source.connect(high);high.connect(low);low.connect(colour);colour.connect(wet);wet.connect(this.musicGate);
+        eqHi.connect(dry);dry.connect(this.musicGate);
+        eqHi.connect(high);high.connect(low);low.connect(colour);colour.connect(wet);wet.connect(this.musicGate);
+        this.spectrumAnalyser=this.context.createAnalyser();this.spectrumAnalyser.fftSize=2048;
+        this.spectrumAnalyser.smoothingTimeConstant=.72;this.musicGate.connect(this.spectrumAnalyser);
         // This analysis branch never receives filtering, saturation or generated noise.
         this.source.connect(this.analysisGain);
         const splitter=this.context.createChannelSplitter(2);this.analysisGain.connect(splitter);
@@ -121,7 +137,7 @@
         this.gain?.disconnect();this.analysisGain?.disconnect();
         if(this.source){try{this.source.disconnect();this.source.connect(this.context.destination);}catch{}}
         try{this.wind?.stop();this.sfxMaster?.disconnect();this.musicGate?.disconnect();}catch{}
-        this.gain=null;this.analysisGain=null;this.restoreNodes=null;this.analysers=null;this.setVolume(this.volume);
+        this.gain=null;this.analysisGain=null;this.restoreNodes=null;this.analysers=null;this.eqNodes=null;this.spectrumAnalyser=null;this.setVolume(this.volume);
       }
     }
     async unlock(){
@@ -234,6 +250,38 @@
           ctx.fillRect(i*step,y,Math.max(.8,step*.7),height);
         }
         ctx.globalAlpha=1;
+      }
+    }
+    readSpectrum(audible){
+      const levels=this.spectrumBands;levels.fill(0);
+      if(!audible||!this.spectrumAnalyser||this.muted||this.volume===0)return levels;
+      const analyser=this.spectrumAnalyser,bins=this.spectrumBins;
+      analyser.getFloatFrequencyData(bins);
+      const hz=this.context.sampleRate/analyser.fftSize,masterDb=20*Math.log10(this.volume);
+      for(let band=0;band<levels.length;band++){
+        const from=35*Math.pow(18000/35,band/levels.length),to=35*Math.pow(18000/35,(band+1)/levels.length);
+        const start=Math.max(1,Math.floor(from/hz)),end=Math.min(bins.length-1,Math.max(start,Math.ceil(to/hz)));
+        let power=0,count=0;
+        for(let i=start;i<=end;i++){if(Number.isFinite(bins[i]))power+=Math.pow(10,bins[i]/10);count++;}
+        const db=power>0?10*Math.log10(power/Math.max(1,count))+masterDb:-100;
+        levels[band]=Math.max(0,Math.min(1,(db+72)/66));
+      }
+      return levels;
+    }
+    drawSpectrum(canvas,audible){
+      const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,levels=this.readSpectrum(audible);
+      ctx.clearRect(0,0,w,h);ctx.fillStyle='#0c131c';ctx.fillRect(0,0,w,h);
+      const left=36,right=w-10,top=9,bottom=h-10;
+      ctx.font='15px Consolas,monospace';ctx.textAlign='right';ctx.lineWidth=1;
+      for(const db of [-12,-36,-60]){
+        const y=bottom-(db+72)/66*(bottom-top);ctx.strokeStyle='#34404a';ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();ctx.fillStyle='#84958e';ctx.fillText(String(db),left-6,y+5);
+      }
+      const step=(right-left)/levels.length;
+      for(let i=0;i<levels.length;i++){
+        const value=levels[i],height=value*(bottom-top),x=left+i*step;
+        ctx.fillStyle=i<8?'#d2f850':i<16?'#aa90ff':'#e7d9e0';
+        ctx.fillRect(x,bottom-height,Math.max(2,step-4),height);
+        if(value>.006){ctx.fillStyle='#ff756a';ctx.fillRect(x,bottom-height,Math.max(2,step-4),2.5);}
       }
     }
     drawPhase(canvas,signal){

@@ -164,7 +164,18 @@
       const { scene, index } = this.getScene(t);
       const fade = this.data.settings.transitionSeconds ?? .6;
       const local = t - scene.t;
-      if(index>0&&scene.transition==='light-cut'&&local<(scene.transitionDuration??.32)&&!this.reducedMotion){
+      if(index>0&&scene.transition==='window-wipe'&&local<(scene.transitionDuration??.72)&&!this.reducedMotion){
+        const w=this.width,h=this.height,p=smooth(local/(scene.transitionDuration??.72));
+        // The window frame moves across the backgrounds. Render the continuing walk only once.
+        this.drawShot(this.ctx,{...this.data.scenes[index-1],pose:null},scene.t-1e-6);
+        this.drawShot(this.nextCtx,{...scene,pose:null},t);
+        const edge=mix(w*1.12,-w*.12,p),width=w*.12;
+        this.ctx.save();this.ctx.beginPath();this.ctx.rect(edge,0,w-edge,h);this.ctx.clip();this.ctx.drawImage(this.next,0,0,w,h);this.ctx.restore();
+        const glass=this.ctx.createLinearGradient(edge-width/2,0,edge+width/2,0);
+        glass.addColorStop(0,'#0a0f1800');glass.addColorStop(.36,'#090e1cc9');glass.addColorStop(.52,'#151926f2');glass.addColorStop(.66,'#3d33486b');glass.addColorStop(1,'#0a0f1800');
+        this.ctx.fillStyle=glass;this.ctx.fillRect(edge-width/2,0,width,h);
+        this.portrait(this.ctx,scene,t);
+      }else if(index>0&&scene.transition==='light-cut'&&local<(scene.transitionDuration??.32)&&!this.reducedMotion){
         const p=smooth(local/(scene.transitionDuration??.32)),w=this.width,h=this.height;
         this.drawShot(this.ctx,this.data.scenes[index-1],t);
         this.drawShot(this.nextCtx,scene,t);
@@ -435,41 +446,33 @@
       }
     }
 
-    rainOnGlass(ctx, scene, t) {
-      if(!scene.weather||scene.weather==='none')return;
-      const names=['rainBead','rainSlide','rainDouble','rainRun'];
-      const clock=this.reducedMotion?3:t;
-      const strength=scene.rainIntensity??1;
-      // Two depths of painted rain: wind-blown streaks beyond the glass and slower near beads.
-      for(let i=0;i<46;i++){
-        const seed=fract((i+1)*.6180339),asset=this.props[i%3?'rainRun':'rainSlide'];
-        if(!asset?.ready)continue;
-        const life=.65+seed*1.4,p=fract(clock/life+i*.71317);
-        const x=fract(i*.38197-p*(.025+seed*.035));
-        const h=this.height*(.075+seed*.15),w=Math.max(1.5,h*asset.image.width/asset.image.height*.36);
-        ctx.save();ctx.globalAlpha=strength*(.15+seed*.19)*Math.sin(Math.PI*p);
-        ctx.translate(x*this.width,(-.2+p*1.4)*this.height);ctx.rotate(.10);
-        ctx.drawImage(asset.image,-w/2,-h/2,w,h);ctx.restore();
+    rainField(ctx,scene,t,plane='all') {
+      if(scene.weather!=='rain')return;
+      const clock=this.reducedMotion?3:t,strength=clamp(scene.rainIntensity??1,0,2);
+      for(const near of [false,true]){
+        if(plane!=='all'&&plane!==(near?'near':'far'))continue;
+        const count=near?22:64;
+        ctx.save();ctx.lineCap='butt';ctx.strokeStyle=near?'#d0cbd8':'#c0bacd';
+        for(let i=0;i<count;i++){
+          const seed=fract((i+1+(near?91:0))*.6180339887),depth=fract(i*.381971+.23);
+          const phase=fract(clock*(.9+seed*.65)+i*.71213);
+          const length=(near?10:5)+depth*(near?12:9),x=fract(seed-phase*.045)*this.width;
+          const y=phase*(this.height+length*2)-length;
+          ctx.lineWidth=near ? .65+depth*.3 : .4+depth*.25;
+          ctx.globalAlpha=strength*(near ? .12+depth*.12 : .055+depth*.1);
+          ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-length*.16,y+length);ctx.stroke();
+        }
+        ctx.restore();
       }
-      for(let i=0;i<13;i++){
-        const depth=fract(i*.61813),asset=this.props[names[i%4]];
-        if(!asset?.ready)continue;
-        const x=fract(.07+i*.38197+Math.sin(clock*.075+i)*.003);
-        const y=fract(i*.71213+clock*(.007+depth*.018));
-        const h=this.height*(i%4===3?.19:.022+depth*.039),w=h*asset.image.width/asset.image.height;
-        ctx.save();ctx.globalAlpha=strength*(.25+depth*.22);
-        ctx.drawImage(asset.image,x*this.width,y*this.height,w,h);ctx.restore();
-      }
-      const haze=ctx.createLinearGradient(0,0,0,this.height);
-      haze.addColorStop(0,'#c0adba05');haze.addColorStop(.52,'#12132000');haze.addColorStop(1,'#b58b9c0d');
-      fill(ctx,this.width,this.height,haze);
     }
 
     city(ctx, scene, t) {
       this.background(ctx, scene, t, 'city');
       this.polygon(ctx, [[.48, 0], [1, 0], [1, 1], [.74, 1]], '#30132270');
       this.drawStickers(ctx, scene, t, 'back');
+      this.rainField(ctx,scene,t,'far');
       this.portrait(ctx, scene, t);
+      this.rainField(ctx,scene,t,'near');
       if (scene.stage === 'departure') {
         const p = smooth((t - 24.5) / 6.5);
         this.polygon(ctx, [[.48, 0], [.54, 0], [.33, .68], [.25, .68]], '#f9dfb0' + Math.round(mix(80, 15, p)).toString(16).padStart(2, '0'));
@@ -489,7 +492,9 @@
       this.background(ctx, scene, t);
       this.drawStickers(ctx, scene, t, 'back');
       this.petalField(ctx,scene,t);
+      this.rainField(ctx,scene,t,'far');
       this.portrait(ctx, scene, t);
+      this.rainField(ctx,scene,t,'near');
       this.drawStickers(ctx, scene, t, 'front');
     }
 
@@ -499,7 +504,6 @@
       if (scene.flashbacks?.length && !nested) this.flashback(ctx, scene, t);
       else if (scene.stage === 'rain' || scene.stage === 'departure') this.city(ctx, scene, t);
       else this.collage(ctx, scene, t);
-      if(!scene.flashbacks?.length)this.rainOnGlass(ctx,scene,t);
       // A readability wash is composition, not a generated illustration.
       const shade = ctx.createLinearGradient(0, this.height * .7, 0, this.height);
       shade.addColorStop(0, '#17131b00'); shade.addColorStop(1, '#17131b70');
@@ -537,7 +541,7 @@
           if (state.asset==='frame') this.framed(ctx,state.x,state.y,state.height,state.content,{angle:state.angle,alpha:state.opacity,fade:state.contentOpacity});
           else this.prop(ctx,state.asset,state.x,state.y,state.height,state.angle,state.opacity,false);
         }
-        this.rainOnGlass(ctx,shot,t);
+        this.rainField(ctx,shot,t);
       }
     }
 
