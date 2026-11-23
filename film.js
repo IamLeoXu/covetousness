@@ -89,7 +89,12 @@
       if(Number.isFinite(shot.animationEndTime)&&shot.animationEndTime>origin){
         const first=clamp(Math.floor((shot.animationStart??0)*animation.fps),0,animation.frames.length-1);
         const last=clamp(shot.animationEndFrame??animation.frames.length-1,first,animation.frames.length-1);
-        const progress=clamp((t-origin)/(shot.animationEndTime-origin));
+        const duration=shot.animationEndTime-origin,elapsed=clamp(t-origin,0,duration);
+        const fps=Number(shot.animationFps);
+        // Hold retimed poses at the requested cadence while preserving the exact final frame.
+        const sampled=Number.isFinite(fps)&&fps>0&&elapsed<duration
+          ? Math.floor(elapsed*fps+1e-7)/fps : elapsed;
+        const progress=sampled/duration;
         return Math.min(last,Math.floor(mix(first,last,progress)+1e-7));
       }
       const speed = Math.max(0, Number(shot.animationSpeed ?? 1) || 0);

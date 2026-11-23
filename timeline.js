@@ -1,6 +1,6 @@
-/* DEAD AIR v0.22: dry plastic keys, an empty-handed kneeling shot, and swapped aligned MOV cues. */
+/* DEAD AIR v0.22.1: keep the early lowhead silhouette at a 10 fps cadence. */
 window.TIMELINE = {
-  "version": "0.22",
+  "version": "0.22.1",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -318,7 +318,7 @@ window.TIMELINE = {
       "id": "first-realisation-through-light",
       "stage": "departure",
       "pose": "lowhead",
-      "action": "窄光转场后使用原片尾 lowhead，保持深色剪影。28 秒 And I knew then 起动作，31 秒收至末帧，过渡开始前段保持首帧。",
+      "action": "窄光转场后使用原片尾 lowhead，保持深色剪影。28 秒 And I knew then 起动作，以 10 帧/秒的画面节奏播放，31 秒收至末帧，过渡开始前段保持首帧。",
       "x": 75,
       "y": 5,
       "scale": 0.86,
@@ -345,7 +345,7 @@ window.TIMELINE = {
       "motion": 0,
       "followExpressions": false,
       "animationLoop": false,
-      "animationSpeed": 0.72,
+      "animationSpeed": 0.1,
       "animationTimeStart": 28,
       "weather": "rain",
       "rainIntensity": 0.8,
@@ -354,10 +354,11 @@ window.TIMELINE = {
       "fitVisible": true,
       "animationStart": 0,
       "animationEndTime": 31,
+      "animationFps": 5,
       "transitionDuration": 0.32
     },
     {
-      "t": 31,
+      "t": 31.5,
       "id": "first-plea",
       "stage": "memory",
       "pose": "cry",
@@ -3790,7 +3791,7 @@ window.TIMELINE = {
       "end": 31
     },
     {
-      "time": 31,
+      "time": 31.5,
       "section": "CHORUS 1",
       "text": "Falling flowers, stay\nJust a little while",
       "end": 35
