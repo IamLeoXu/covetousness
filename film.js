@@ -85,6 +85,13 @@
       const animation = this.animations[shot.pose];
       if (!animation?.frames.length) return 0;
       if(this.reducedMotion)return animation.posterIndex;
+      const origin=Number(shot.animationTimeStart??shot.t??0);
+      if(Number.isFinite(shot.animationEndTime)&&shot.animationEndTime>origin){
+        const first=clamp(Math.floor((shot.animationStart??0)*animation.fps),0,animation.frames.length-1);
+        const last=clamp(shot.animationEndFrame??animation.frames.length-1,first,animation.frames.length-1);
+        const progress=clamp((t-origin)/(shot.animationEndTime-origin));
+        return Math.min(last,Math.floor(mix(first,last,progress)+1e-7));
+      }
       const speed = Math.max(0, Number(shot.animationSpeed ?? 1) || 0);
       const start = Math.max(0, Number(shot.animationStart ?? 0) || 0);
       const elapsed = Math.max(0, t - (shot.animationTimeStart ?? shot.t ?? 0)) * speed + start;
@@ -139,7 +146,7 @@
     }
 
     updateLyrics(t, scene) {
-      const cue = this.data.lyrics.find(line => t >= line.time && t < line.end) || null;
+      const cue = scene.hideLyrics ? null : this.data.lyrics.find(line => t >= line.time && t < line.end) || null;
       if (cue !== this.currentLyric) {
         const words = (cue?.text || '').split('\n');
         this.lines[0].textContent = words[0] || '';
@@ -157,7 +164,15 @@
       const { scene, index } = this.getScene(t);
       const fade = this.data.settings.transitionSeconds ?? .6;
       const local = t - scene.t;
-      if (index > 0 && local < fade && scene.transition === 'fade' && !this.reducedMotion) {
+      if(index>0&&scene.transition==='light-cut'&&local<(scene.transitionDuration??.32)&&!this.reducedMotion){
+        const p=smooth(local/(scene.transitionDuration??.32)),w=this.width,h=this.height;
+        this.drawShot(this.ctx,this.data.scenes[index-1],t);
+        this.drawShot(this.nextCtx,scene,t);
+        const edge=mix(w*1.2,-w*.2,p),slant=w*.075;
+        this.ctx.save();this.ctx.beginPath();this.ctx.moveTo(edge+slant,0);this.ctx.lineTo(w,0);this.ctx.lineTo(w,h);this.ctx.lineTo(edge-slant,h);this.ctx.closePath();this.ctx.clip();
+        this.ctx.drawImage(this.next,0,0,w,h);this.ctx.restore();
+        this.polygon(this.ctx,[[edge/w+.075,0],[edge/w+.095,0],[edge/w-.055,1],[edge/w-.075,1]],'#f6dfbf');
+      }else if (index > 0 && local < fade && scene.transition === 'fade' && !this.reducedMotion) {
         const previous = this.data.scenes[index - 1];
         // Hold the outgoing expression before the new cue, including its own layout.
         this.drawShot(this.ctx, previous, Math.max(previous.t, scene.t - 1e-6));
@@ -235,6 +250,11 @@
         const clock = this.reducedMotion ? 72 : 69 + Math.max(0, t - motionStart);
         const anchor = Number(motion.anchorX ?? mix(-20, 125, fract(index / (motion.count || 4))));
         x += this.facePosition(clock, depth, index, motion.count || 4) * 100 - anchor;
+      } else if(motion.preset==='passing'){
+        const count=Math.max(1,Number(motion.count)||6),index=Number(motion.index)||0;
+        const clock=this.reducedMotion?2:Math.max(0,t-motionStart),speed=Number(motion.speed)||.14;
+        const phase=fract(index/count-clock*speed*(Number(motion.depth)||1));
+        x=mix(-20,125,phase);
       } else if (motion.preset === 'archive') {
         const index = Number(motion.index) || 0;
         const clock = t - motionStart + (Number(motion.offset) || 0);
@@ -342,12 +362,14 @@
       const isSilhouette = shot.treatment === 'silhouette';
       const img = isSilhouette ? this.silhouette(shot) : mixed || asset.image;
       const defaultScale = !this.animations[shot.pose] && shot.framing !== 'portrait' ? .82 : 1;
-      const h = this.height * (shot.scale ?? defaultScale), w = h * img.width / img.height;
+      const registration=shot.fitVisible&&this.data.animations?.[shot.pose]?.registration;
+      const bounds=registration||{x:0,y:0,width:img.width,height:img.height};
+      const h = this.height * (shot.scale ?? defaultScale)*img.height/bounds.height, w = h * img.width / img.height;
       const motion = shot.motion ?? this.data.settings.motion ?? 1;
       const drift = this.reducedMotion ? 0 : Math.sin(t * .6) * this.height * .002 * motion;
       // x is the sprite's horizontal centre; y is its bottom's distance above the frame bottom.
-      const x = this.width * (shot.x ?? 50) / 100 - w / 2;
-      const y = this.height * (1 - (shot.y ?? 0) / 100) - h + drift;
+      const x = this.width * (shot.x ?? 50) / 100 - (bounds.x+bounds.width/2)/img.width*w;
+      const y = this.height * (1 - (shot.y ?? 0) / 100) - (bounds.y+bounds.height)/img.height*h + drift;
       const opacity = shot.opacity ?? 1;
       ctx.save(); ctx.globalAlpha = opacity;
       if(isSilhouette && shot.rimColor){
@@ -401,7 +423,7 @@
       const names=this.data.settings.petalAssets||[],count=field.count??7;
       if(!names.length)return;
       const clock=this.reducedMotion?4:Math.max(0,t-(field.startTime??scene.t));
-      const presence=Math.min(smooth((t-scene.t)/.8),smooth(((field.end??this.data.duration)-t)/1.5));
+      const presence=Math.min(smooth((t-(field.startTime??scene.t))/.8),smooth(((field.end??this.data.duration)-t)/1.5));
       for(let i=0;i<count;i++){
         const seed=fract((i+1)*.6180339),life=12+seed*8;
         const p=fract(clock/life+fract(i*.38197));
@@ -472,6 +494,7 @@
     }
 
     drawShot(ctx, scene, t, nested = false) {
+      if(scene.stage==='black'){fill(ctx,this.width,this.height,'#000');return;}
       ctx.save(); fill(ctx, this.width, this.height, '#17131b');
       if (scene.flashbacks?.length && !nested) this.flashback(ctx, scene, t);
       else if (scene.stage === 'rain' || scene.stage === 'departure') this.city(ctx, scene, t);

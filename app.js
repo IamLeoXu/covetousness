@@ -68,7 +68,8 @@
     $('signalAuto').setAttribute('aria-pressed',String(values.automatic));
     $('trackingState').textContent=values.tracking>.94?'SIGNAL LOCK':values.tracking>.25?'TRACKING':'SIGNAL LOST';
     signal.setRestoration(values.restoration);
-    display.render(time,values.tracking,noiseClock);
+    const blank=film.getScene(time).scene.stage==='black';
+    display.render(time,blank?1:values.tracking,noiseClock);
   }
   updateRestoration();
 

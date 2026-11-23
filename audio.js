@@ -141,7 +141,16 @@
     makeSound(kind){
       if(this.sounds.has(kind))return this.sounds.get(kind);
       const rate=this.context.sampleRate,wind=kind==='wind';
-      const duration=wind ? 4 : kind==='insert' ? .28 : kind==='latch' ? .23 : .105;
+      const profiles={
+        key:{duration:.10,gap:.018,pitch:1780,body:.055},
+        release:{duration:.09,gap:.014,pitch:2060,body:.035},
+        switch:{duration:.075,gap:.012,pitch:2280,body:.025},
+        fader:{duration:.055,gap:.009,pitch:1920,body:.015},
+        stop:{duration:.12,gap:.023,pitch:1520,body:.075},
+        insert:{duration:.16,gap:.061,pitch:1330,body:.08},
+        latch:{duration:.17,gap:.042,pitch:1050,body:.13}
+      };
+      const profile=profiles[kind]||profiles.key,duration=wind?4:profile.duration;
       const buffer=this.context.createBuffer(1,Math.ceil(rate*duration),rate),pcm=buffer.getChannelData(0);
       let seed=0x947ad51,low=0,previous=0;
       for(let i=0;i<pcm.length;i++){
@@ -152,12 +161,17 @@
           const mod=.75+.12*Math.sin(2*Math.PI*11*t)+.07*Math.sin(2*Math.PI*23*t);
           pcm[i]=low*.9+white*.12+mod*(.11*Math.sin(2*Math.PI*184*t)+.055*Math.sin(2*Math.PI*552*t));
         }else{
-          const heavy=kind==='latch'||kind==='stop',frequency=heavy?145:kind==='insert'?210:340;
-          const onset=Math.min(1,t/.0008),decay=Math.exp(-t/(heavy ? .032 : .017));
-          const click=high*.17*Math.exp(-t/.0035),body=Math.sin(t*Math.PI*2*frequency)*.38+low*1.2;
-          const catchTime=kind==='insert' ? .075 : .021,second=Math.max(0,t-catchTime);
-          const catchClick=t>catchTime ? high*.14*Math.exp(-second/.009) : 0;
-          pcm[i]=Math.max(-.9,Math.min(.9,onset*(click+body*decay+catchClick)));
+          // Two dry contacts form a crisp plastic snap. The hatch has a wider, lower latch bite.
+          const contact=(u,level,pitch)=>{
+            if(u<0)return 0;
+            const attack=Math.min(1,u/.00022),edge=Math.exp(-u/.0016),shell=Math.exp(-u/.0058);
+            return level*attack*(high*.29*edge+white*.16*shell+
+              (Math.sin(2*Math.PI*pitch*u)*.16+Math.sin(2*Math.PI*pitch*2.73*u)*.065)*shell);
+          };
+          const a=contact(t,1,profile.pitch),b=contact(t-profile.gap,kind==='latch' ? .95 : .72,profile.pitch*1.27);
+          const body=profile.body*Math.sin(2*Math.PI*(kind==='latch'?470:790)*t)*Math.exp(-t/.008);
+          const catchTick=kind==='latch'?contact(t-.071,.25,2840):0;
+          pcm[i]=Math.max(-.92,Math.min(.92,a+b+body+catchTick));
         }
       }
       this.sounds.set(kind,buffer);return buffer;
@@ -215,10 +229,11 @@
         const peaks=this.overview?.[ch];if(!peaks)continue;
         const step=w/peaks.length;const end=time/duration*w;
         for(let i=0;i<peaks.length;i++){
-          ctx.fillStyle=i*step<=end?'#d2f850':'#6c768c';
+          ctx.fillStyle=ch?'#aa90ff':'#d2f850';ctx.globalAlpha=i*step<=end?1:.43;
           const [min,max]=peaks[i];const y=mid-max*h*.205,height=Math.max(1,(max-min)*h*.205);
           ctx.fillRect(i*step,y,Math.max(.8,step*.7),height);
         }
+        ctx.globalAlpha=1;
       }
     }
     drawPhase(canvas,signal){

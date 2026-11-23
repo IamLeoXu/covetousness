@@ -1,6 +1,6 @@
-/* DEAD AIR v0.19: tape transport, signal automation and hard-cut memories. */
+/* DEAD AIR v0.20: continuous actions, two turns, walking memories and the last platform. */
 window.TIMELINE = {
-  "version": "0.19",
+  "version": "0.20",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -75,14 +75,26 @@ window.TIMELINE = {
       "frameCount": 30,
       "fps": 10,
       "loop": true,
-      "posterFrame": 0
+      "posterFrame": 0,
+      "registration": {
+        "x": 8,
+        "y": 0,
+        "width": 694,
+        "height": 1239
+      }
     },
     "walk2": {
       "src": "assets/character/animations/walk2/{frame}.webp",
       "frameCount": 30,
       "fps": 10,
       "loop": true,
-      "posterFrame": 0
+      "posterFrame": 0,
+      "registration": {
+        "x": 8,
+        "y": 0,
+        "width": 694,
+        "height": 1239
+      }
     },
     "cry": {
       "src": "assets/character/animations/cry/{frame}.webp",
@@ -129,6 +141,35 @@ window.TIMELINE = {
       "sourceSha256": "93409fd22bcfea7adc6ba1c743e041c70f14af6388561aecae21e19c108310bd",
       "duration": 5.5,
       "bytes": 18720928
+    },
+    "lowhead": {
+      "src": "assets/character/animations/lowhead/{frame}.webp",
+      "frameCount": 79,
+      "fps": 10,
+      "loop": false,
+      "posterFrame": 78,
+      "width": 660,
+      "height": 1250,
+      "sourceSize": [
+        720,
+        1280
+      ],
+      "crop": {
+        "x": 57,
+        "y": 17,
+        "width": 660,
+        "height": 1250
+      },
+      "registration": {
+        "x": 12,
+        "y": 12,
+        "width": 636,
+        "height": 1226
+      },
+      "sourceName": "lowhead.mov",
+      "sourceSha256": "c4545e18207af8f007d9871b22131507d163c0b2ad06c00739670a380ca4fb0d",
+      "duration": 7.9,
+      "bytes": 32061886
     }
   },
   "scenes": [
@@ -198,7 +239,8 @@ window.TIMELINE = {
       },
       "stickers": [],
       "weather": "rain",
-      "rainIntensity": 0.8
+      "rainIntensity": 0.8,
+      "followExpressions": false
     },
     {
       "t": 21,
@@ -230,26 +272,27 @@ window.TIMELINE = {
       },
       "stickers": [],
       "weather": "rain",
-      "rainIntensity": 0.8
+      "rainIntensity": 0.8,
+      "followExpressions": false
     },
     {
       "t": 24.5,
       "id": "half-in-the-light-return",
       "stage": "departure",
-      "pose": "lookback",
-      "action": "使用用户新增 lookback.mov 的透明动画，在半明半暗中回望；只呈现 Koharu，不新增歌词中 you 的身份。",
-      "x": 77,
-      "y": 6,
-      "scale": 0.85,
+      "pose": "walk",
+      "action": "You turned your face：重新开始深色步行剪影；27.6 秒由一道窄光扫过，衔接完整转身。",
+      "x": 75,
+      "y": 5,
+      "scale": 0.86,
       "opacity": 1,
-      "treatment": "color",
-      "silhouetteColor": "#150009",
+      "treatment": "silhouette",
+      "silhouetteColor": "#170b17",
       "camera": 2,
       "pan": 0.02,
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "transition": "fade",
+      "transition": "cut",
       "background": "city",
       "backgroundMotion": {
         "zoom": 1.5,
@@ -259,40 +302,72 @@ window.TIMELINE = {
         "duration": 6,
         "ease": "linear"
       },
-      "stickers": [
-        {
-          "id": "departure-frame",
-          "asset": "frame",
-          "start": 24.5,
-          "end": 31,
-          "x": 40,
-          "y": 43,
-          "height": 53,
-          "rotation": -4.010704565915763,
-          "opacity": 0.25,
-          "layer": "front",
-          "content": "faceEmpty",
-          "fadeIn": 6.5
-        }
-      ],
+      "stickers": [],
+      "framing": "full",
+      "motion": 0,
+      "followExpressions": false,
+      "animationLoop": true,
+      "animationSpeed": 0.72,
+      "animationTimeStart": 24.5,
+      "weather": "rain",
+      "rainIntensity": 0.8,
+      "printShadow": false,
+      "rimColor": "#bc7b91",
+      "fitVisible": true,
+      "animationStart": 0
+    },
+    {
+      "t": 27.6,
+      "id": "first-turn-through-light",
+      "stage": "departure",
+      "pose": "lookback",
+      "action": "窄光经过剪影时把步行接到回头 MOV，保持相同站位与深色剪影；完整转身对齐 31 秒。",
+      "x": 75,
+      "y": 5,
+      "scale": 0.86,
+      "opacity": 1,
+      "treatment": "silhouette",
+      "silhouetteColor": "#170b17",
+      "camera": 2,
+      "pan": 0.02,
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "transition": "light-cut",
+      "background": "city",
+      "backgroundMotion": {
+        "zoom": 1.5,
+        "fromX": -22,
+        "toX": -24,
+        "startTime": 25,
+        "duration": 6,
+        "ease": "linear"
+      },
+      "stickers": [],
       "framing": "full",
       "motion": 0,
       "followExpressions": false,
       "animationLoop": false,
-      "animationSpeed": 0.85,
-      "animationTimeStart": 24.5,
+      "animationSpeed": 0.72,
+      "animationTimeStart": 27.6,
       "weather": "rain",
-      "rainIntensity": 0.8
+      "rainIntensity": 0.8,
+      "printShadow": false,
+      "rimColor": "#bc7b91",
+      "fitVisible": false,
+      "animationStart": 0,
+      "animationEndTime": 31,
+      "transitionDuration": 0.32
     },
     {
       "t": 31,
       "id": "first-plea",
       "stage": "memory",
-      "pose": "letterSit",
-      "action": "第一遍副歌由握信剪影进入挽留姿态；单片花瓣分别飘落，不整串移动。",
-      "x": 74,
-      "y": 6,
-      "scale": 0.73,
+      "pose": "cry",
+      "action": "第一遍 Falling flowers, stay 保留 MOV 的举手起始帧。39 秒开始收手到胸前，人物、镜头和站位连续。",
+      "x": 75,
+      "y": 5,
+      "scale": 0.86,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
@@ -302,7 +377,7 @@ window.TIMELINE = {
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "transition": "fade",
+      "transition": "cut",
       "background": "memoryCut",
       "stickers": [],
       "backgroundMotion": {
@@ -319,17 +394,22 @@ window.TIMELINE = {
         "end": 61,
         "count": 7,
         "drift": -0.1
-      }
+      },
+      "followExpressions": false,
+      "animationTimeStart": 31,
+      "animationStart": 0,
+      "animationSpeed": 0,
+      "animationLoop": false
     },
     {
-      "t": 52,
-      "id": "warm-recollection",
+      "t": 39,
+      "id": "first-you-were-here",
       "stage": "memory",
-      "pose": "letterSit",
-      "action": "信件与空房间的静止回忆。行走素材留给列车窗段落。",
+      "pose": "cry",
+      "action": "You were here 开始慢放完整的收手到胸口动作；首帧与前一节点相同，61 秒人物退场。",
       "x": 75,
       "y": 5,
-      "scale": 0.84,
+      "scale": 0.86,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
@@ -339,24 +419,9 @@ window.TIMELINE = {
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "transition": "fade",
+      "transition": "cut",
       "background": "memoryCut",
-      "stickers": [
-        {
-          "id": "memory-empty-mount",
-          "asset": "frameCut",
-          "start": 52,
-          "end": 61,
-          "x": 27,
-          "y": 35,
-          "height": 42,
-          "rotation": 5,
-          "opacity": 0.58,
-          "layer": "back",
-          "fadeIn": 1,
-          "fadeOut": 1
-        }
-      ],
+      "stickers": [],
       "backgroundMotion": {
         "zoom": 1.02,
         "zoomTo": 1.06,
@@ -372,14 +437,19 @@ window.TIMELINE = {
         "count": 7,
         "drift": -0.1
       },
-      "followExpressions": false
+      "followExpressions": false,
+      "animationTimeStart": 39,
+      "animationStart": 0,
+      "animationSpeed": 1,
+      "animationLoop": false,
+      "animationEndTime": 61
     },
     {
       "t": 61,
       "id": "the-folded-name",
       "stage": "keepsakes",
       "pose": null,
-      "action": "人物退场，以折信、旧票据和断笔的绘制素材承接口袋中的名字，不使用新的具象人物。",
+      "action": "只保留信封、住客便条、钥匙、账单和蓝笔；移除拿信人物与所有人物局部。",
       "x": 73,
       "y": 7,
       "scale": 0.76,
@@ -492,18 +562,17 @@ window.TIMELINE = {
           "fadeOut": 0.4
         },
         {
-          "id": "pocket-envelope-detail",
-          "asset": "letterClose",
-          "x": 79,
-          "y": 45,
-          "height": 66,
-          "rotation": 0,
+          "id": "folded-envelope",
+          "asset": "envelope",
+          "x": 77,
+          "y": 46,
+          "height": 55,
+          "rotation": -5,
           "start": 61,
           "end": 69,
-          "opacity": 1,
+          "opacity": 0.95,
           "layer": "back",
-          "fadeIn": 0.65,
-          "fadeOut": 0.4
+          "fadeIn": 0.35
         }
       ],
       "backgroundMotion": {
@@ -513,17 +582,18 @@ window.TIMELINE = {
         "startTime": 61,
         "duration": 8,
         "ease": "smooth"
-      }
+      },
+      "followExpressions": false
     },
     {
       "t": 69,
       "id": "faces-in-transit",
       "stage": "faces",
       "pose": "walk2",
-      "action": "另一段步行素材置于列车窗与匿名相片前，以实色剪影行走；黑脸相片从身后加速经过，77 秒全部离场。",
-      "x": 82,
-      "y": -3,
-      "scale": 1.01,
+      "action": "列车窗段走路。匿名黑脸画框在身后加速流过，76.5 秒换背景时步行动作与站位不重置。",
+      "x": 79,
+      "y": 5,
+      "scale": 0.86,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
@@ -541,7 +611,7 @@ window.TIMELINE = {
           "asset": "frame",
           "content": "faceA",
           "start": 69,
-          "end": 77,
+          "end": 76.5,
           "x": -20,
           "y": 32,
           "height": 63,
@@ -563,7 +633,7 @@ window.TIMELINE = {
           "asset": "frame",
           "content": "faceB",
           "start": 69,
-          "end": 77,
+          "end": 76.5,
           "x": 4.166666666666668,
           "y": 39,
           "height": 56,
@@ -585,7 +655,7 @@ window.TIMELINE = {
           "asset": "frame",
           "content": "faceC",
           "start": 69,
-          "end": 77,
+          "end": 76.5,
           "x": 28.333333333333336,
           "y": 31,
           "height": 65,
@@ -607,7 +677,7 @@ window.TIMELINE = {
           "asset": "frame",
           "content": "faceA",
           "start": 69,
-          "end": 77,
+          "end": 76.5,
           "x": 52.5,
           "y": 38,
           "height": 58,
@@ -629,7 +699,7 @@ window.TIMELINE = {
           "asset": "frame",
           "content": "faceB",
           "start": 69,
-          "end": 77,
+          "end": 76.5,
           "x": 76.66666666666667,
           "y": 34,
           "height": 62,
@@ -651,7 +721,7 @@ window.TIMELINE = {
           "asset": "frame",
           "content": "faceC",
           "start": 69,
-          "end": 77,
+          "end": 76.5,
           "x": 100.83333333333333,
           "y": 41,
           "height": 54,
@@ -683,14 +753,16 @@ window.TIMELINE = {
       "rimColor": "#d69aa4",
       "animationTimeStart": 69,
       "animationLoop": true,
-      "animationSpeed": 0.72
+      "animationSpeed": 0.72,
+      "fitVisible": true,
+      "animationStart": 0
     },
     {
-      "t": 77,
+      "t": 76.5,
       "id": "wind-in-the-wires",
       "stage": "wind",
-      "pose": null,
-      "action": "Wind in the wires 起立即结束人像闪回，复用之前的电线、窄光与落纸背景。77–90 秒保持同一场景，让风和落花承担记忆的回应。",
+      "pose": "walk2",
+      "action": "Wind in the wires 的场景与字幕提前半秒；继续上一镜步行，83 秒 You turned your head 才开始回头。",
       "camera": 1,
       "transition": "cut",
       "subtitleAlign": "left",
@@ -703,69 +775,91 @@ window.TIMELINE = {
         "toX": -1.5,
         "fromY": 0,
         "toY": 0.7,
-        "startTime": 77,
-        "duration": 13,
+        "startTime": 76.5,
+        "duration": 13.5,
         "ease": "smooth"
       },
       "stickers": [],
       "petals": {
-        "startTime": 77,
-        "end": 90,
-        "count": 8,
-        "drift": -0.27
-      }
-    },
-    {
-      "t": 87,
-      "id": "then-the-moment-broke",
-      "stage": "wind",
-      "pose": "lookback",
-      "action": "Then the moment broke：回头素材只保留无五官剪影，从转头的中段接入，在 90 秒硬切离场。",
-      "camera": 1,
-      "transition": "cut",
-      "subtitleAlign": "left",
-      "subtitleX": 6,
-      "subtitleY": 8,
-      "background": "blackStrings",
-      "backgroundMotion": {
-        "zoom": 1.12,
-        "fromX": 1.5,
-        "toX": -1.5,
-        "fromY": 0,
-        "toY": 0.7,
-        "startTime": 77,
-        "duration": 13,
-        "ease": "smooth"
-      },
-      "stickers": [],
-      "petals": {
-        "startTime": 77,
+        "startTime": 76.5,
         "end": 90,
         "count": 8,
         "drift": -0.27
       },
       "followExpressions": false,
-      "x": 78,
+      "x": 79,
       "y": 5,
-      "scale": 0.88,
+      "scale": 0.86,
       "framing": "full",
+      "printShadow": false,
+      "motion": 0,
+      "opacity": 1,
+      "fitVisible": true,
+      "animationTimeStart": 69,
+      "animationStart": 0,
+      "animationSpeed": 0.72,
+      "animationLoop": true,
       "treatment": "silhouette",
-      "silhouetteColor": "#1b101d",
-      "rimColor": "#c58b9a",
-      "animationTimeStart": 87,
-      "animationStart": 2.5,
-      "animationSpeed": 1,
-      "animationLoop": false
+      "silhouetteColor": "#170f1c",
+      "rimColor": "#d69aa4"
+    },
+    {
+      "t": 83,
+      "id": "second-turn-through-light",
+      "stage": "wind",
+      "pose": "lookback",
+      "action": "You turned your head：窄光扫过后接回头 MOV。动作从头到尾慢放到 90 秒，不在 moment broke 重新开始。",
+      "camera": 1,
+      "transition": "light-cut",
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "background": "blackStrings",
+      "backgroundMotion": {
+        "zoom": 1.12,
+        "fromX": 1.5,
+        "toX": -1.5,
+        "fromY": 0,
+        "toY": 0.7,
+        "startTime": 76.5,
+        "duration": 13.5,
+        "ease": "smooth"
+      },
+      "stickers": [],
+      "petals": {
+        "startTime": 76.5,
+        "end": 90,
+        "count": 8,
+        "drift": -0.27
+      },
+      "followExpressions": false,
+      "x": 79,
+      "y": 5,
+      "scale": 0.86,
+      "framing": "full",
+      "printShadow": false,
+      "motion": 0,
+      "opacity": 1,
+      "fitVisible": false,
+      "animationTimeStart": 83,
+      "animationStart": 0,
+      "animationSpeed": 0.72,
+      "animationLoop": false,
+      "treatment": "silhouette",
+      "silhouetteColor": "#170f1c",
+      "rimColor": "#d69aa4",
+      "animationEndTime": 90,
+      "transitionDuration": 0.28
     },
     {
       "t": 90,
       "id": "second-plea",
       "stage": "possession",
-      "pose": "reachShadow",
-      "action": "副歌回到相同空框，彩色人物被伸手剪影代替；98 秒滑落后换成掩面蜷缩的姿势。",
-      "x": 70,
-      "y": 6,
-      "scale": 0.82,
+      "pose": "cry",
+      "action": "第二遍副歌先停在举手姿态，98 秒同一人物开始收手；不插入盘腿素材。",
+      "x": 75,
+      "y": 5,
+      "scale": 0.86,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
@@ -792,6 +886,118 @@ window.TIMELINE = {
         "end": 112,
         "count": 8,
         "drift": -0.1
+      },
+      "followExpressions": false,
+      "animationTimeStart": 90,
+      "animationStart": 0,
+      "animationSpeed": 0,
+      "animationLoop": false
+    },
+    {
+      "t": 98,
+      "id": "second-you-were-here",
+      "stage": "possession",
+      "pose": "cry",
+      "action": "You were here 后把手收至胸前，106 秒转入空掌与离开的信件。",
+      "x": 75,
+      "y": 5,
+      "scale": 0.86,
+      "framing": "full",
+      "printShadow": false,
+      "motion": 0,
+      "opacity": 1,
+      "treatment": "color",
+      "camera": 1,
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "transition": "cut",
+      "background": "memoryCut",
+      "stickers": [],
+      "backgroundMotion": {
+        "zoom": 1.1,
+        "zoomTo": 1.16,
+        "fromX": 0,
+        "toX": -2,
+        "startTime": 90,
+        "duration": 22,
+        "ease": "smooth"
+      },
+      "petals": {
+        "startTime": 90,
+        "end": 112,
+        "count": 8,
+        "drift": -0.1
+      },
+      "followExpressions": false,
+      "animationTimeStart": 98,
+      "animationStart": 0,
+      "animationSpeed": 1,
+      "animationLoop": false,
+      "animationEndTime": 106
+    },
+    {
+      "t": 106,
+      "id": "nothing-left-in-the-palms",
+      "stage": "afterimage",
+      "pose": null,
+      "followExpressions": false,
+      "background": "voidCut",
+      "backgroundTint": "#17131b33",
+      "transition": "cut",
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "backgroundMotion": {
+        "zoom": 1.08,
+        "fromX": 0.5,
+        "toX": -1,
+        "startTime": 106,
+        "duration": 6,
+        "ease": "smooth"
+      },
+      "action": "106–112 秒：放大的空掌细节伸向离开的信封，单片花瓣从掌前穿过。人物局部在独奏开始前全部离场。",
+      "stickers": [
+        {
+          "id": "empty-palms",
+          "asset": "absenceClose",
+          "start": 106,
+          "end": 112,
+          "x": 74,
+          "y": 57,
+          "height": 104,
+          "rotation": 0,
+          "opacity": 1,
+          "layer": "back"
+        },
+        {
+          "id": "letter-leaving-palms",
+          "asset": "envelope",
+          "start": 106,
+          "end": 112,
+          "x": 85,
+          "y": 34,
+          "height": 18,
+          "rotation": -8,
+          "opacity": 0.85,
+          "layer": "front",
+          "motion": {
+            "xTo": 94,
+            "yTo": 12,
+            "heightTo": 9,
+            "opacityTo": 0.1,
+            "rotationTo": 6,
+            "startTime": 106,
+            "duration": 6,
+            "ease": "smooth"
+          }
+        }
+      ],
+      "petals": {
+        "startTime": 106,
+        "end": 112,
+        "count": 5,
+        "drift": -0.18
       }
     },
     {
@@ -799,7 +1005,7 @@ window.TIMELINE = {
       "id": "solo-memory-flashback",
       "stage": "flashback",
       "pose": null,
-      "action": "112–135 秒纯物件闪回，每秒约 3.5 张硬切。卡内保持静止，使用信件、房门、匿名相片、账簿、钥匙和花，不出现 Koharu 或她的身体局部。",
+      "action": "112–136.5 秒纯物件硬切闪回，每秒约 3.27 张；不出现 Koharu 或她的身体局部。",
       "x": 75,
       "y": 8,
       "scale": 0.68,
@@ -850,7 +1056,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 112.2875,
+          "t": 112.30625,
           "id": "memory-cut-002",
           "background": "emptyWindows",
           "layout": "strips",
@@ -882,7 +1088,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 112.575,
+          "t": 112.6125,
           "id": "memory-cut-003",
           "background": "emptyWindows",
           "layout": "strips",
@@ -913,7 +1119,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 112.8625,
+          "t": 112.91875,
           "id": "memory-cut-004",
           "background": "morningVault",
           "layout": "aperture",
@@ -943,7 +1149,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 113.15,
+          "t": 113.225,
           "id": "memory-cut-005",
           "background": "paperVault",
           "layout": "contact",
@@ -964,7 +1170,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 113.4375,
+          "t": 113.53125,
           "id": "memory-cut-006",
           "background": "petalRoad",
           "layout": "aperture",
@@ -994,7 +1200,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 113.725,
+          "t": 113.8375,
           "id": "memory-cut-007",
           "background": "paperVault",
           "layout": "aperture",
@@ -1024,7 +1230,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 114.0125,
+          "t": 114.14375,
           "id": "memory-cut-008",
           "background": "blackStrings",
           "layout": "split",
@@ -1046,7 +1252,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 114.3,
+          "t": 114.45,
           "id": "memory-cut-009",
           "background": "voidCut",
           "layout": "strips",
@@ -1068,7 +1274,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 114.5875,
+          "t": 114.75625,
           "id": "memory-cut-010",
           "background": "morningVault",
           "layout": "split",
@@ -1098,7 +1304,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 114.875,
+          "t": 115.0625,
           "id": "memory-cut-011",
           "background": "emptyWindows",
           "layout": "split",
@@ -1130,7 +1336,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 115.1625,
+          "t": 115.36875,
           "id": "memory-cut-012",
           "background": "petalRoad",
           "layout": "split",
@@ -1160,7 +1366,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 115.45,
+          "t": 115.675,
           "id": "memory-cut-013",
           "background": "voidCut",
           "layout": "aperture",
@@ -1182,7 +1388,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 115.7375,
+          "t": 115.98125,
           "id": "memory-cut-014",
           "background": "archiveCut",
           "layout": "split",
@@ -1212,7 +1418,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 116.025,
+          "t": 116.2875,
           "id": "memory-cut-015",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1242,7 +1448,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 116.3125,
+          "t": 116.59375,
           "id": "memory-cut-016",
           "background": "paperVault",
           "layout": "contact",
@@ -1263,7 +1469,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 116.6,
+          "t": 116.9,
           "id": "memory-cut-017",
           "background": "voidCut",
           "layout": "aperture",
@@ -1293,7 +1499,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 116.8875,
+          "t": 117.20625,
           "id": "memory-cut-018",
           "background": "paperVault",
           "layout": "contact",
@@ -1314,7 +1520,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 117.175,
+          "t": 117.5125,
           "id": "memory-cut-019",
           "background": "voidCut",
           "layout": "aperture",
@@ -1344,7 +1550,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 117.4625,
+          "t": 117.81875,
           "id": "memory-cut-020",
           "background": "city",
           "layout": "strips",
@@ -1376,7 +1582,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 117.75,
+          "t": 118.125,
           "id": "memory-cut-021",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1408,7 +1614,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 118.0375,
+          "t": 118.43125,
           "id": "memory-cut-022",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1439,7 +1645,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 118.325,
+          "t": 118.7375,
           "id": "memory-cut-023",
           "background": "morningVault",
           "layout": "aperture",
@@ -1469,7 +1675,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 118.6125,
+          "t": 119.04375,
           "id": "memory-cut-024",
           "background": "paperVault",
           "layout": "contact",
@@ -1490,7 +1696,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 118.9,
+          "t": 119.35,
           "id": "memory-cut-025",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1520,7 +1726,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 119.1875,
+          "t": 119.65625,
           "id": "memory-cut-026",
           "background": "paperVault",
           "layout": "aperture",
@@ -1550,7 +1756,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 119.475,
+          "t": 119.9625,
           "id": "memory-cut-027",
           "background": "blackStrings",
           "layout": "split",
@@ -1572,7 +1778,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 119.7625,
+          "t": 120.26875,
           "id": "memory-cut-028",
           "background": "voidCut",
           "layout": "strips",
@@ -1594,7 +1800,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 120.05,
+          "t": 120.575,
           "id": "memory-cut-029",
           "background": "morningVault",
           "layout": "split",
@@ -1624,7 +1830,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 120.3375,
+          "t": 120.88125,
           "id": "memory-cut-030",
           "background": "emptyWindows",
           "layout": "split",
@@ -1656,7 +1862,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 120.625,
+          "t": 121.1875,
           "id": "memory-cut-031",
           "background": "petalRoad",
           "layout": "split",
@@ -1686,7 +1892,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 120.9125,
+          "t": 121.49375,
           "id": "memory-cut-032",
           "background": "voidCut",
           "layout": "aperture",
@@ -1708,7 +1914,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 121.2,
+          "t": 121.8,
           "id": "memory-cut-033",
           "background": "archiveCut",
           "layout": "split",
@@ -1738,7 +1944,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 121.4875,
+          "t": 122.10625,
           "id": "memory-cut-034",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1768,7 +1974,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 121.775,
+          "t": 122.4125,
           "id": "memory-cut-035",
           "background": "archiveCut",
           "layout": "split",
@@ -1798,7 +2004,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 122.0625,
+          "t": 122.71875,
           "id": "memory-cut-036",
           "background": "petalRoad",
           "layout": "aperture",
@@ -1828,7 +2034,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 122.35,
+          "t": 123.025,
           "id": "memory-cut-037",
           "background": "paperVault",
           "layout": "contact",
@@ -1849,7 +2055,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 122.6375,
+          "t": 123.33125,
           "id": "memory-cut-038",
           "background": "voidCut",
           "layout": "aperture",
@@ -1879,7 +2085,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 122.925,
+          "t": 123.6375,
           "id": "memory-cut-039",
           "background": "city",
           "layout": "strips",
@@ -1911,7 +2117,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 123.2125,
+          "t": 123.94375,
           "id": "memory-cut-040",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1943,7 +2149,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 123.5,
+          "t": 124.25,
           "id": "memory-cut-041",
           "background": "emptyWindows",
           "layout": "strips",
@@ -1974,7 +2180,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 123.7875,
+          "t": 124.55625,
           "id": "memory-cut-042",
           "background": "morningVault",
           "layout": "aperture",
@@ -2004,7 +2210,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 124.075,
+          "t": 124.8625,
           "id": "memory-cut-043",
           "background": "paperVault",
           "layout": "contact",
@@ -2025,7 +2231,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 124.3625,
+          "t": 125.16875,
           "id": "memory-cut-044",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2055,7 +2261,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 124.65,
+          "t": 125.475,
           "id": "memory-cut-045",
           "background": "paperVault",
           "layout": "aperture",
@@ -2085,7 +2291,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 124.9375,
+          "t": 125.78125,
           "id": "memory-cut-046",
           "background": "blackStrings",
           "layout": "split",
@@ -2107,7 +2313,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 125.225,
+          "t": 126.0875,
           "id": "memory-cut-047",
           "background": "voidCut",
           "layout": "strips",
@@ -2129,7 +2335,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 125.5125,
+          "t": 126.39375,
           "id": "memory-cut-048",
           "background": "morningVault",
           "layout": "split",
@@ -2159,7 +2365,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 125.8,
+          "t": 126.7,
           "id": "memory-cut-049",
           "background": "emptyWindows",
           "layout": "split",
@@ -2191,7 +2397,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 126.0875,
+          "t": 127.00625,
           "id": "memory-cut-050",
           "background": "petalRoad",
           "layout": "split",
@@ -2221,7 +2427,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 126.375,
+          "t": 127.3125,
           "id": "memory-cut-051",
           "background": "voidCut",
           "layout": "aperture",
@@ -2243,7 +2449,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 126.6625,
+          "t": 127.61875,
           "id": "memory-cut-052",
           "background": "petalRoad",
           "layout": "split",
@@ -2273,7 +2479,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 126.95,
+          "t": 127.925,
           "id": "memory-cut-053",
           "background": "voidCut",
           "layout": "aperture",
@@ -2295,7 +2501,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 127.2375,
+          "t": 128.23125,
           "id": "memory-cut-054",
           "background": "archiveCut",
           "layout": "split",
@@ -2325,7 +2531,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 127.525,
+          "t": 128.5375,
           "id": "memory-cut-055",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2355,7 +2561,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 127.8125,
+          "t": 128.84375,
           "id": "memory-cut-056",
           "background": "paperVault",
           "layout": "contact",
@@ -2376,7 +2582,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 128.1,
+          "t": 129.15,
           "id": "memory-cut-057",
           "background": "voidCut",
           "layout": "aperture",
@@ -2406,7 +2612,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 128.3875,
+          "t": 129.45625,
           "id": "memory-cut-058",
           "background": "city",
           "layout": "strips",
@@ -2438,7 +2644,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 128.675,
+          "t": 129.7625,
           "id": "memory-cut-059",
           "background": "emptyWindows",
           "layout": "strips",
@@ -2470,7 +2676,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 128.9625,
+          "t": 130.06875,
           "id": "memory-cut-060",
           "background": "emptyWindows",
           "layout": "strips",
@@ -2501,7 +2707,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 129.25,
+          "t": 130.375,
           "id": "memory-cut-061",
           "background": "morningVault",
           "layout": "aperture",
@@ -2531,7 +2737,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 129.5375,
+          "t": 130.68125,
           "id": "memory-cut-062",
           "background": "paperVault",
           "layout": "contact",
@@ -2552,7 +2758,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 129.825,
+          "t": 130.9875,
           "id": "memory-cut-063",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2582,7 +2788,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.1125,
+          "t": 131.29375,
           "id": "memory-cut-064",
           "background": "paperVault",
           "layout": "aperture",
@@ -2612,7 +2818,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.4,
+          "t": 131.6,
           "id": "memory-cut-065",
           "background": "blackStrings",
           "layout": "split",
@@ -2634,7 +2840,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.6875,
+          "t": 131.90625,
           "id": "memory-cut-066",
           "background": "voidCut",
           "layout": "strips",
@@ -2656,7 +2862,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 130.975,
+          "t": 132.2125,
           "id": "memory-cut-067",
           "background": "morningVault",
           "layout": "split",
@@ -2686,7 +2892,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 131.2625,
+          "t": 132.51875,
           "id": "memory-cut-068",
           "background": "emptyWindows",
           "layout": "split",
@@ -2718,7 +2924,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 131.55,
+          "t": 132.825,
           "id": "memory-cut-069",
           "background": "morningVault",
           "layout": "split",
@@ -2748,7 +2954,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 131.8375,
+          "t": 133.13125,
           "id": "memory-cut-070",
           "background": "emptyWindows",
           "layout": "split",
@@ -2780,7 +2986,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 132.125,
+          "t": 133.4375,
           "id": "memory-cut-071",
           "background": "petalRoad",
           "layout": "split",
@@ -2810,7 +3016,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 132.4125,
+          "t": 133.74375,
           "id": "memory-cut-072",
           "background": "voidCut",
           "layout": "aperture",
@@ -2832,7 +3038,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 132.7,
+          "t": 134.05,
           "id": "memory-cut-073",
           "background": "archiveCut",
           "layout": "split",
@@ -2862,7 +3068,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 132.9875,
+          "t": 134.35625,
           "id": "memory-cut-074",
           "background": "petalRoad",
           "layout": "aperture",
@@ -2892,7 +3098,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 133.275,
+          "t": 134.6625,
           "id": "memory-cut-075",
           "background": "paperVault",
           "layout": "contact",
@@ -2913,7 +3119,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 133.5625,
+          "t": 134.96875,
           "id": "memory-cut-076",
           "background": "voidCut",
           "layout": "aperture",
@@ -2943,7 +3149,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 133.85,
+          "t": 135.275,
           "id": "memory-cut-077",
           "background": "city",
           "layout": "strips",
@@ -2975,7 +3181,7 @@ window.TIMELINE = {
           "rainIntensity": 0.8
         },
         {
-          "t": 134.1375,
+          "t": 135.58125,
           "id": "memory-cut-078",
           "background": "emptyWindows",
           "layout": "strips",
@@ -3007,7 +3213,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 134.425,
+          "t": 135.8875,
           "id": "memory-cut-079",
           "background": "emptyWindows",
           "layout": "strips",
@@ -3038,7 +3244,7 @@ window.TIMELINE = {
           }
         },
         {
-          "t": 134.7125,
+          "t": 136.19375,
           "id": "memory-cut-080",
           "background": "morningVault",
           "layout": "aperture",
@@ -3068,17 +3274,18 @@ window.TIMELINE = {
           }
         }
       ],
-      "flashbackStyle": "hard"
+      "flashbackStyle": "hard",
+      "followExpressions": false
     },
     {
-      "t": 135,
+      "t": 136.5,
       "id": "reach-into-absence",
       "stage": "fracture",
-      "pose": "standReachShadow",
-      "action": "黑弦不直译成触须。把断裂的纸面与画外窄光作为意象，盘腿坐着仰头伸手，手与光之间留下空隙。",
-      "x": 61,
-      "y": 7,
-      "scale": 0.81,
+      "pose": "standReachOpen",
+      "action": "Black strings crying 在 136.5 秒进入：正面强势站姿伸手，保留印刷硬影与切面；146 秒才落到掩面痛哭特写。",
+      "x": 70,
+      "y": 5,
+      "scale": 0.94,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
@@ -3093,19 +3300,19 @@ window.TIMELINE = {
       "stickers": [],
       "followExpressions": false,
       "backgroundMotion": {
-        "zoom": 1.02,
-        "zoomTo": 1.05,
+        "zoom": 1.03,
+        "zoomTo": 1.1,
         "fromX": 0,
-        "toX": -0.7,
-        "startTime": 135,
-        "duration": 16,
+        "toX": -1,
+        "startTime": 136.5,
+        "duration": 9.5,
         "ease": "smooth"
       },
       "petals": {
-        "startTime": 135,
+        "startTime": 136.5,
         "end": 146,
-        "count": 5,
-        "drift": -0.16
+        "count": 4,
+        "drift": -0.2
       }
     },
     {
@@ -3113,7 +3320,7 @@ window.TIMELINE = {
       "id": "one-soft-hum",
       "stage": "quiet",
       "pose": "coveredFace",
-      "action": "静默段用掩面特写，截面落到画面之外；该特写不进入独奏闪回。",
+      "action": "But the night just answers：保留现有掩面痛哭特写，接住上一段强情绪。",
       "x": 66,
       "y": -5,
       "scale": 1.04,
@@ -3146,7 +3353,7 @@ window.TIMELINE = {
       "id": "unreachable-collection",
       "stage": "collection",
       "pose": "reachShadow",
-      "action": "最后副歌仍在同一处空白里伸手；159 秒以后退回掩面。重复意象而不反复换景。",
+      "action": "151–167.5 秒保持同一跪姿伸手；159 秒 You were here 与 163 秒都不换人物。",
       "x": 61,
       "y": 7,
       "scale": 0.81,
@@ -3168,68 +3375,276 @@ window.TIMELINE = {
         "fromX": -0.7,
         "toX": -1,
         "startTime": 151,
-        "duration": 19,
+        "duration": 16.5,
         "ease": "smooth"
       },
       "petals": {
         "startTime": 151,
-        "end": 170,
+        "end": 167.5,
         "count": 7,
         "drift": -0.13
-      }
+      },
+      "followExpressions": false
     },
     {
-      "t": 170,
-      "id": "sealed",
-      "stage": "sealed",
-      "pose": "letterSit",
-      "action": "她攥紧小楼的钥匙，完整人物被收进同一只纸框。住客已离开，物件却被完整保留。",
-      "x": 73,
-      "y": 25,
-      "scale": 0.46,
+      "t": 167.5,
+      "id": "walk-beyond-the-last-plea",
+      "stage": "road",
+      "pose": "walk",
+      "followExpressions": false,
+      "x": 78,
+      "y": 5,
+      "scale": 0.9,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
       "opacity": 1,
+      "fitVisible": true,
       "treatment": "color",
-      "camera": 1,
+      "animationTimeStart": 167.5,
+      "animationStart": 0,
+      "animationSpeed": 0.7,
+      "animationLoop": true,
+      "background": "petalRoad",
+      "backgroundTint": "#17131b20",
+      "transition": "cut",
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "transition": "fade",
-      "background": "memoryCut",
-      "stickers": [
-        {
-          "id": "sealed-paper-mount",
-          "asset": "frameCut",
-          "start": 170,
-          "end": 193,
-          "x": 73,
-          "y": 49,
-          "height": 78,
-          "rotation": 2,
-          "opacity": 0.78,
-          "layer": "front",
-          "fadeIn": 1.3
-        }
-      ],
-      "followExpressions": false,
-      "backgroundTint": "#17131b78",
+      "action": "167.5 秒切新场景，使用黑白印刷感更强的另一段 walk 素材；步行时间一直延续到 188 秒。",
       "backgroundMotion": {
-        "zoom": 1.06,
-        "fromX": 0,
-        "toX": -0.8,
-        "startTime": 170,
-        "duration": 43.68,
-        "ease": "smooth"
+        "zoom": 1.25,
+        "fromX": 8,
+        "toX": -9,
+        "startTime": 167.5,
+        "duration": 20.5,
+        "ease": "linear"
+      },
+      "stickers": [],
+      "petals": {
+        "startTime": 167.5,
+        "end": 188,
+        "count": 5,
+        "drift": -0.22
       }
     },
     {
-      "t": 193,
+      "t": 182,
+      "id": "walking-past-the-records",
+      "stage": "road",
+      "pose": "walk",
+      "followExpressions": false,
+      "x": 78,
+      "y": 5,
+      "scale": 0.9,
+      "framing": "full",
+      "printShadow": false,
+      "motion": 0,
+      "opacity": 1,
+      "fitVisible": true,
+      "treatment": "color",
+      "animationTimeStart": 167.5,
+      "animationStart": 0,
+      "animationSpeed": 0.7,
+      "animationLoop": true,
+      "background": "emptyWindows",
+      "backgroundTint": "#17131b45",
+      "transition": "cut",
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "action": "182 秒 You were here 换背景，人物步行相位不中断；匿名相片、信件与物件像列车窗画框一样从身后流过，不做独奏式硬切。",
+      "backgroundMotion": {
+        "zoom": 1.12,
+        "fromX": 2,
+        "toX": -2,
+        "startTime": 182,
+        "duration": 6,
+        "ease": "linear"
+      },
+      "stickers": [
+        {
+          "id": "passing-record-1",
+          "asset": "frame",
+          "content": "faceA",
+          "start": 182,
+          "end": 188,
+          "x": 50,
+          "y": 31,
+          "height": 57,
+          "rotation": -5,
+          "opacity": 0.88,
+          "layer": "back",
+          "motion": {
+            "preset": "passing",
+            "index": 0,
+            "count": 7,
+            "speed": 0.15,
+            "depth": 0.9,
+            "startTime": 182,
+            "duration": 6
+          }
+        },
+        {
+          "id": "passing-record-2",
+          "asset": "frame",
+          "content": "envelope",
+          "start": 182,
+          "end": 188,
+          "x": 50,
+          "y": 41,
+          "height": 65,
+          "rotation": 6,
+          "opacity": 0.88,
+          "layer": "back",
+          "motion": {
+            "preset": "passing",
+            "index": 1,
+            "count": 7,
+            "speed": 0.15,
+            "depth": 0.99,
+            "startTime": 182,
+            "duration": 6
+          }
+        },
+        {
+          "id": "passing-record-3",
+          "asset": "frame",
+          "content": "faceB",
+          "start": 182,
+          "end": 188,
+          "x": 50,
+          "y": 51,
+          "height": 57,
+          "rotation": -5,
+          "opacity": 0.88,
+          "layer": "back",
+          "motion": {
+            "preset": "passing",
+            "index": 2,
+            "count": 7,
+            "speed": 0.15,
+            "depth": 1.08,
+            "startTime": 182,
+            "duration": 6
+          }
+        },
+        {
+          "id": "passing-record-4",
+          "asset": "frame",
+          "content": "repairLedger",
+          "start": 182,
+          "end": 188,
+          "x": 50,
+          "y": 31,
+          "height": 65,
+          "rotation": 6,
+          "opacity": 0.88,
+          "layer": "back",
+          "motion": {
+            "preset": "passing",
+            "index": 3,
+            "count": 7,
+            "speed": 0.15,
+            "depth": 0.9,
+            "startTime": 182,
+            "duration": 6
+          }
+        },
+        {
+          "id": "passing-record-5",
+          "asset": "frame",
+          "content": "pressedNote",
+          "start": 182,
+          "end": 188,
+          "x": 50,
+          "y": 41,
+          "height": 57,
+          "rotation": -5,
+          "opacity": 0.88,
+          "layer": "back",
+          "motion": {
+            "preset": "passing",
+            "index": 4,
+            "count": 7,
+            "speed": 0.15,
+            "depth": 0.99,
+            "startTime": 182,
+            "duration": 6
+          }
+        },
+        {
+          "id": "passing-record-6",
+          "asset": "frame",
+          "content": "roomKeys",
+          "start": 182,
+          "end": 188,
+          "x": 50,
+          "y": 51,
+          "height": 65,
+          "rotation": 6,
+          "opacity": 0.88,
+          "layer": "back",
+          "motion": {
+            "preset": "passing",
+            "index": 5,
+            "count": 7,
+            "speed": 0.15,
+            "depth": 1.08,
+            "startTime": 182,
+            "duration": 6
+          }
+        },
+        {
+          "id": "passing-record-7",
+          "asset": "frame",
+          "content": "faceEmpty",
+          "start": 182,
+          "end": 188,
+          "x": 50,
+          "y": 31,
+          "height": 57,
+          "rotation": -5,
+          "opacity": 0.88,
+          "layer": "back",
+          "motion": {
+            "preset": "passing",
+            "index": 6,
+            "count": 7,
+            "speed": 0.15,
+            "depth": 0.9,
+            "startTime": 182,
+            "duration": 6
+          }
+        }
+      ],
+      "petals": {
+        "startTime": 167.5,
+        "end": 188,
+        "count": 5,
+        "drift": -0.22
+      }
+    },
+    {
+      "t": 188,
+      "id": "two-seconds-of-black",
+      "stage": "black",
+      "pose": null,
+      "followExpressions": false,
+      "transition": "cut",
+      "hideLyrics": true,
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "stickers": [],
+      "action": "188–190 秒纯黑间断，歌曲继续；不显示字幕、人物、花瓣或雪花。"
+    },
+    {
+      "t": 190,
       "id": "the-things-remain",
       "stage": "outro",
       "pose": null,
-      "action": "人物消失，留下空框和纸面残物；204.5 秒起信号失锁，曲终后持续动态雪花与磁带底噪，不弹出重播界面。",
+      "action": "190 秒直接接原 193 秒的空框、纸面残物、钥匙与杯子，人物不再出现。",
       "x": 73,
       "y": 7,
       "scale": 0.76,
@@ -3242,13 +3657,13 @@ window.TIMELINE = {
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "transition": "fade",
+      "transition": "cut",
       "background": "memoryCut",
       "stickers": [
         {
           "id": "remaining-empty-mount",
           "asset": "frameCut",
-          "start": 193,
+          "start": 190,
           "end": 213.68,
           "x": 73,
           "y": 49,
@@ -3264,7 +3679,7 @@ window.TIMELINE = {
           "y": 66,
           "height": 15,
           "rotation": 5,
-          "start": 193,
+          "start": 190,
           "end": 213.68,
           "opacity": 0.9,
           "layer": "back",
@@ -3277,7 +3692,7 @@ window.TIMELINE = {
           "y": 63,
           "height": 22,
           "rotation": -7,
-          "start": 193,
+          "start": 190,
           "end": 213.68,
           "opacity": 0.9,
           "layer": "back",
@@ -3290,7 +3705,7 @@ window.TIMELINE = {
           "y": 70,
           "height": 12,
           "rotation": -2,
-          "start": 193,
+          "start": 190,
           "end": 213.68,
           "opacity": 0.9,
           "layer": "back",
@@ -3305,7 +3720,49 @@ window.TIMELINE = {
         "startTime": 170,
         "duration": 43.68,
         "ease": "smooth"
-      }
+      },
+      "followExpressions": false
+    },
+    {
+      "t": 204,
+      "id": "last-platform-lowhead",
+      "stage": "rain",
+      "pose": "lowhead",
+      "action": "204 秒回到同一雨站，lowhead 首帧精确对齐 204 秒，末帧精确对齐曲终 213.68 秒。只调整播放时间，不插帧、不改原画。",
+      "x": 77,
+      "y": 5,
+      "scale": 0.87,
+      "opacity": 1,
+      "treatment": "color",
+      "camera": 2,
+      "pan": 0.02,
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "transition": "cut",
+      "background": "city",
+      "backgroundMotion": {
+        "zoom": 1.05,
+        "fromX": 1,
+        "toX": -1,
+        "startTime": 204,
+        "duration": 9.680000000000007,
+        "ease": "linear"
+      },
+      "stickers": [],
+      "framing": "full",
+      "motion": 0,
+      "followExpressions": false,
+      "animationLoop": false,
+      "animationSpeed": 1,
+      "weather": "rain",
+      "rainIntensity": 0.6,
+      "printShadow": false,
+      "fitVisible": true,
+      "animationTimeStart": 204,
+      "animationStart": 0,
+      "animationEndTime": 213.68,
+      "backgroundTint": "#17131b20"
     }
   ],
   "lyrics": [
@@ -3409,10 +3866,10 @@ window.TIMELINE = {
       "time": 73.5,
       "section": "VERSE 2",
       "text": "I watch every face\nBut they move too fast",
-      "end": 77
+      "end": 76.5
     },
     {
-      "time": 77,
+      "time": 76.5,
       "section": "PRE 2",
       "text": "Wind in the wires\nSoft through the trees",
       "end": 80
@@ -3466,7 +3923,7 @@ window.TIMELINE = {
       "end": 112
     },
     {
-      "time": 135,
+      "time": 136.5,
       "section": "BRIDGE",
       "text": "Black strings crying\nThrough the open air",
       "end": 139
@@ -3657,103 +4114,7 @@ window.TIMELINE = {
       "keysHeld": "侧坐攥紧房间钥匙"
     }
   },
-  "expressions": [
-    {
-      "t": 0,
-      "pose": "walk"
-    },
-    {
-      "t": 31,
-      "pose": "letterSit"
-    },
-    {
-      "t": 39,
-      "pose": "standBowed",
-      "layout": {
-        "x": 74,
-        "y": 6,
-        "scale": 0.84
-      }
-    },
-    {
-      "t": 42,
-      "pose": "reachShadow",
-      "layout": {
-        "x": 72,
-        "y": 6,
-        "scale": 0.82
-      }
-    },
-    {
-      "t": 90,
-      "pose": "standReachHigh",
-      "layout": {
-        "x": 71,
-        "y": 6,
-        "scale": 0.85
-      }
-    },
-    {
-      "t": 98,
-      "pose": "cry",
-      "layout": {
-        "x": 73,
-        "y": 6,
-        "scale": 0.85,
-        "animationLoop": false
-      }
-    },
-    {
-      "t": 135,
-      "pose": "standReachProfile",
-      "layout": {
-        "x": 68,
-        "y": 6,
-        "scale": 0.86
-      }
-    },
-    {
-      "t": 142,
-      "pose": "reachShadow",
-      "layout": {
-        "x": 65,
-        "y": 6,
-        "scale": 0.81
-      }
-    },
-    {
-      "t": 146,
-      "pose": "standBowed"
-    },
-    {
-      "t": 151,
-      "pose": "reachShadow"
-    },
-    {
-      "t": 159,
-      "pose": "cry",
-      "layout": {
-        "x": 67,
-        "y": 6,
-        "scale": 0.83,
-        "animationStart": 3,
-        "animationLoop": false
-      }
-    },
-    {
-      "t": 163,
-      "pose": "standReachOpen",
-      "layout": {
-        "x": 67,
-        "y": 6,
-        "scale": 0.84
-      }
-    },
-    {
-      "t": 170,
-      "pose": "letterSit"
-    }
-  ],
+  "expressions": [],
   "shadowSprites": {
     "standShadow": "assets/character/shadows/stand-bowed.png",
     "standBowed": "assets/character/shadows/stand-bowed.png",
