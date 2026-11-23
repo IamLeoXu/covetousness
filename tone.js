@@ -42,4 +42,27 @@
     }
   }
   window.ToneControls=ToneControls;
+  class FaderDetents {
+    constructor(signal){
+      for(const id of ['volume','trackingFx','restorationFx']){
+        const input=document.getElementById(id);let dragging=false,last=Number(input.value),travel=0;
+        input.addEventListener('pointerdown',event=>{
+          if(event.button!==undefined&&event.button!==0)return;
+          dragging=true;last=Number(input.value);travel=0;
+        });
+        const release=()=>{dragging=false;travel=0;};
+        input.addEventListener('pointerup',release);input.addEventListener('pointercancel',release);
+        input.addEventListener('lostpointercapture',release);document.addEventListener('pointerup',release);
+        input.addEventListener('keydown',()=>{last=Number(input.value);});
+        input.addEventListener('input',()=>{
+          const value=Number(input.value),distance=Math.abs(value-last);last=value;
+          if(distance<.001)return;
+          if(!dragging){signal.faderStep(1);return;}
+          travel+=distance;const steps=Math.floor(travel/3);travel-=steps*3;
+          if(steps)signal.faderStep(steps);
+        });
+      }
+    }
+  }
+  window.FaderDetents=FaderDetents;
 })();

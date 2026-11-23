@@ -1,6 +1,6 @@
-/* DEAD AIR v0.21: tone controls, real spectrum, recessed hardware and fine rain. */
+/* DEAD AIR v0.22: dry plastic keys, an empty-handed kneeling shot, and swapped aligned MOV cues. */
 window.TIMELINE = {
-  "version": "0.21",
+  "version": "0.22",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -315,10 +315,10 @@ window.TIMELINE = {
     },
     {
       "t": 27.6,
-      "id": "first-turn-through-light",
+      "id": "first-realisation-through-light",
       "stage": "departure",
-      "pose": "lookback",
-      "action": "窄光经过剪影时把步行接到回头 MOV，保持相同站位与深色剪影；完整转身对齐 31 秒。",
+      "pose": "lowhead",
+      "action": "窄光转场后使用原片尾 lowhead，保持深色剪影。28 秒 And I knew then 起动作，31 秒收至末帧，过渡开始前段保持首帧。",
       "x": 75,
       "y": 5,
       "scale": 0.86,
@@ -346,12 +346,12 @@ window.TIMELINE = {
       "followExpressions": false,
       "animationLoop": false,
       "animationSpeed": 0.72,
-      "animationTimeStart": 27.6,
+      "animationTimeStart": 28,
       "weather": "rain",
       "rainIntensity": 0.8,
       "printShadow": false,
       "rimColor": "#bc7b91",
-      "fitVisible": false,
+      "fitVisible": true,
       "animationStart": 0,
       "animationEndTime": 31,
       "transitionDuration": 0.32
@@ -954,31 +954,8 @@ window.TIMELINE = {
         "duration": 6,
         "ease": "smooth"
       },
-      "action": "106–112 秒改为跪姿举手，信封仍向画外离开；独奏开始前人物退场。",
-      "stickers": [
-        {
-          "id": "letter-leaving-palms",
-          "asset": "envelope",
-          "start": 106,
-          "end": 112,
-          "x": 85,
-          "y": 34,
-          "height": 18,
-          "rotation": -8,
-          "opacity": 0.85,
-          "layer": "front",
-          "motion": {
-            "xTo": 94,
-            "yTo": 12,
-            "heightTo": 9,
-            "opacityTo": 0.1,
-            "rotationTo": 6,
-            "startTime": 106,
-            "duration": 6,
-            "ease": "smooth"
-          }
-        }
-      ],
+      "action": "106–112 秒只保留跪姿举手的人物与背景，不再出现信封或其他前景物件。",
+      "stickers": [],
       "petals": {
         "startTime": 106,
         "end": 112,
@@ -3723,10 +3700,10 @@ window.TIMELINE = {
     },
     {
       "t": 204,
-      "id": "last-platform-lowhead",
+      "id": "last-platform-lookback",
       "stage": "rain",
-      "pose": "lowhead",
-      "action": "204 秒回到同一雨站，lowhead 首帧精确对齐 204 秒，末帧精确对齐曲终 213.68 秒。只调整播放时间，不插帧、不改原画。",
+      "pose": "lookback",
+      "action": "204 秒回到站台，使用原前段的 lookback 原色动画；第 0 帧对齐 204 秒，第 54 帧对齐曲终 213.68 秒。",
       "x": 77,
       "y": 5,
       "scale": 0.87,
@@ -3756,7 +3733,7 @@ window.TIMELINE = {
       "weather": "rain",
       "rainIntensity": 0.6,
       "printShadow": false,
-      "fitVisible": true,
+      "fitVisible": false,
       "animationTimeStart": 204,
       "animationStart": 0,
       "animationEndTime": 213.68,

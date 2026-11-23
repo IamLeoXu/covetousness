@@ -8,6 +8,7 @@
       this.restoration=1;this.analysisGain=null;this.restoreNodes=null;
       this.mode='stop';this.musicGate=null;this.windGain=null;this.sfxMaster=null;this.sounds=new Map();
       this.tone={lo:0,mid:0,hi:0};this.eqNodes=null;this.spectrumAnalyser=null;
+      this.detentUntil=0;this.detentIndex=0;
       this.spectrumBins=new Float32Array(1024);this.spectrumBands=new Float32Array(24);
       this.localReady=null;
       this.originalMusic=audio.getAttribute?.('src')||audio.src;
@@ -154,19 +155,48 @@
       if(this.wind?.playbackRate)this.wind.playbackRate.setTargetAtTime(mode==='rew'?1.16:.94,now,.06);
       this.setRestoration(this.restoration,true);this.setVolume(this.volume);
     }
+    plasticButton(kind){
+      const detent=/^detent([0-2])?$/.exec(kind);
+      const profiles={
+        key:{length:.105,bodyHz:880,edgeHz:3400,bodyFall:.0065,gap:.0105,second:.48,seed:0x4a61e8,peak:.72},
+        release:{length:.085,bodyHz:1100,edgeHz:3900,bodyFall:.0048,gap:.0075,second:.34,seed:0x5bc3a1,peak:.59},
+        stop:{length:.12,bodyHz:690,edgeHz:3100,bodyFall:.008,gap:.0145,second:.57,seed:0x34dae1,peak:.76},
+        switch:{length:.07,bodyHz:1050,edgeHz:3600,bodyFall:.0045,gap:.007,second:.28,seed:0x7143bd,peak:.48},
+        detent:{length:.018,bodyHz:720,edgeHz:2500,bodyFall:.0019,gap:.004,second:.18,seed:0x31e64a,peak:.16}
+      };
+      const variant=detent?Number(detent[1]||0):0,p={...profiles[detent?'detent':kind]};
+      if(detent){p.seed^=Math.imul(variant+1,0x67fa19);p.bodyHz*=.93+variant*.07;p.peak*=.9+variant*.08;}
+      const rate=this.context.sampleRate,buffer=this.context.createBuffer(1,Math.ceil(rate*p.length),rate);
+      const pcm=buffer.getChannelData(0),bodyA=1-Math.exp(-2*Math.PI*p.bodyHz/rate),edgeA=1-Math.exp(-2*Math.PI*p.edgeHz/rate),dcA=1-Math.exp(-2*Math.PI*130/rate);
+      let seed=p.seed,body=0,edge=0,dc=0,peak=0;
+      for(let i=0;i<pcm.length;i++){
+        seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;
+        const noise=(seed>>>0)/2147483648-1,t=i/rate;
+        body+=bodyA*(noise-body);edge+=edgeA*(noise-edge);dc+=dcA*(body-dc);
+        const contact=(u,amount)=>{
+          if(u<0)return 0;
+          const attack=Math.min(1,u/.00016);
+          // Broad, damped plastic impacts: no oscillator or ringing musical partials.
+          return amount*attack*((body-dc)*1.35*Math.exp(-u/p.bodyFall)+(edge-body)*.72*Math.exp(-u/.0017));
+        };
+        const value=contact(t,1)+contact(t-p.gap,p.second)+contact(t-p.gap-.008,.09);
+        pcm[i]=value;peak=Math.max(peak,Math.abs(value));
+      }
+      const gain=p.peak/Math.max(peak,.001);
+      for(let i=0;i<pcm.length;i++)pcm[i]*=gain;
+      this.sounds.set(kind,buffer);return buffer;
+    }
     makeSound(kind){
       if(this.sounds.has(kind))return this.sounds.get(kind);
+      if(kind==='fader')return this.makeSound('detent0');
+      if(['key','release','stop','switch'].includes(kind)||/^detent[0-2]?$/.test(kind))return this.plasticButton(kind);
       const rate=this.context.sampleRate,wind=kind==='wind';
       const profiles={
-        key:{duration:.10,gap:.018,pitch:1780,body:.055},
-        release:{duration:.09,gap:.014,pitch:2060,body:.035},
-        switch:{duration:.075,gap:.012,pitch:2280,body:.025},
         fader:{duration:.055,gap:.009,pitch:1920,body:.015},
-        stop:{duration:.12,gap:.023,pitch:1520,body:.075},
         insert:{duration:.16,gap:.061,pitch:1330,body:.08},
         latch:{duration:.17,gap:.042,pitch:1050,body:.13}
       };
-      const profile=profiles[kind]||profiles.key,duration=wind?4:profile.duration;
+      const profile=profiles[kind]||profiles.fader,duration=wind?4:profile.duration;
       const buffer=this.context.createBuffer(1,Math.ceil(rate*duration),rate),pcm=buffer.getChannelData(0);
       let seed=0x947ad51,low=0,previous=0;
       for(let i=0;i<pcm.length;i++){
@@ -198,6 +228,20 @@
         const voice=this.context.createBufferSource();voice.buffer=this.makeSound(kind);voice.connect(this.sfxMaster);
         voice.onended=()=>voice.disconnect();voice.start();
       }catch{} // Playback must still work when a browser declines Web Audio.
+    }
+    async faderStep(steps=1){
+      try{
+        await this.unlock();if(!this.sfxMaster)return;
+        const now=this.context.currentTime,start=Math.max(now,this.detentUntil);
+        if(start>now+.026)return;
+        const count=Math.max(1,Math.min(3,Math.floor(steps)||1));let played=0;
+        for(let i=0;i<count;i++){
+          const when=start+i*.012;if(when>now+.038)break;
+          const voice=this.context.createBufferSource();voice.buffer=this.makeSound('detent'+this.detentIndex++%3);
+          voice.connect(this.sfxMaster);voice.onended=()=>voice.disconnect();voice.start(when);played++;
+        }
+        this.detentUntil=start+played*.012;
+      }catch{}
     }
     async loadActualOverview(){
       try{

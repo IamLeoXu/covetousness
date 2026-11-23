@@ -18,6 +18,7 @@
   const cache = window.AUDIO_ANALYSIS?.music === data.music ? window.AUDIO_ANALYSIS : null;
   const signal = new window.AudioSignal(audio, cache);
   new window.ToneControls(signal,data.settings.eq);
+  new window.FaderDetents(signal);
   const automation = new window.TapeSignalAutomation(data.settings.signalAutomation);
   const film = new window.ExecutionFilm(data);
   const display = new window.AnalogueDisplay($('signalNoise'), $('picture'));
@@ -294,7 +295,6 @@
     automation.hold(name,Number(event.target.value)/100);updateRestoration();
   };
   $('signalAuto').onclick=()=>{signal.mechanical('switch');automation.toggle(time);updateRestoration();};
-  for(const id of ['volume','trackingFx','restorationFx'])$(id).addEventListener('pointerdown',()=>signal.mechanical('fader'));
   $('mute').onclick = toggleMute;
   $('cinema').onclick = cinema;
   $('exitCinema').onclick = cinema;
