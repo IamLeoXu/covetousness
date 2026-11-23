@@ -2,9 +2,10 @@
 (() => {
   'use strict';
   class TapeLoadingScene {
-    constructor({ root, game, target, config, unlock }) {
+    constructor({ root, game, target, config, unlock, sound }) {
       this.root=root; this.game=game; this.target=target; this.config=config||{}; this.unlock=unlock;
       this.loaded=false; this.loading=false;
+      this.sound=sound||(()=>{});
       this.button=document.getElementById('enter'); this.scene=document.getElementById('loadScene');
       this.bay=document.getElementById('loadBay'); this.status=document.getElementById('loadStatus');
       this.game.inert=true;
@@ -31,8 +32,12 @@
       const dx=bay.left+bay.width/2-source.left-source.width/2, dy=bay.top+bay.height/2-source.top-source.height/2;
       const ratio=bay.width/source.width;
       await this.animate(this.button,[{transform:'translate(0,0) scale(1)'},{transform:`translate(${dx}px,${dy}px) scale(${ratio})`}],(this.config.insertMs??850)*speed);
+      this.sound('insert');
       this.root.dataset.step='closing'; this.status.textContent='CLOSING HATCH';
-      await this.animate(document.getElementById('loadDoor'),[{transform:'rotateX(-108deg)'},{transform:'rotateX(0deg)'}],(this.config.closeMs??520)*speed);
+      await this.animate(document.getElementById('loadDoor'),[
+        {transform:'rotateX(-74deg)',offset:0},{transform:'rotateX(1deg)',offset:.92},{transform:'rotateX(0deg)',offset:1}
+      ],(this.config.closeMs??680)*speed);
+      this.sound('latch');
       this.root.dataset.step='pullback'; this.status.textContent='SIDE A';
       const current=document.getElementById('bayCassette').getBoundingClientRect(), target=this.target.getBoundingClientRect();
       const cx=current.left+current.width/2, cy=current.top+current.height/2;

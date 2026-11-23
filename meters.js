@@ -44,9 +44,12 @@
     }).join('');
     const numbers = labels.map(db => {
       const position = point(angle(db), 74);
-      return `<text x="${position.x}" y="${position.y}" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="10" fill="${db > 0 ? '#ad433b' : '#383b37'}">${db > 0 ? '+' + db : db === -20 ? '−20' : db}</text>`;
+      return `<text x="${position.x}" y="${position.y}" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="10" fill="${db > 0 ? '#ad433b' : '#383b37'}">${db > 0 ? '+' + db : db < 0 ? '\u2212'+Math.abs(db) : db}</text>`;
     }).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 104" aria-hidden="true">
+      <defs><linearGradient id="meter-paper-${channel}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d6c6a9"/><stop offset=".5" stop-color="#f0e7d2"/><stop offset="1" stop-color="#d5c5a8"/></linearGradient></defs>
+      <rect width="140" height="104" fill="url(#meter-paper-${channel})"/>
+      <path d="M 6 97 L 134 97" stroke="#8b7a64" stroke-width=".6"/>
       <path d="${arc(-48, 42, 55)}" fill="none" stroke="#797266" stroke-width="1"/>
       <path d="${arc(angle(0), angle(3), 55)}" fill="none" stroke="#c4594f" stroke-width="3.5"/>
       ${marks}${numbers}

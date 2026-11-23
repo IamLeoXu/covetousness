@@ -1,6 +1,6 @@
-/* DEAD AIR v0.18: restored anonymous memories, source MOV animation, object-only flashbacks. */
+/* DEAD AIR v0.19: tape transport, signal automation and hard-cut memories. */
 window.TIMELINE = {
-  "version": "0.18",
+  "version": "0.19",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -164,7 +164,9 @@ window.TIMELINE = {
       "motion": 0,
       "followExpressions": false,
       "animationLoop": true,
-      "animationSpeed": 0.7
+      "animationSpeed": 0.7,
+      "weather": "rain",
+      "rainIntensity": 1
     },
     {
       "t": 17,
@@ -194,7 +196,9 @@ window.TIMELINE = {
         "duration": 3,
         "ease": "linear"
       },
-      "stickers": []
+      "stickers": [],
+      "weather": "rain",
+      "rainIntensity": 0.8
     },
     {
       "t": 21,
@@ -224,7 +228,9 @@ window.TIMELINE = {
         "duration": 10,
         "ease": "linear"
       },
-      "stickers": []
+      "stickers": [],
+      "weather": "rain",
+      "rainIntensity": 0.8
     },
     {
       "t": 24.5,
@@ -274,7 +280,9 @@ window.TIMELINE = {
       "followExpressions": false,
       "animationLoop": false,
       "animationSpeed": 0.85,
-      "animationTimeStart": 24.5
+      "animationTimeStart": 24.5,
+      "weather": "rain",
+      "rainIntensity": 0.8
     },
     {
       "t": 31,
@@ -317,16 +325,16 @@ window.TIMELINE = {
       "t": 52,
       "id": "warm-recollection",
       "stage": "memory",
-      "pose": "walk2",
-      "action": "无歌词的回忆中恢复另一组走路剪影，保持同一底板，不显示旧五官立绘。",
+      "pose": "letterSit",
+      "action": "信件与空房间的静止回忆。行走素材留给列车窗段落。",
       "x": 75,
-      "y": -1,
-      "scale": 1.02,
+      "y": 5,
+      "scale": 0.84,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
-      "opacity": 0.82,
-      "treatment": "silhouette",
+      "opacity": 1,
+      "treatment": "color",
       "camera": 1,
       "subtitleAlign": "left",
       "subtitleX": 6,
@@ -364,9 +372,6 @@ window.TIMELINE = {
         "count": 7,
         "drift": -0.1
       },
-      "animationLoop": true,
-      "animationSpeed": 0.45,
-      "silhouetteColor": "#291723",
       "followExpressions": false
     },
     {
@@ -514,16 +519,16 @@ window.TIMELINE = {
       "t": 69,
       "id": "faces-in-transit",
       "stage": "faces",
-      "pose": null,
-      "action": "69–77 秒，已有黑脸、遮眼的人像在车窗画框中加速闪回；到 Wind in the wires 立即硬切离开。",
-      "x": 73,
-      "y": 7,
-      "scale": 0.76,
+      "pose": "walk2",
+      "action": "另一段步行素材置于列车窗与匿名相片前，以实色剪影行走；黑脸相片从身后加速经过，77 秒全部离场。",
+      "x": 82,
+      "y": -3,
+      "scale": 1.01,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
       "opacity": 1,
-      "treatment": "color",
+      "treatment": "silhouette",
       "camera": 1,
       "subtitleAlign": "left",
       "subtitleX": 6,
@@ -672,7 +677,13 @@ window.TIMELINE = {
         "startTime": 69,
         "duration": 8,
         "ease": "linear"
-      }
+      },
+      "followExpressions": false,
+      "silhouetteColor": "#170f1c",
+      "rimColor": "#d69aa4",
+      "animationTimeStart": 69,
+      "animationLoop": true,
+      "animationSpeed": 0.72
     },
     {
       "t": 77,
@@ -703,6 +714,48 @@ window.TIMELINE = {
         "count": 8,
         "drift": -0.27
       }
+    },
+    {
+      "t": 87,
+      "id": "then-the-moment-broke",
+      "stage": "wind",
+      "pose": "lookback",
+      "action": "Then the moment broke：回头素材只保留无五官剪影，从转头的中段接入，在 90 秒硬切离场。",
+      "camera": 1,
+      "transition": "cut",
+      "subtitleAlign": "left",
+      "subtitleX": 6,
+      "subtitleY": 8,
+      "background": "blackStrings",
+      "backgroundMotion": {
+        "zoom": 1.12,
+        "fromX": 1.5,
+        "toX": -1.5,
+        "fromY": 0,
+        "toY": 0.7,
+        "startTime": 77,
+        "duration": 13,
+        "ease": "smooth"
+      },
+      "stickers": [],
+      "petals": {
+        "startTime": 77,
+        "end": 90,
+        "count": 8,
+        "drift": -0.27
+      },
+      "followExpressions": false,
+      "x": 78,
+      "y": 5,
+      "scale": 0.88,
+      "framing": "full",
+      "treatment": "silhouette",
+      "silhouetteColor": "#1b101d",
+      "rimColor": "#c58b9a",
+      "animationTimeStart": 87,
+      "animationStart": 2.5,
+      "animationSpeed": 1,
+      "animationLoop": false
     },
     {
       "t": 90,
@@ -746,7 +799,7 @@ window.TIMELINE = {
       "id": "solo-memory-flashback",
       "stage": "flashback",
       "pose": null,
-      "action": "独奏闪回只使用雨站、匿名黑头相片、房门、信件、账单、钥匙、花与空画框；用切片、接触印相格和遮罩组织记忆，不使用 Koharu 或她的身体局部。",
+      "action": "112–135 秒纯物件闪回，每秒约 3.5 张硬切。卡内保持静止，使用信件、房门、匿名相片、账簿、钥匙和花，不出现 Koharu 或她的身体局部。",
       "x": 75,
       "y": 8,
       "scale": 0.68,
@@ -763,82 +816,1940 @@ window.TIMELINE = {
       "background": "archiveCut",
       "stickers": [],
       "backgroundTint": "#17131b9c",
-      "backgroundMotion": {
-        "zoom": 1.08,
-        "zoomTo": 1.18,
-        "fromX": 1,
-        "toX": -2,
-        "startTime": 112,
-        "duration": 23,
-        "ease": "smooth"
-      },
       "flashbacks": [
         {
           "t": 112,
-          "id": "rain-without-her",
+          "id": "memory-cut-001",
           "background": "city",
           "layout": "strips",
           "layers": [
             {
               "asset": "emptyCup",
               "x": 67,
-              "y": 69,
-              "height": 24,
+              "y": 65,
+              "height": 22.32,
               "rotation": 0,
               "opacity": 1
             },
             {
               "asset": "rentReceipt",
               "x": 47,
-              "y": 58,
-              "height": 30,
+              "y": 54,
+              "height": 27.9,
               "rotation": 11,
               "opacity": 1
             }
           ],
-          "splice": 0.09,
+          "splice": 0,
           "backgroundMotion": {
             "zoom": 1.8,
             "fromX": -18,
-            "toX": -20,
-            "startTime": 112,
-            "duration": 2.2,
-            "ease": "linear"
+            "fromY": -2
+          },
+          "weather": "rain",
+          "rainIntensity": 0.8
+        },
+        {
+          "t": 112.2875,
+          "id": "memory-cut-002",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 29,
+              "y": 43,
+              "height": 76.25999999999999,
+              "rotation": -6,
+              "opacity": 1,
+              "content": "faceB"
+            },
+            {
+              "asset": "frame",
+              "x": 68,
+              "y": 41,
+              "height": 90.21,
+              "rotation": 5,
+              "opacity": 1,
+              "content": "faceA"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
           }
         },
         {
-          "t": 114.2,
-          "id": "letter-with-no-addressee",
+          "t": 112.575,
+          "id": "memory-cut-003",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 35,
+              "y": 43,
+              "height": 76.25999999999999,
+              "rotation": -5,
+              "opacity": 1,
+              "content": "faceEmpty"
+            },
+            {
+              "asset": "archiveSleeve",
+              "x": 71,
+              "y": 46,
+              "height": 71.61,
+              "rotation": 7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 112.8625,
+          "id": "memory-cut-004",
+          "background": "morningVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 66,
+              "y": 48,
+              "height": 79.97999999999999,
+              "rotation": -2,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 34,
+              "y": 63,
+              "height": 26.97,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 113.15,
+          "id": "memory-cut-005",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "envelope",
+            "roomTag",
+            "emptyCup",
+            "pressedNote",
+            "looseKeys",
+            "archiveSleeve"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 113.4375,
+          "id": "memory-cut-006",
           "background": "petalRoad",
           "layout": "aperture",
           "layers": [
             {
               "asset": "envelope",
               "x": 66,
-              "y": 48,
-              "height": 73,
+              "y": 44,
+              "height": 67.89,
               "rotation": -7,
-              "opacity": 1,
-              "motion": {
-                "heightTo": 80,
-                "xTo": 63,
-                "ease": "smooth"
-              }
+              "opacity": 1
             },
             {
               "asset": "roomTag",
               "x": 34,
-              "y": 67,
-              "height": 25,
+              "y": 63,
+              "height": 23.25,
               "rotation": 8,
               "opacity": 1
             }
           ],
-          "splice": 0.09
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
         },
         {
-          "t": 116.3,
-          "id": "windows-pass-too-fast",
+          "t": 113.725,
+          "id": "memory-cut-007",
+          "background": "paperVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 61,
+              "y": 48,
+              "height": 84.63,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "asset": "roomKeys",
+              "x": 32,
+              "y": 63,
+              "height": 29.759999999999998,
+              "rotation": 13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 114.0125,
+          "id": "memory-cut-008",
+          "background": "blackStrings",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "roomKeys",
+              "x": 62,
+              "y": 51,
+              "height": 53.01,
+              "rotation": -9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 114.3,
+          "id": "memory-cut-009",
+          "background": "voidCut",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "looseKeys",
+              "x": 58,
+              "y": 47,
+              "height": 84.63,
+              "rotation": -11,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 114.5875,
+          "id": "memory-cut-010",
+          "background": "morningVault",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "rentReceipt",
+              "x": 60,
+              "y": 48,
+              "height": 80.91,
+              "rotation": 7,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 31,
+              "y": 66,
+              "height": 21.389999999999997,
+              "rotation": -15,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 114.875,
+          "id": "memory-cut-011",
+          "background": "emptyWindows",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 32,
+              "y": 42,
+              "height": 80.91,
+              "rotation": -7,
+              "opacity": 1,
+              "content": "faceA"
+            },
+            {
+              "asset": "frame",
+              "x": 70,
+              "y": 45,
+              "height": 68.82,
+              "rotation": 7,
+              "opacity": 1,
+              "content": "faceC"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 115.1625,
+          "id": "memory-cut-012",
+          "background": "petalRoad",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "pressedFlower",
+              "x": 63,
+              "y": 47,
+              "height": 64.17,
+              "rotation": -8,
+              "opacity": 1
+            },
+            {
+              "asset": "residentNote",
+              "x": 31,
+              "y": 57,
+              "height": 29.759999999999998,
+              "rotation": 8,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 115.45,
+          "id": "memory-cut-013",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "petalBlush",
+              "x": 62,
+              "y": 49,
+              "height": 32.55,
+              "rotation": -18,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 115.7375,
+          "id": "memory-cut-014",
+          "background": "archiveCut",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "memoryTrace",
+              "x": 59,
+              "y": 48,
+              "height": 80.91,
+              "rotation": 6,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedNote",
+              "x": 26,
+              "y": 62,
+              "height": 27.9,
+              "rotation": -9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 116.025,
+          "id": "memory-cut-015",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 60,
+              "y": 49,
+              "height": 81.83999999999999,
+              "rotation": -5,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedFlower",
+              "x": 28,
+              "y": 65,
+              "height": 26.97,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 116.3125,
+          "id": "memory-cut-016",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "repairLedger",
+            "rentReceipt",
+            "roomKeys",
+            "bluePen",
+            "residentNote",
+            "pressedFlower"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 116.6,
+          "id": "memory-cut-017",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 61,
+              "y": 49,
+              "height": 68.82,
+              "rotation": -3,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 33,
+              "y": 66,
+              "height": 20.459999999999997,
+              "rotation": -12,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 0,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 116.8875,
+          "id": "memory-cut-018",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "rentReceipt",
+            "roomKeys",
+            "bluePen",
+            "residentNote",
+            "pressedFlower",
+            "repairLedger"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 117.175,
+          "id": "memory-cut-019",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 64,
+              "y": 53,
+              "height": 74,
+              "rotation": -1,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 36,
+              "y": 70,
+              "height": 22,
+              "rotation": -10,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 117.4625,
+          "id": "memory-cut-020",
+          "background": "city",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 64,
+              "y": 69,
+              "height": 24,
+              "rotation": -2,
+              "opacity": 1
+            },
+            {
+              "asset": "rentReceipt",
+              "x": 44,
+              "y": 58,
+              "height": 30,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.8800000000000001,
+            "fromX": -20,
+            "fromY": 0
+          },
+          "weather": "rain",
+          "rainIntensity": 0.8
+        },
+        {
+          "t": 117.75,
+          "id": "memory-cut-021",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 32,
+              "y": 47,
+              "height": 82,
+              "rotation": -4,
+              "opacity": 1,
+              "content": "faceB"
+            },
+            {
+              "asset": "frame",
+              "x": 71,
+              "y": 45,
+              "height": 97,
+              "rotation": 7,
+              "opacity": 1,
+              "content": "faceA"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 118.0375,
+          "id": "memory-cut-022",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 32,
+              "y": 47,
+              "height": 82,
+              "rotation": -7,
+              "opacity": 1,
+              "content": "faceEmpty"
+            },
+            {
+              "asset": "archiveSleeve",
+              "x": 68,
+              "y": 50,
+              "height": 77,
+              "rotation": 5,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 118.325,
+          "id": "memory-cut-023",
+          "background": "morningVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 69,
+              "y": 52,
+              "height": 86,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 37,
+              "y": 67,
+              "height": 29,
+              "rotation": 11,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 118.6125,
+          "id": "memory-cut-024",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "roomTag",
+            "emptyCup",
+            "pressedNote",
+            "looseKeys",
+            "archiveSleeve",
+            "envelope"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 118.9,
+          "id": "memory-cut-025",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 69,
+              "y": 48,
+              "height": 73,
+              "rotation": -5,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 37,
+              "y": 67,
+              "height": 25,
+              "rotation": 10,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 119.1875,
+          "id": "memory-cut-026",
+          "background": "paperVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 58,
+              "y": 52,
+              "height": 91,
+              "rotation": -2,
+              "opacity": 1
+            },
+            {
+              "asset": "roomKeys",
+              "x": 29,
+              "y": 67,
+              "height": 32,
+              "rotation": 11,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 119.475,
+          "id": "memory-cut-027",
+          "background": "blackStrings",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "roomKeys",
+              "x": 65,
+              "y": 55,
+              "height": 57,
+              "rotation": -7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 119.7625,
+          "id": "memory-cut-028",
+          "background": "voidCut",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "looseKeys",
+              "x": 55,
+              "y": 51,
+              "height": 91,
+              "rotation": -13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 120.05,
+          "id": "memory-cut-029",
+          "background": "morningVault",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "rentReceipt",
+              "x": 63,
+              "y": 52,
+              "height": 87,
+              "rotation": 9,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 34,
+              "y": 70,
+              "height": 23,
+              "rotation": -13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 120.3375,
+          "id": "memory-cut-030",
+          "background": "emptyWindows",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 29,
+              "y": 46,
+              "height": 87,
+              "rotation": -9,
+              "opacity": 1,
+              "content": "faceA"
+            },
+            {
+              "asset": "frame",
+              "x": 67,
+              "y": 49,
+              "height": 74,
+              "rotation": 5,
+              "opacity": 1,
+              "content": "faceC"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 120.625,
+          "id": "memory-cut-031",
+          "background": "petalRoad",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "pressedFlower",
+              "x": 66,
+              "y": 51,
+              "height": 69,
+              "rotation": -6,
+              "opacity": 1
+            },
+            {
+              "asset": "residentNote",
+              "x": 34,
+              "y": 61,
+              "height": 32,
+              "rotation": 10,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 120.9125,
+          "id": "memory-cut-032",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "petalBlush",
+              "x": 59,
+              "y": 53,
+              "height": 35,
+              "rotation": -20,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 121.2,
+          "id": "memory-cut-033",
+          "background": "archiveCut",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "memoryTrace",
+              "x": 62,
+              "y": 52,
+              "height": 87,
+              "rotation": 8,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedNote",
+              "x": 29,
+              "y": 66,
+              "height": 30,
+              "rotation": -7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 121.4875,
+          "id": "memory-cut-034",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 57,
+              "y": 53,
+              "height": 88,
+              "rotation": -7,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedFlower",
+              "x": 25,
+              "y": 69,
+              "height": 29,
+              "rotation": 7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": -2,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 121.775,
+          "id": "memory-cut-035",
+          "background": "archiveCut",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "memoryTrace",
+              "x": 65,
+              "y": 56,
+              "height": 93.09,
+              "rotation": 10,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedNote",
+              "x": 32,
+              "y": 70,
+              "height": 32.1,
+              "rotation": -5,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 122.0625,
+          "id": "memory-cut-036",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 54,
+              "y": 57,
+              "height": 94.16000000000001,
+              "rotation": -9,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedFlower",
+              "x": 22,
+              "y": 73,
+              "height": 31.03,
+              "rotation": 5,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 122.35,
+          "id": "memory-cut-037",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "roomKeys",
+            "bluePen",
+            "residentNote",
+            "pressedFlower",
+            "repairLedger",
+            "rentReceipt"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 122.6375,
+          "id": "memory-cut-038",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 55,
+              "y": 57,
+              "height": 79.18,
+              "rotation": -7,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 27,
+              "y": 74,
+              "height": 23.540000000000003,
+              "rotation": -16,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 122.925,
+          "id": "memory-cut-039",
+          "background": "city",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 73,
+              "y": 73,
+              "height": 25.68,
+              "rotation": 4,
+              "opacity": 1
+            },
+            {
+              "asset": "rentReceipt",
+              "x": 53,
+              "y": 62,
+              "height": 32.1,
+              "rotation": 15,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.96,
+            "fromX": -14,
+            "fromY": 2
+          },
+          "weather": "rain",
+          "rainIntensity": 0.8
+        },
+        {
+          "t": 123.2125,
+          "id": "memory-cut-040",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 23,
+              "y": 51,
+              "height": 87.74000000000001,
+              "rotation": -10,
+              "opacity": 1,
+              "content": "faceB"
+            },
+            {
+              "asset": "frame",
+              "x": 62,
+              "y": 49,
+              "height": 103.79,
+              "rotation": 1,
+              "opacity": 1,
+              "content": "faceA"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 123.5,
+          "id": "memory-cut-041",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 41,
+              "y": 51,
+              "height": 87.74000000000001,
+              "rotation": -1,
+              "opacity": 1,
+              "content": "faceEmpty"
+            },
+            {
+              "asset": "archiveSleeve",
+              "x": 77,
+              "y": 54,
+              "height": 82.39,
+              "rotation": 11,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 123.7875,
+          "id": "memory-cut-042",
+          "background": "morningVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 60,
+              "y": 56,
+              "height": 92.02000000000001,
+              "rotation": -6,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 28,
+              "y": 71,
+              "height": 31.03,
+              "rotation": 5,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 124.075,
+          "id": "memory-cut-043",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "emptyCup",
+            "pressedNote",
+            "looseKeys",
+            "archiveSleeve",
+            "envelope",
+            "roomTag"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 124.3625,
+          "id": "memory-cut-044",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 60,
+              "y": 52,
+              "height": 78.11,
+              "rotation": -11,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 28,
+              "y": 71,
+              "height": 26.75,
+              "rotation": 4,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 124.65,
+          "id": "memory-cut-045",
+          "background": "paperVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 67,
+              "y": 56,
+              "height": 97.37,
+              "rotation": 4,
+              "opacity": 1
+            },
+            {
+              "asset": "roomKeys",
+              "x": 38,
+              "y": 71,
+              "height": 34.24,
+              "rotation": 17,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 124.9375,
+          "id": "memory-cut-046",
+          "background": "blackStrings",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "roomKeys",
+              "x": 56,
+              "y": 59,
+              "height": 60.99,
+              "rotation": -13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 125.225,
+          "id": "memory-cut-047",
+          "background": "voidCut",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "looseKeys",
+              "x": 64,
+              "y": 55,
+              "height": 97.37,
+              "rotation": -7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 125.5125,
+          "id": "memory-cut-048",
+          "background": "morningVault",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "rentReceipt",
+              "x": 54,
+              "y": 56,
+              "height": 93.09,
+              "rotation": 3,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 25,
+              "y": 74,
+              "height": 24.610000000000003,
+              "rotation": -19,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 125.8,
+          "id": "memory-cut-049",
+          "background": "emptyWindows",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 38,
+              "y": 50,
+              "height": 93.09,
+              "rotation": -3,
+              "opacity": 1,
+              "content": "faceA"
+            },
+            {
+              "asset": "frame",
+              "x": 76,
+              "y": 53,
+              "height": 79.18,
+              "rotation": 11,
+              "opacity": 1,
+              "content": "faceC"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 126.0875,
+          "id": "memory-cut-050",
+          "background": "petalRoad",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "pressedFlower",
+              "x": 57,
+              "y": 55,
+              "height": 73.83,
+              "rotation": -12,
+              "opacity": 1
+            },
+            {
+              "asset": "residentNote",
+              "x": 25,
+              "y": 65,
+              "height": 34.24,
+              "rotation": 4,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": -4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 126.375,
+          "id": "memory-cut-051",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "petalBlush",
+              "x": 68,
+              "y": 57,
+              "height": 37.45,
+              "rotation": -14,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.24,
+            "fromX": 4,
+            "fromY": 2
+          }
+        },
+        {
+          "t": 126.6625,
+          "id": "memory-cut-052",
+          "background": "petalRoad",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "pressedFlower",
+              "x": 54,
+              "y": 47,
+              "height": 64.17,
+              "rotation": -8,
+              "opacity": 1
+            },
+            {
+              "asset": "residentNote",
+              "x": 22,
+              "y": 57,
+              "height": 29.759999999999998,
+              "rotation": 8,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 126.95,
+          "id": "memory-cut-053",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "petalBlush",
+              "x": 71,
+              "y": 49,
+              "height": 32.55,
+              "rotation": -18,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 127.2375,
+          "id": "memory-cut-054",
+          "background": "archiveCut",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "memoryTrace",
+              "x": 50,
+              "y": 48,
+              "height": 80.91,
+              "rotation": 6,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedNote",
+              "x": 17,
+              "y": 62,
+              "height": 27.9,
+              "rotation": -9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 127.525,
+          "id": "memory-cut-055",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 69,
+              "y": 49,
+              "height": 81.83999999999999,
+              "rotation": -5,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedFlower",
+              "x": 37,
+              "y": 65,
+              "height": 26.97,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 127.8125,
+          "id": "memory-cut-056",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "bluePen",
+            "residentNote",
+            "pressedFlower",
+            "repairLedger",
+            "rentReceipt",
+            "roomKeys"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 128.1,
+          "id": "memory-cut-057",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 70,
+              "y": 49,
+              "height": 68.82,
+              "rotation": -3,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 42,
+              "y": 66,
+              "height": 20.459999999999997,
+              "rotation": -12,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 128.3875,
+          "id": "memory-cut-058",
+          "background": "city",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 58,
+              "y": 65,
+              "height": 22.32,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "asset": "rentReceipt",
+              "x": 38,
+              "y": 54,
+              "height": 27.9,
+              "rotation": 11,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.8,
+            "fromX": -24,
+            "fromY": -2
+          },
+          "weather": "rain",
+          "rainIntensity": 0.8
+        },
+        {
+          "t": 128.675,
+          "id": "memory-cut-059",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 38,
+              "y": 43,
+              "height": 76.25999999999999,
+              "rotation": -6,
+              "opacity": 1,
+              "content": "faceB"
+            },
+            {
+              "asset": "frame",
+              "x": 77,
+              "y": 41,
+              "height": 90.21,
+              "rotation": 5,
+              "opacity": 1,
+              "content": "faceA"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 128.9625,
+          "id": "memory-cut-060",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 26,
+              "y": 43,
+              "height": 76.25999999999999,
+              "rotation": -5,
+              "opacity": 1,
+              "content": "faceEmpty"
+            },
+            {
+              "asset": "archiveSleeve",
+              "x": 62,
+              "y": 46,
+              "height": 71.61,
+              "rotation": 7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 129.25,
+          "id": "memory-cut-061",
+          "background": "morningVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 75,
+              "y": 48,
+              "height": 79.97999999999999,
+              "rotation": -2,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 43,
+              "y": 63,
+              "height": 26.97,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 129.5375,
+          "id": "memory-cut-062",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "pressedNote",
+            "looseKeys",
+            "archiveSleeve",
+            "envelope",
+            "roomTag",
+            "emptyCup"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 129.825,
+          "id": "memory-cut-063",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 75,
+              "y": 44,
+              "height": 67.89,
+              "rotation": -7,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 43,
+              "y": 63,
+              "height": 23.25,
+              "rotation": 8,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 130.1125,
+          "id": "memory-cut-064",
+          "background": "paperVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 52,
+              "y": 48,
+              "height": 84.63,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "asset": "roomKeys",
+              "x": 23,
+              "y": 63,
+              "height": 29.759999999999998,
+              "rotation": 13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 130.4,
+          "id": "memory-cut-065",
+          "background": "blackStrings",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "roomKeys",
+              "x": 71,
+              "y": 51,
+              "height": 53.01,
+              "rotation": -9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 130.6875,
+          "id": "memory-cut-066",
+          "background": "voidCut",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "looseKeys",
+              "x": 49,
+              "y": 47,
+              "height": 84.63,
+              "rotation": -11,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 130.975,
+          "id": "memory-cut-067",
+          "background": "morningVault",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "rentReceipt",
+              "x": 69,
+              "y": 48,
+              "height": 80.91,
+              "rotation": 7,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 40,
+              "y": 66,
+              "height": 21.389999999999997,
+              "rotation": -15,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": 6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 131.2625,
+          "id": "memory-cut-068",
+          "background": "emptyWindows",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 23,
+              "y": 42,
+              "height": 80.91,
+              "rotation": -7,
+              "opacity": 1,
+              "content": "faceA"
+            },
+            {
+              "asset": "frame",
+              "x": 61,
+              "y": 45,
+              "height": 68.82,
+              "rotation": 7,
+              "opacity": 1,
+              "content": "faceC"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.08,
+            "fromX": -6,
+            "fromY": -2
+          }
+        },
+        {
+          "t": 131.55,
+          "id": "memory-cut-069",
+          "background": "morningVault",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "rentReceipt",
+              "x": 60,
+              "y": 52,
+              "height": 87,
+              "rotation": 9,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 31,
+              "y": 70,
+              "height": 23,
+              "rotation": -13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 131.8375,
+          "id": "memory-cut-070",
           "background": "emptyWindows",
           "layout": "split",
           "layers": [
@@ -847,7 +2758,7 @@ window.TIMELINE = {
               "x": 32,
               "y": 46,
               "height": 87,
-              "rotation": -7,
+              "rotation": -9,
               "opacity": 1,
               "content": "faceA"
             },
@@ -856,160 +2767,21 @@ window.TIMELINE = {
               "x": 70,
               "y": 49,
               "height": 74,
-              "rotation": 7,
+              "rotation": 5,
               "opacity": 1,
               "content": "faceC"
             }
           ],
-          "splice": 0.09
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
         },
         {
-          "t": 118.4,
-          "id": "everything-accounted-for",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
-          "splice": 0.09,
-          "cells": [
-            "repairLedger",
-            "rentReceipt",
-            "roomKeys",
-            "bluePen",
-            "residentNote",
-            "pressedFlower"
-          ]
-        },
-        {
-          "t": 120.6,
-          "id": "the-room-is-empty",
-          "background": "morningVault",
-          "layout": "aperture",
-          "layers": [
-            {
-              "asset": "vacantDoor",
-              "x": 66,
-              "y": 52,
-              "height": 86,
-              "rotation": -2,
-              "opacity": 1,
-              "motion": {
-                "heightTo": 94,
-                "ease": "smooth"
-              }
-            },
-            {
-              "asset": "roomTag",
-              "x": 34,
-              "y": 67,
-              "height": 29,
-              "rotation": 9,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 122.4,
-          "id": "keys-still-fit",
-          "background": "voidCut",
-          "layout": "strips",
-          "layers": [
-            {
-              "asset": "looseKeys",
-              "x": 58,
-              "y": 51,
-              "height": 91,
-              "rotation": -11,
-              "opacity": 1,
-              "motion": {
-                "rotationTo": -3,
-                "heightTo": 97,
-                "ease": "smooth"
-              }
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 124,
-          "id": "papers-we-kept",
-          "background": "archiveCut",
-          "layout": "split",
-          "layers": [
-            {
-              "asset": "memoryTrace",
-              "x": 59,
-              "y": 52,
-              "height": 87,
-              "rotation": 6,
-              "opacity": 1
-            },
-            {
-              "asset": "pressedNote",
-              "x": 26,
-              "y": 66,
-              "height": 30,
-              "rotation": -9,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 125.4,
-          "id": "anonymous-contact",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
-            {
-              "asset": "frame",
-              "x": 29,
-              "y": 47,
-              "height": 82,
-              "rotation": -6,
-              "opacity": 1,
-              "content": "faceB"
-            },
-            {
-              "asset": "frame",
-              "x": 68,
-              "y": 45,
-              "height": 97,
-              "rotation": 5,
-              "opacity": 1,
-              "content": "faceA"
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 126.8,
-          "id": "a-door-with-no-return",
-          "background": "paperVault",
-          "layout": "aperture",
-          "layers": [
-            {
-              "asset": "vacantDoor",
-              "x": 61,
-              "y": 52,
-              "height": 91,
-              "rotation": 0,
-              "opacity": 1
-            },
-            {
-              "asset": "roomKeys",
-              "x": 32,
-              "y": 67,
-              "height": 32,
-              "rotation": 13,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 128.2,
-          "id": "flowers-between-the-pages",
+          "t": 132.125,
+          "id": "memory-cut-071",
           "background": "petalRoad",
           "layout": "split",
           "layers": [
@@ -1018,161 +2790,28 @@ window.TIMELINE = {
               "x": 63,
               "y": 51,
               "height": 69,
-              "rotation": -8,
-              "opacity": 1,
-              "motion": {
-                "heightTo": 76,
-                "ease": "smooth"
-              }
+              "rotation": -6,
+              "opacity": 1
             },
             {
               "asset": "residentNote",
               "x": 31,
               "y": 61,
               "height": 32,
-              "rotation": 8,
+              "rotation": 10,
               "opacity": 1
             }
           ],
-          "splice": 0.09
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
         },
         {
-          "t": 129.4,
-          "id": "a-cup-left-behind",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
-            {
-              "asset": "emptyCup",
-              "x": 61,
-              "y": 53,
-              "height": 74,
-              "rotation": -3,
-              "opacity": 1
-            },
-            {
-              "asset": "bluePen",
-              "x": 33,
-              "y": 70,
-              "height": 22,
-              "rotation": -12,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 130.5,
-          "id": "objects-in-the-register",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
-          "splice": 0.09,
-          "cells": [
-            "envelope",
-            "roomTag",
-            "emptyCup",
-            "pressedNote",
-            "looseKeys",
-            "archiveSleeve"
-          ]
-        },
-        {
-          "t": 131.4,
-          "id": "receipt-without-a-name",
-          "background": "morningVault",
-          "layout": "split",
-          "layers": [
-            {
-              "asset": "rentReceipt",
-              "x": 60,
-              "y": 52,
-              "height": 87,
-              "rotation": 7,
-              "opacity": 1
-            },
-            {
-              "asset": "bluePen",
-              "x": 31,
-              "y": 70,
-              "height": 23,
-              "rotation": -15,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 132.2,
-          "id": "the-unposted-letter",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
-            {
-              "asset": "envelope",
-              "x": 60,
-              "y": 53,
-              "height": 88,
-              "rotation": -5,
-              "opacity": 1
-            },
-            {
-              "asset": "pressedFlower",
-              "x": 28,
-              "y": 69,
-              "height": 29,
-              "rotation": 9,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 133,
-          "id": "only-the-frames",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
-            {
-              "asset": "frame",
-              "x": 35,
-              "y": 47,
-              "height": 82,
-              "rotation": -5,
-              "opacity": 1,
-              "content": "faceEmpty"
-            },
-            {
-              "asset": "archiveSleeve",
-              "x": 71,
-              "y": 50,
-              "height": 77,
-              "rotation": 7,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 133.8,
-          "id": "wires-and-metal",
-          "background": "blackStrings",
-          "layout": "split",
-          "layers": [
-            {
-              "asset": "roomKeys",
-              "x": 62,
-              "y": 55,
-              "height": 57,
-              "rotation": -9,
-              "opacity": 1
-            }
-          ],
-          "splice": 0.09
-        },
-        {
-          "t": 134.4,
-          "id": "one-petal-left",
+          "t": 132.4125,
+          "id": "memory-cut-072",
           "background": "voidCut",
           "layout": "aperture",
           "layers": [
@@ -1181,19 +2820,255 @@ window.TIMELINE = {
               "x": 62,
               "y": 53,
               "height": 35,
-              "rotation": -18,
-              "opacity": 1,
-              "motion": {
-                "xTo": 56,
-                "yTo": 63,
-                "heightTo": 18,
-                "ease": "smooth"
-              }
+              "rotation": -20,
+              "opacity": 1
             }
           ],
-          "splice": 0.09
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 132.7,
+          "id": "memory-cut-073",
+          "background": "archiveCut",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "memoryTrace",
+              "x": 59,
+              "y": 52,
+              "height": 87,
+              "rotation": 8,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedNote",
+              "x": 26,
+              "y": 66,
+              "height": 30,
+              "rotation": -7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 132.9875,
+          "id": "memory-cut-074",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 60,
+              "y": 53,
+              "height": 88,
+              "rotation": -7,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedFlower",
+              "x": 28,
+              "y": 69,
+              "height": 29,
+              "rotation": 7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 133.275,
+          "id": "memory-cut-075",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0,
+          "cells": [
+            "residentNote",
+            "pressedFlower",
+            "repairLedger",
+            "rentReceipt",
+            "roomKeys",
+            "bluePen"
+          ],
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 133.5625,
+          "id": "memory-cut-076",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 61,
+              "y": 53,
+              "height": 74,
+              "rotation": -5,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 33,
+              "y": 70,
+              "height": 22,
+              "rotation": -14,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 133.85,
+          "id": "memory-cut-077",
+          "background": "city",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 67,
+              "y": 69,
+              "height": 24,
+              "rotation": 2,
+              "opacity": 1
+            },
+            {
+              "asset": "rentReceipt",
+              "x": 47,
+              "y": 58,
+              "height": 30,
+              "rotation": 13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.8800000000000001,
+            "fromX": -18,
+            "fromY": 0
+          },
+          "weather": "rain",
+          "rainIntensity": 0.8
+        },
+        {
+          "t": 134.1375,
+          "id": "memory-cut-078",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 29,
+              "y": 47,
+              "height": 82,
+              "rotation": -8,
+              "opacity": 1,
+              "content": "faceB"
+            },
+            {
+              "asset": "frame",
+              "x": 68,
+              "y": 45,
+              "height": 97,
+              "rotation": 3,
+              "opacity": 1,
+              "content": "faceA"
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 134.425,
+          "id": "memory-cut-079",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 35,
+              "y": 47,
+              "height": 82,
+              "rotation": -3,
+              "opacity": 1,
+              "content": "faceEmpty"
+            },
+            {
+              "asset": "archiveSleeve",
+              "x": 71,
+              "y": 50,
+              "height": 77,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
+        },
+        {
+          "t": 134.7125,
+          "id": "memory-cut-080",
+          "background": "morningVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 66,
+              "y": 52,
+              "height": 86,
+              "rotation": -4,
+              "opacity": 1
+            },
+            {
+              "asset": "roomTag",
+              "x": 34,
+              "y": 67,
+              "height": 29,
+              "rotation": 7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0,
+          "backgroundMotion": {
+            "zoom": 1.1600000000000001,
+            "fromX": 0,
+            "fromY": 0
+          }
         }
-      ]
+      ],
+      "flashbackStyle": "hard"
     },
     {
       "t": 135,
@@ -1213,7 +3088,7 @@ window.TIMELINE = {
       "subtitleAlign": "left",
       "subtitleX": 6,
       "subtitleY": 8,
-      "transition": "fade",
+      "transition": "cut",
       "background": "voidCut",
       "stickers": [],
       "followExpressions": false,
@@ -1354,7 +3229,7 @@ window.TIMELINE = {
       "id": "the-things-remain",
       "stage": "outro",
       "pose": null,
-      "action": "人物消失，留下空框和纸面残物；末尾用印刷闸门与套印错位收黑，不使用雪花屏。",
+      "action": "人物消失，留下空框和纸面残物；204.5 秒起信号失锁，曲终后持续动态雪花与磁带底噪，不弹出重播界面。",
       "x": 73,
       "y": 7,
       "scale": 0.76,
@@ -1674,7 +3549,7 @@ window.TIMELINE = {
     "printTransitions": [],
     "intro": {
       "insertMs": 850,
-      "closeMs": 520,
+      "closeMs": 680,
       "pullbackMs": 1050
     },
     "petalAssets": [
@@ -1691,50 +3566,58 @@ window.TIMELINE = {
       "intro": [
         {
           "t": 0,
-          "tracking": 0.025,
-          "restoration": 0.025
+          "tracking": 0,
+          "restoration": 0
         },
         {
           "t": 0.55,
-          "tracking": 0.09,
-          "restoration": 0.12
+          "tracking": 0.18,
+          "restoration": 0.1
         },
         {
-          "t": 1.4,
-          "tracking": 0.48,
-          "restoration": 0.5
+          "t": 1.6,
+          "tracking": 0.5,
+          "restoration": 0.3
         },
         {
-          "t": 2.7,
-          "tracking": 0.9,
-          "restoration": 0.88
+          "t": 16.5,
+          "tracking": 0.5,
+          "restoration": 0.3
         },
         {
-          "t": 4,
-          "tracking": 1,
+          "t": 17,
+          "tracking": 0.8,
           "restoration": 1
         }
+      ],
+      "sustain": {
+        "tracking": 0.8,
+        "restoration": 1
+      },
+      "rearmTimes": [
+        17,
+        204.5
       ],
       "outro": [
         {
           "t": 204.5,
-          "tracking": 1,
+          "tracking": 0.8,
           "restoration": 1
         },
         {
           "t": 207.5,
-          "tracking": 0.92,
+          "tracking": 0.72,
           "restoration": 0.85
         },
         {
           "t": 210,
-          "tracking": 0.45,
+          "tracking": 0.38,
           "restoration": 0.42
         },
         {
           "t": 212.3,
-          "tracking": 0.08,
-          "restoration": 0.06
+          "tracking": 0.06,
+          "restoration": 0.04
         },
         {
           "t": 213.68,

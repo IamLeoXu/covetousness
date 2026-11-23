@@ -31,7 +31,7 @@
   new window.CharacterCassette($('handCassette'), 'selected', cassetteConfig);
   new window.CharacterCassette($('bayCassette'), 'bay', cassetteConfig);
   const loadingScene = new window.TapeLoadingScene({ root: $('opening'), game, target: $('cassetteMount'),
-    config: data.settings.intro, unlock: async () => { await signal.resume(); signal.pauseOutput(); } });
+    config: data.settings.intro, unlock: () => signal.unlock(), sound: kind => signal.mechanical(kind) });
 
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -46,6 +46,7 @@
   let paintedTime = -1;
   let waveformTime = -1;
   let lastFrame = 0;
+  let noiseClock = 0;
   let messageTimer;
 
   const setVolume = value => {
@@ -67,7 +68,7 @@
     $('signalAuto').setAttribute('aria-pressed',String(values.automatic));
     $('trackingState').textContent=values.tracking>.94?'SIGNAL LOCK':values.tracking>.25?'TRACKING':'SIGNAL LOST';
     signal.setRestoration(values.restoration);
-    display.render(time,values.tracking);
+    display.render(time,values.tracking,noiseClock);
   }
   updateRestoration();
 
@@ -81,7 +82,6 @@
   function showFilm() {
     entered = true;
     $('opening').hidden = true;
-    $('ending').hidden = true;
   }
 
   function updateState() {
@@ -112,9 +112,10 @@
     if (!loadingScene.loaded) return;
     const stateChanged = completed || (reveal && !entered);
     completed = false;
-    $('ending').hidden = true;
     if (reveal) showFilm();
     time = clamp(Number(value) || 0, 0, duration);
+    noiseClock = time;
+    signal.setTransport(rate===1?'play':rate<0?'rew':rate>1?'forward':'pause');
     automation.follow(time);
     updateRestoration();
     syncAudio();
@@ -123,6 +124,8 @@
   }
 
   async function play() {
+    if(loadingScene.loading)return;
+    signal.mechanical(rate===1?'release':'key');
     if (!loadingScene.loaded && !(await loadingScene.insert())) return;
     if (rate === 1) {
       command++;
@@ -135,14 +138,15 @@
     showFilm();
     const operation = ++command;
     completed = false;
-    if (time >= duration - .03) {time = 0;automation.follow(0);}
+    if (time >= duration - .03) {time = noiseClock = 0;automation.follow(0);}
     updateRestoration();
     syncAudio();
     rate = 1;
     updateState();
     try {
-      await signal.resume();
-      if (operation !== command || rate !== 1) { signal.pauseOutput(); return; }
+      await signal.unlock();
+      if (operation !== command || rate !== 1) return;
+      signal.setTransport('play');
       await audio.play();
       if (operation !== command && rate !== 1) pauseAudio();
     } catch {
@@ -156,6 +160,7 @@
 
   function stop() {
     if (!loadingScene.loaded) return;
+    signal.mechanical('stop');
     command++;
     rate = 0;
     pauseAudio();
@@ -165,21 +170,27 @@
 
   function scan(speed) {
     if (!loadingScene.loaded) return;
+    signal.mechanical('key');
     showFilm();
     command++;
     pauseAudio();
     completed = false;
     rate = rate === speed ? 0 : speed;
+    signal.setTransport(rate<0?'rew':rate>1?'forward':'pause');
+    signal.unlock();
     updateState();
   }
 
   function finish() {
+    if(completed)return;
     command++;
     rate = 0;
     time = duration;
-    pauseAudio();
+    audio.pause();
     completed = true;
-    $('ending').hidden = false;
+    automation.follow(time);
+    updateRestoration();
+    signal.setTransport('end');
     updateState();
   }
 
@@ -191,11 +202,13 @@
   }
 
   function cinema() {
+    signal.mechanical('switch');
     game.classList.toggle('cinema');
     resize();
   }
 
   function fullscreen() {
+    signal.mechanical('switch');
     if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
     else viewport.requestFullscreen?.().catch(() => notify("Use your browser's fullscreen shortcut."));
   }
@@ -224,12 +237,12 @@
     lastFrame = stamp;
     const audible = rate === 1 && !audio.paused && !audio.seeking && audio.readyState >= 2;
     if (audible) time = clamp(audio.currentTime, 0, duration);
+    if(rate!==0||completed)noiseClock+=delta;
     if (rate !== 0 && rate !== 1) {
       time = clamp(time + delta * rate, 0, duration);
       if (time <= 0 || time >= duration) {
-        rate = 0;
-        syncAudio();
-        updateState();
+        if(time>=duration)finish();
+        else {rate=0;signal.setTransport('stop');syncAudio();updateState();}
       }
     }
     if (time !== paintedTime || film.needsPaint) {
@@ -258,6 +271,7 @@
   }
 
   function toggleMute() {
+    signal.mechanical('switch');
     signal.setMuted(!signal.muted);
     const mute = $('mute');
     mute.classList.toggle('muted', signal.muted);
@@ -270,13 +284,13 @@
   $('stop').onclick = stop;
   $('rew').onclick = () => scan(-3);
   $('forward').onclick = () => scan(2.5);
-  $('replay').onclick = () => { stop(); play(); };
   scrub.oninput = event => seek(event.target.value);
   $('volume').oninput = event => setVolume(Number(event.target.value));
   for(const name of ['tracking','restoration'])$(name+'Fx').oninput=event=>{
     automation.hold(name,Number(event.target.value)/100);updateRestoration();
   };
-  $('signalAuto').onclick=()=>{automation.toggle(time);updateRestoration();};
+  $('signalAuto').onclick=()=>{signal.mechanical('switch');automation.toggle(time);updateRestoration();};
+  for(const id of ['volume','trackingFx','restorationFx'])$(id).addEventListener('pointerdown',()=>signal.mechanical('fader'));
   $('mute').onclick = toggleMute;
   $('cinema').onclick = cinema;
   $('exitCinema').onclick = cinema;

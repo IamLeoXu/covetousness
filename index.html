@@ -8,17 +8,17 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2310151e'/%3E%3Cpath d='M8 5h7c14 0 14 22 0 22H8z' fill='%23d2f850'/%3E%3C/svg%3E">
   <link rel="preload" as="image" href="assets/props/city.webp">
   <link rel="preload" as="image" href="assets/ui/koharu-tape-decal.png">
-  <link rel="stylesheet" href="style.css?v=0.18">
-  <link rel="stylesheet" href="receiver.css?v=0.18">
-  <script defer src="timeline.js?v=0.18"></script>
-  <script defer src="assets/audio-analysis.js?v=0.18"></script>
-  <script defer src="audio.js?v=0.18"></script>
-  <script defer src="signal.js?v=0.18"></script>
-  <script defer src="meters.js?v=0.18"></script>
-  <script defer src="film.js?v=0.18"></script>
-  <script defer src="cassette.js?v=0.18"></script>
-  <script defer src="opening.js?v=0.18"></script>
-  <script defer src="app.js?v=0.18"></script>
+  <link rel="stylesheet" href="style.css?v=0.19">
+  <link rel="stylesheet" href="receiver.css?v=0.19">
+  <script defer src="timeline.js?v=0.19"></script>
+  <script defer src="assets/audio-analysis.js?v=0.19"></script>
+  <script defer src="audio.js?v=0.19"></script>
+  <script defer src="signal.js?v=0.19"></script>
+  <script defer src="meters.js?v=0.19"></script>
+  <script defer src="film.js?v=0.19"></script>
+  <script defer src="cassette.js?v=0.19"></script>
+  <script defer src="opening.js?v=0.19"></script>
+  <script defer src="app.js?v=0.19"></script>
 </head>
 <body>
   <div id="viewport">
@@ -29,6 +29,7 @@
           <div class="loading-vents"></div><div class="loading-brand">AFTER HOURS <i></i></div>
           <div class="loading-bay" id="loadBay"><div id="bayCassette"></div></div>
           <div class="loading-door" id="loadDoor"><span>MEMORY RECORDER</span><i></i></div>
+          <div class="loading-hinge" aria-hidden="true"><i></i><i></i></div>
           <div class="loading-controls"><span class="loading-key"></span><span class="loading-key"></span><span class="loading-key loading-key-lime"></span><b>STEREO<br><small>SIDE A</small></b></div>
           <div class="loading-foot left-foot"></div><div class="loading-foot right-foot"></div>
         </div>
@@ -82,9 +83,6 @@
               <div id="lyric" class="lyric" data-align="left" aria-live="off">
                 <div class="lyric-copy"><span id="lyricOne"></span><span id="lyricTwo"></span></div>
               </div>
-              <div id="ending" class="ending" hidden>
-                <b>DEAD AIR</b><button id="replay">REPLAY</button>
-              </div>
               <div id="message" class="message" role="status" hidden></div>
             </div>
           </div>
@@ -133,7 +131,7 @@
 
         <section class="phase-panel" aria-label="Stereo phase scope">
           <div class="phase-header">PHASE MONITOR</div>
-          <canvas id="phaseScope" width="400" height="256" aria-label="Live stereo phase trace"></canvas>
+          <div class="phase-bezel"><canvas id="phaseScope" width="400" height="256" aria-label="Live stereo phase trace"></canvas></div>
         </section>
       </footer>
       <button id="exitCinema" class="exit-cinema" title="Return to deck (C)" aria-label="Return to deck">DECK</button>

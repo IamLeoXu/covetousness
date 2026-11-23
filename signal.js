@@ -19,12 +19,11 @@
       const intro=this.config.intro||[],outro=this.config.outro||[];
       if(intro.length&&t<=intro.at(-1).t)return this.envelope(intro,t);
       if(outro.length&&t>=outro[0].t)return this.envelope(outro,t);
-      return {tracking:1,restoration:1};
+      return this.config.sustain||this.envelope(intro,t);
     }
     read(t) {
-      const start=this.config.outro?.[0]?.t??Infinity;
-      // The closing loss of signal is part of the record, even after a manual mix.
-      if(t>=start&&this.lastTime<start)this.enabled=true;
+      const cues=this.config.rearmTimes||[this.config.outro?.[0]?.t??Infinity];
+      if(cues.some(start=>t>=start&&this.lastTime<start))this.enabled=true;
       this.lastTime=t;
       this.values=this.enabled?this.recorded(t):{...this.manual};
       return {...this.values,automatic:this.enabled};
@@ -48,8 +47,8 @@
       const w=480,h=Math.max(96,Math.round(w*(this.picture.clientHeight||500)/(this.picture.clientWidth||1180)));
       if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;this.pixels=this.ctx.createImageData(w,h);this.needsPaint=true;}
     }
-    render(time,tracking) {
-      this.resize();const wet=1-clamp(tracking),tick=this.reducedMotion?0:Math.floor(time*20);
+    render(time,tracking,visualTime=time) {
+      this.resize();const wet=1-clamp(tracking),tick=this.reducedMotion?0:Math.floor(visualTime*20);
       if(tick===this.tick&&Math.abs(wet-this.value)<.001&&!this.needsPaint)return;
       this.tick=tick;this.value=wet;this.needsPaint=false;
       this.picture.style.setProperty('--signal-loss',String(wet));
@@ -58,11 +57,11 @@
       if(wet<.003)return;
       let seed=(Math.imul(tick+7,747796405)^0x51af38d1)>>>0;
       const random=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)/4294967296;};
-      const d=pixels.data,opacity=Math.pow(wet,1.35)*.91;
-      for(let i=0;i<d.length;i+=4){const n=random(),luma=24+Math.floor(n*n*205);d[i]=luma;d[i+1]=luma+2;d[i+2]=Math.min(255,luma+6);d[i+3]=Math.round(opacity*(.55+random()*.45)*255);}
+      const d=pixels.data,opacity=Math.pow(wet,1.65);
+      for(let i=0;i<d.length;i+=4){const n=random(),luma=24+Math.floor(n*n*205);d[i]=luma;d[i+1]=luma+2;d[i+2]=Math.min(255,luma+6);d[i+3]=Math.round(opacity*255);}
       ctx.putImageData(pixels,0,0);
       if(!this.reducedMotion){
-        const y=((time*.19)%1)*canvas.height;
+        const y=((visualTime*.19)%1)*canvas.height;
         ctx.fillStyle=`rgba(210,215,218,${wet*.13})`;ctx.fillRect(0,y,canvas.width,Math.max(1,wet*9));
         ctx.fillStyle=`rgba(7,9,15,${wet*.22})`;ctx.fillRect(0,(y+11)%canvas.height,canvas.width,Math.max(1,wet*4));
       }

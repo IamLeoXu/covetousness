@@ -6,6 +6,7 @@
       this.audio=audio;this.cache=cache;this.volume=.75;this.muted=false;this.running=false;
       this.context=null;this.analysers=null;this.source=null;this.gain=null;this.initializing=null;
       this.restoration=1;this.analysisGain=null;this.restoreNodes=null;
+      this.mode='stop';this.musicGate=null;this.windGain=null;this.sfxMaster=null;this.sounds=new Map();
       this.localReady=null;
       this.originalMusic=audio.getAttribute?.('src')||audio.src;
       this.overview=cache?.overview||null;this.buffers=[new Float32Array(1024),new Float32Array(1024)];
@@ -22,9 +23,11 @@
       this.volume=Math.max(0,Math.min(1,Number(v)||0));
       const gain=this.muted?0:this.volume;
       if(this.gain){
-        this.audio.volume=1;const value=this.running?gain:0;
-        this.gain.gain.setTargetAtTime(value,this.context.currentTime,.012);
-        this.analysisGain?.gain.setTargetAtTime(value,this.context.currentTime,.012);
+        this.audio.volume=1;const now=this.context.currentTime;
+        this.gain.gain.setTargetAtTime(gain,now,.012);
+        this.analysisGain?.gain.setTargetAtTime(this.running?gain:0,now,.012);
+        // Physical switches remain audible when the programme MUTE switch is engaged.
+        this.sfxMaster?.gain.setTargetAtTime(this.volume*.38,now,.008);
       }
       else this.audio.volume=gain;
     }
@@ -39,7 +42,8 @@
       set(n.dry.gain,amount);set(n.wet.gain,1-amount);
       set(n.high.frequency,22+230*(1-amount));
       set(n.low.frequency,1400+17000*amount*amount);
-      set(n.hiss.gain,.062*Math.pow(1-amount,1.5));
+      const tapeActive=['play','end'].includes(this.mode);
+      set(n.hiss.gain,tapeActive ? .047*Math.pow(1-amount,1.35) : 0);
     }
     prepareLocalMedia(){
       if(this.localReady)return this.localReady;
@@ -73,6 +77,9 @@
         if(location.protocol==='file:')await this.prepareLocalMedia();
         this.source=this.context.createMediaElementSource(this.audio);
         this.gain=this.context.createGain();
+        this.musicGate=this.context.createGain();this.musicGate.gain.value=0;
+        this.musicGate.connect(this.gain);
+        this.sfxMaster=this.context.createGain();this.sfxMaster.connect(this.context.destination);
         this.analysisGain=this.context.createGain();
         const dry=this.context.createGain(),wet=this.context.createGain();
         const high=this.context.createBiquadFilter(),low=this.context.createBiquadFilter();
@@ -80,8 +87,8 @@
         const colour=this.context.createWaveShaper(),curve=new Float32Array(4096);
         for(let i=0;i<curve.length;i++){const x=i*2/(curve.length-1)-1;curve[i]=Math.tanh(x*1.45)/Math.tanh(1.45);}
         colour.curve=curve;colour.oversample='2x';
-        this.source.connect(dry);dry.connect(this.gain);
-        this.source.connect(high);high.connect(low);low.connect(colour);colour.connect(wet);wet.connect(this.gain);
+        this.source.connect(dry);dry.connect(this.musicGate);
+        this.source.connect(high);high.connect(low);low.connect(colour);colour.connect(wet);wet.connect(this.musicGate);
         // This analysis branch never receives filtering, saturation or generated noise.
         this.source.connect(this.analysisGain);
         const splitter=this.context.createChannelSplitter(2);this.analysisGain.connect(splitter);
@@ -90,29 +97,78 @@
         const noiseBuffer=this.context.createBuffer(2,this.context.sampleRate*4,this.context.sampleRate);
         let seed=0x63ab17;
         for(let ch=0;ch<2;ch++){
-          const pcm=noiseBuffer.getChannelData(ch);
-          for(let i=0;i<pcm.length;i++){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;pcm[i]=(seed>>>0)/2147483648-1;}
+          const pcm=noiseBuffer.getChannelData(ch);let pink=0;
+          for(let i=0;i<pcm.length;i++){
+            seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;
+            const white=(seed>>>0)/2147483648-1;pink=.97*pink+.03*white;
+            // Fine tape hiss with slight modulation, rather than the coarse TV snow spectrum.
+            pcm[i]=(white*.78+pink*1.5)*(.96+.04*Math.sin(i/this.context.sampleRate*Math.PI));
+          }
         }
         const noiseHigh=this.context.createBiquadFilter(),noiseLow=this.context.createBiquadFilter();
-        noiseHigh.type='highpass';noiseHigh.frequency.value=580;noiseHigh.Q.value=.5;
-        noiseLow.type='lowpass';noiseLow.frequency.value=6200;noiseLow.Q.value=.5;
+        noiseHigh.type='highpass';noiseHigh.frequency.value=900;noiseHigh.Q.value=.5;
+        noiseLow.type='lowpass';noiseLow.frequency.value=10500;noiseLow.Q.value=.5;
         noise.buffer=noiseBuffer;noise.loop=true;noise.connect(noiseHigh);noiseHigh.connect(noiseLow);noiseLow.connect(hiss);hiss.connect(this.gain);
-        this.restoreNodes={dry,wet,high,low,hiss,noise};
-        this.setRestoration(this.restoration,true);this.setVolume(this.volume);
+        this.restoreNodes={dry,wet,high,low,hiss,noise,noiseHigh,noiseLow};
+        this.windGain=this.context.createGain();this.windGain.gain.value=0;this.windGain.connect(this.gain);
+        this.wind=this.context.createBufferSource();this.wind.buffer=this.makeSound('wind');this.wind.loop=true;
+        this.wind.connect(this.windGain);this.wind.start();
+        this.setTransport(this.mode);this.setVolume(this.volume);
         this.gain.connect(this.context.destination);noise.start();
         this.setVolume(this.volume);this.loadActualOverview();
       }catch(error){
         try{this.restoreNodes?.noise.stop();this.restoreNodes?.noise.disconnect();}catch{}
         this.gain?.disconnect();this.analysisGain?.disconnect();
         if(this.source){try{this.source.disconnect();this.source.connect(this.context.destination);}catch{}}
+        try{this.wind?.stop();this.sfxMaster?.disconnect();this.musicGate?.disconnect();}catch{}
         this.gain=null;this.analysisGain=null;this.restoreNodes=null;this.analysers=null;this.setVolume(this.volume);
       }
     }
-    async resume(){
+    async unlock(){
       await this.initialize();if(this.context?.state==='suspended')await this.context.resume();
-      this.running=true;this.setVolume(this.volume);
     }
-    pauseOutput(){this.running=false;this.setVolume(this.volume);}
+    async resume(){await this.unlock();this.setTransport('play');}
+    pauseOutput(){this.setTransport('pause');}
+    setTransport(mode){
+      this.mode=mode;this.running=mode==='play';
+      if(!this.context||!this.gain)return;
+      const now=this.context.currentTime,wind=mode==='rew'||mode==='forward';
+      this.musicGate.gain.setTargetAtTime(this.running?1:0,now,.012);
+      this.windGain?.gain.setTargetAtTime(wind ? .095 : 0,now,.025);
+      if(this.wind?.playbackRate)this.wind.playbackRate.setTargetAtTime(mode==='rew'?1.16:.94,now,.06);
+      this.setRestoration(this.restoration,true);this.setVolume(this.volume);
+    }
+    makeSound(kind){
+      if(this.sounds.has(kind))return this.sounds.get(kind);
+      const rate=this.context.sampleRate,wind=kind==='wind';
+      const duration=wind ? 4 : kind==='insert' ? .28 : kind==='latch' ? .23 : .105;
+      const buffer=this.context.createBuffer(1,Math.ceil(rate*duration),rate),pcm=buffer.getChannelData(0);
+      let seed=0x947ad51,low=0,previous=0;
+      for(let i=0;i<pcm.length;i++){
+        seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;
+        const white=(seed>>>0)/2147483648-1,t=i/rate;low+=.055*(white-low);
+        const high=white-previous;previous=white;
+        if(wind){
+          const mod=.75+.12*Math.sin(2*Math.PI*11*t)+.07*Math.sin(2*Math.PI*23*t);
+          pcm[i]=low*.9+white*.12+mod*(.11*Math.sin(2*Math.PI*184*t)+.055*Math.sin(2*Math.PI*552*t));
+        }else{
+          const heavy=kind==='latch'||kind==='stop',frequency=heavy?145:kind==='insert'?210:340;
+          const onset=Math.min(1,t/.0008),decay=Math.exp(-t/(heavy ? .032 : .017));
+          const click=high*.17*Math.exp(-t/.0035),body=Math.sin(t*Math.PI*2*frequency)*.38+low*1.2;
+          const catchTime=kind==='insert' ? .075 : .021,second=Math.max(0,t-catchTime);
+          const catchClick=t>catchTime ? high*.14*Math.exp(-second/.009) : 0;
+          pcm[i]=Math.max(-.9,Math.min(.9,onset*(click+body*decay+catchClick)));
+        }
+      }
+      this.sounds.set(kind,buffer);return buffer;
+    }
+    async mechanical(kind='key'){
+      try{
+        await this.unlock();if(!this.sfxMaster)return;
+        const voice=this.context.createBufferSource();voice.buffer=this.makeSound(kind);voice.connect(this.sfxMaster);
+        voice.onended=()=>voice.disconnect();voice.start();
+      }catch{} // Playback must still work when a browser declines Web Audio.
+    }
     async loadActualOverview(){
       try{
         const response=await fetch(this.audio.currentSrc||this.audio.src);if(!response.ok)return;
@@ -169,19 +225,24 @@
       const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
       ctx.clearRect(0,0,w,h);
       const cx=w/2,cy=h/2,r=Math.min(w,h)*.42;
-      ctx.strokeStyle='#293343';ctx.lineWidth=1;
+      ctx.strokeStyle='#435c4a';ctx.lineWidth=1;
       ctx.beginPath();ctx.moveTo(cx-r,cy);ctx.lineTo(cx+r,cy);ctx.moveTo(cx,cy-r);ctx.lineTo(cx,cy+r);ctx.stroke();
       ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
       ctx.save();ctx.translate(cx,cy);ctx.rotate(Math.PI/4);ctx.strokeRect(-r*.7,-r*.7,r*1.4,r*1.4);ctx.restore();
+      for(let i=-4;i<=4;i++){
+        const d=i*r/5;ctx.beginPath();ctx.moveTo(cx+d,cy-3);ctx.lineTo(cx+d,cy+3);ctx.moveTo(cx-3,cy+d);ctx.lineTo(cx+3,cy+d);ctx.stroke();
+      }
+      ctx.fillStyle='#9ba58d';ctx.font='12px Consolas,monospace';ctx.textAlign='center';
+      ctx.fillText('M',cx,17);ctx.fillText('S',cx+r+16,cy+4);ctx.fillText('STEREO / X-Y',cx,h-7);
       const [left,right]=signal.waves,n=Math.min(left.length,right.length);
-      ctx.strokeStyle='#aa90ff';ctx.lineWidth=1.4;ctx.beginPath();
+      ctx.strokeStyle='#d2f850';ctx.lineWidth=1.4;ctx.shadowColor='#aec961';ctx.shadowBlur=3;ctx.beginPath();
       for(let i=0;i<n;i++){
         // Mid/side display: mono produces a vertical trace; stereo widens it.
         const x=cx+(left[i]-right[i])*r*1.4;
         const y=cy-(left[i]+right[i])*r*1.4;
         if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
       }
-      ctx.stroke();ctx.fillStyle='#d2f850';ctx.fillRect(cx-1,cy-1,2,2);
+      ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#d2f850';ctx.fillRect(cx-1,cy-1,2,2);
     }
     drawScope(canvas,signal){
       const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);

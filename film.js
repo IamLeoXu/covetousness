@@ -350,6 +350,9 @@
       const y = this.height * (1 - (shot.y ?? 0) / 100) - h + drift;
       const opacity = shot.opacity ?? 1;
       ctx.save(); ctx.globalAlpha = opacity;
+      if(isSilhouette && shot.rimColor){
+        ctx.drawImage(this.silhouette({...shot,silhouetteColor:shot.rimColor}),x-2.5,y-1.5,w,h);
+      }
       // Hard printed shadow, not an airbrushed halo.
       if (!isSilhouette && shot.printShadow !== false && !this.data.shadowSprites?.[shot.pose]) {
         ctx.drawImage(this.silhouette(shot, mixed), x + 8, y + 4, w, h);
@@ -411,17 +414,28 @@
     }
 
     rainOnGlass(ctx, scene, t) {
-      if(scene.weather==='none')return;
+      if(!scene.weather||scene.weather==='none')return;
       const names=['rainBead','rainSlide','rainDouble','rainRun'];
       const clock=this.reducedMotion?3:t;
-      // Sparse illustrated beads move on the glass; the street carries the rain's atmosphere.
-      for(let i=0;i<15;i++){
+      const strength=scene.rainIntensity??1;
+      // Two depths of painted rain: wind-blown streaks beyond the glass and slower near beads.
+      for(let i=0;i<46;i++){
+        const seed=fract((i+1)*.6180339),asset=this.props[i%3?'rainRun':'rainSlide'];
+        if(!asset?.ready)continue;
+        const life=.65+seed*1.4,p=fract(clock/life+i*.71317);
+        const x=fract(i*.38197-p*(.025+seed*.035));
+        const h=this.height*(.075+seed*.15),w=Math.max(1.5,h*asset.image.width/asset.image.height*.36);
+        ctx.save();ctx.globalAlpha=strength*(.15+seed*.19)*Math.sin(Math.PI*p);
+        ctx.translate(x*this.width,(-.2+p*1.4)*this.height);ctx.rotate(.10);
+        ctx.drawImage(asset.image,-w/2,-h/2,w,h);ctx.restore();
+      }
+      for(let i=0;i<13;i++){
         const depth=fract(i*.61813),asset=this.props[names[i%4]];
         if(!asset?.ready)continue;
         const x=fract(.07+i*.38197+Math.sin(clock*.075+i)*.003);
-        const y=fract(i*.71213+clock*(.002+depth*.006));
-        const h=this.height*(i%4===3?.06:.011+depth*.018),w=h*asset.image.width/asset.image.height;
-        ctx.save();ctx.globalAlpha=.10+depth*.10;
+        const y=fract(i*.71213+clock*(.007+depth*.018));
+        const h=this.height*(i%4===3?.19:.022+depth*.039),w=h*asset.image.width/asset.image.height;
+        ctx.save();ctx.globalAlpha=strength*(.25+depth*.22);
         ctx.drawImage(asset.image,x*this.width,y*this.height,w,h);ctx.restore();
       }
       const haze=ctx.createLinearGradient(0,0,0,this.height);
@@ -434,7 +448,6 @@
       this.polygon(ctx, [[.48, 0], [1, 0], [1, 1], [.74, 1]], '#30132270');
       this.drawStickers(ctx, scene, t, 'back');
       this.portrait(ctx, scene, t);
-      this.rainOnGlass(ctx,scene,t);
       if (scene.stage === 'departure') {
         const p = smooth((t - 24.5) / 6.5);
         this.polygon(ctx, [[.48, 0], [.54, 0], [.33, .68], [.25, .68]], '#f9dfb0' + Math.round(mix(80, 15, p)).toString(16).padStart(2, '0'));
@@ -463,6 +476,7 @@
       if (scene.flashbacks?.length && !nested) this.flashback(ctx, scene, t);
       else if (scene.stage === 'rain' || scene.stage === 'departure') this.city(ctx, scene, t);
       else this.collage(ctx, scene, t);
+      if(!scene.flashbacks?.length)this.rainOnGlass(ctx,scene,t);
       // A readability wash is composition, not a generated illustration.
       const shade = ctx.createLinearGradient(0, this.height * .7, 0, this.height);
       shade.addColorStop(0, '#17131b00'); shade.addColorStop(1, '#17131b70');
@@ -500,17 +514,18 @@
           if (state.asset==='frame') this.framed(ctx,state.x,state.y,state.height,state.content,{angle:state.angle,alpha:state.opacity,fade:state.contentOpacity});
           else this.prop(ctx,state.asset,state.x,state.y,state.height,state.angle,state.opacity,false);
         }
+        this.rainOnGlass(ctx,shot,t);
       }
     }
 
-    flashbackContact(ctx,cue,t) {
+    flashbackContact(ctx,cue,t,instant=false) {
       const cells=cue.cells||[],columns=3,rows=Math.ceil(cells.length/columns);
       if(!rows)return;
       const marginX=this.width*.09,marginY=this.height*.1,gap=Math.max(9,this.height*.025);
       const cw=(this.width-marginX*2-gap*(columns-1))/columns,ch=(this.height-marginY*2-gap*(rows-1))/rows;
       for(const[i,name]of cells.entries()){
         const asset=this.props[name];if(!asset?.ready||!this.flashbackLayerAllowed({asset:name}))continue;
-        const p=this.reducedMotion?1:smooth((t-cue.t-i*.025)/.24);
+        const p=instant||this.reducedMotion?1:smooth((t-cue.t-i*.025)/.24);
         const x=marginX+(i%columns)*(cw+gap),y=marginY+Math.floor(i/columns)*(ch+gap)+(1-p)*ch*.12;
         ctx.save();ctx.globalAlpha=p;ctx.fillStyle=i%2?'#ead9c2':'#c68b9a';ctx.fillRect(x,y,cw,ch);
         ctx.strokeStyle='#36232e';ctx.lineWidth=2;ctx.strokeRect(x+3,y+3,cw-6,ch-6);
@@ -522,7 +537,19 @@
     flashback(ctx, scene, t) {
       const {cue,end}=this.flashbackAt(scene,t),w=this.width,h=this.height,r=this.pixelRatio;
       const surface=this.flashbackSurface,plate=surface.getContext('2d');
-      this.flashbackPlate(plate,scene,cue,end,t);
+      const hard=scene.flashbackStyle==='hard';
+      this.flashbackPlate(plate,scene,cue,end,hard?cue.t:t);
+      if(hard){
+        // Hold each printed composition completely still, then replace it in a single frame.
+        if(cue.layout==='strips'){
+          for(let i=0;i<4;i++){
+            const sh=h/4,offset=(i%2?-1:1)*w*.014;
+            ctx.drawImage(surface,0,i*sh*r,w*r,sh*r,offset,i*sh,w,sh+.5);
+          }
+        }else ctx.drawImage(surface,0,0,w,h);
+        if(cue.layout==='contact')this.flashbackContact(ctx,cue,cue.t,true);
+        return;
+      }
       const local=t-cue.t,enter=this.reducedMotion?1:smooth(local/Math.min(.28,(end-cue.t)*.45));
       ctx.save();
       if(cue.layout==='contact'){
