@@ -354,7 +354,7 @@ window.TIMELINE = {
       "fitVisible": true,
       "animationStart": 0,
       "animationEndTime": 31,
-      "animationFps": 5,
+      "animationFps": 10,
       "transitionDuration": 0.32
     },
     {
