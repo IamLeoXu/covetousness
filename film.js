@@ -17,6 +17,7 @@
       this.nextCtx = this.next.getContext('2d', { alpha: false });
       this.expressionLayer = document.createElement('canvas');
       this.expressionShadow = document.createElement('canvas');
+      this.flashbackSurface = document.createElement('canvas');
       this.lyric = document.getElementById('lyric');
       this.lines = ['lyricOne', 'lyricTwo'].map(id => document.getElementById(id));
       this.reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -54,20 +55,42 @@
           { length: Math.max(0, Math.floor(config.frameCount || 0)) },
           (_, index) => config.src.replace('{frame}', String(index).padStart(config.digits ?? 3, '0')),
         );
-        const frames = Object.values(this.loadGroup(Object.fromEntries(paths.map((src, index) => [index, src]))));
-        return [name, { frames, fps: Math.max(.01, Number(config.fps) || 24) }];
+        const frames=paths.map((src,index)=>({src,index,image:null,ready:false}));
+        const clip={frames,fps:Math.max(.01,Number(config.fps)||24),loop:config.loop!==false,
+          posterIndex:clamp(Math.floor(config.posterFrame||0),0,Math.max(0,frames.length-1))};
+        this.warmAnimation(clip,0);
+        return [name,clip];
       }));
+    }
+
+    warmAnimation(clip,index) {
+      // Keep a small decoded window, rather than retaining hundreds of HD alpha frames.
+      const keep=new Set([clip.posterIndex,0]);
+      for(let i=Math.max(0,index-2);i<=Math.min(clip.frames.length-1,index+4);i++)keep.add(i);
+      for(const frame of clip.frames){
+        if(!keep.has(frame.index)&&frame.image){
+          frame.image.onload=frame.image.onerror=null;frame.image=null;frame.ready=false;
+        }
+      }
+      for(const i of keep){
+        const frame=clip.frames[i];if(!frame||frame.image)continue;
+        const image=new Image();frame.image=image;
+        image.onload=()=>{if(frame.image!==image)return;frame.ready=true;this.needsPaint=true;};
+        image.onerror=()=>{if(frame.image!==image)return;frame.failed=true;this.needsPaint=true;};
+        image.decoding='async';image.src=frame.src;
+      }
     }
 
     animationFrame(shot, t) {
       const animation = this.animations[shot.pose];
       if (!animation?.frames.length) return 0;
+      if(this.reducedMotion)return animation.posterIndex;
       const speed = Math.max(0, Number(shot.animationSpeed ?? 1) || 0);
       const start = Math.max(0, Number(shot.animationStart ?? 0) || 0);
-      const elapsed = Math.max(0, t - (shot.t ?? 0)) * speed + start;
+      const elapsed = Math.max(0, t - (shot.animationTimeStart ?? shot.t ?? 0)) * speed + start;
       // The epsilon keeps exact frame boundaries stable despite floating-point song times.
       const index = Math.floor(elapsed * animation.fps + 1e-7);
-      return shot.animationLoop === false ? Math.min(index, animation.frames.length - 1) : index % animation.frames.length;
+      return (shot.animationLoop ?? animation.loop) === false ? Math.min(index, animation.frames.length - 1) : index % animation.frames.length;
     }
 
     resize() {
@@ -75,7 +98,7 @@
       const ratio = clamp(window.devicePixelRatio || 1, 1, 2);
       if (w === this.width && h === this.height && ratio === this.pixelRatio) return;
       this.width = w; this.height = h; this.pixelRatio = ratio;
-      for (const surface of [this.canvas, this.next]) {
+      for (const surface of [this.canvas, this.next, this.flashbackSurface]) {
         surface.width = Math.round(w * ratio); surface.height = Math.round(h * ratio);
         const context = surface.getContext('2d');
         context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -93,7 +116,7 @@
     expressionAt(t, scene) {
       if (!scene.pose) return { pose: null, previous: null, blend: 1 };
       if (scene.followExpressions === false || (this.animations[scene.pose] && scene.followExpressions !== true)) {
-        return { pose: scene.pose, previous: null, blend: 1 };
+        return { pose: scene.pose, previous: null, blend: 1, cueTime:scene.animationTimeStart??scene.t };
       }
       let cue = null, previous = null;
       for (const item of this.data.expressions || []) {
@@ -101,13 +124,14 @@
         previous = cue;
         cue = item;
       }
-      if (!cue) return { pose: scene.pose, previous: null, blend: 1 };
+      if (!cue) return { pose: scene.pose, previous: null, blend: 1, cueTime:scene.t };
       const seconds = this.data.settings.expressionTransitionSeconds ?? .2;
       const canBlend = previous && cue.t > scene.t && !this.reducedMotion && scene.treatment !== 'silhouette'
         && !this.animations[cue.pose] && !this.animations[previous.pose]
         && !this.data.shadowSprites?.[cue.pose] && !this.data.shadowSprites?.[previous.pose];
       return {
         pose: cue.pose,
+        cueTime: cue.t,
         layout: cue.t >= scene.t ? cue.layout : null,
         previous: canBlend ? previous.pose : null,
         blend: canBlend ? smooth((t - cue.t) / Math.max(.01, seconds)) : 1,
@@ -245,7 +269,12 @@
 
     portraitAsset(shot) {
       const animation = this.animations[shot.pose];
-      if (animation) return animation.frames[shot._animationFrame ?? 0];
+      if (animation) {
+        const index=shot._animationFrame??this.animationFrame(shot,shot.animationTimeStart??shot.t??0);
+        this.warmAnimation(animation,index);
+        if(animation.frames[index]?.ready)return animation.frames[index];
+        return animation.frames.filter(f=>f.ready).sort((a,b)=>Math.abs(a.index-index)-Math.abs(b.index-index))[0]||animation.frames[animation.posterIndex];
+      }
       // Complete figures are the default. Old face-anchored crops require an explicit portrait shot.
       if (shot.framing !== 'portrait' && shot.quality !== 'original' && this.data.settings.characterHD !== false) {
         const hd = this.hdPortraits[shot.pose];
@@ -302,7 +331,8 @@
           mixed = layer;
         }
       }
-      if (expression.pose) this.portraitLayer(ctx, { ...shot, ...(expression.layout || {}), pose: expression.pose }, t, mixed);
+      if (expression.pose) this.portraitLayer(ctx, { ...shot, ...(expression.layout || {}), pose: expression.pose,
+        animationTimeStart:expression.cueTime??shot.animationTimeStart??shot.t }, t, mixed);
     }
 
     portraitLayer(ctx, shot, t, mixed = null) {
@@ -448,23 +478,67 @@
       return { cue, end };
     }
 
-    flashback(ctx, scene, t) {
-      const {cue,end}=this.flashbackAt(scene,t);
+    flashbackLayerAllowed(layer) {
+      return ![layer.asset,layer.content].some(key=>/^assets\/character\//.test(this.data.props[key]||''));
+    }
+
+    flashbackPlate(ctx, scene, cue, end, t) {
+      fill(ctx,this.width,this.height,'#17131b');
       const source=this.data.scenes.find(s=>s.id===cue.sourceScene && !s.flashbacks);
       if (source) {
         const sourceTime=(cue.sourceTime??source.t) + (this.reducedMotion?0:Math.max(0,t-cue.t)*(cue.sourceSpeed??.15));
-        this.drawShot(ctx,{...source,...(cue.sceneOverrides||{})},sourceTime,true);
+        const overrides=cue.sceneOverrides||{};
+        this.drawShot(ctx,{...source,...overrides,pose:null,followExpressions:false,
+          stickers:(overrides.stickers||source.stickers||[]).filter(layer=>this.flashbackLayerAllowed(layer))},sourceTime,true);
       } else {
         const shot={...scene,...cue,flashbacks:null,pose:null,stickers:[],t:cue.t};
         this.background(ctx,shot,t);
         for (const layer of cue.layers||[]) {
+          if(!this.flashbackLayerAllowed(layer))continue;
           const state=this.stickerState({...layer,start:cue.t,end},scene,t);
           if (!state) continue;
           if (state.asset==='frame') this.framed(ctx,state.x,state.y,state.height,state.content,{angle:state.angle,alpha:state.opacity,fade:state.contentOpacity});
           else this.prop(ctx,state.asset,state.x,state.y,state.height,state.angle,state.opacity,false);
         }
       }
-      const length=cue.splice??0, local=t-cue.t;
+    }
+
+    flashbackContact(ctx,cue,t) {
+      const cells=cue.cells||[],columns=3,rows=Math.ceil(cells.length/columns);
+      if(!rows)return;
+      const marginX=this.width*.09,marginY=this.height*.1,gap=Math.max(9,this.height*.025);
+      const cw=(this.width-marginX*2-gap*(columns-1))/columns,ch=(this.height-marginY*2-gap*(rows-1))/rows;
+      for(const[i,name]of cells.entries()){
+        const asset=this.props[name];if(!asset?.ready||!this.flashbackLayerAllowed({asset:name}))continue;
+        const p=this.reducedMotion?1:smooth((t-cue.t-i*.025)/.24);
+        const x=marginX+(i%columns)*(cw+gap),y=marginY+Math.floor(i/columns)*(ch+gap)+(1-p)*ch*.12;
+        ctx.save();ctx.globalAlpha=p;ctx.fillStyle=i%2?'#ead9c2':'#c68b9a';ctx.fillRect(x,y,cw,ch);
+        ctx.strokeStyle='#36232e';ctx.lineWidth=2;ctx.strokeRect(x+3,y+3,cw-6,ch-6);
+        const h=Math.min(ch*.8,cw*.8*asset.image.height/asset.image.width);
+        this.prop(ctx,name,(x+cw/2)/this.width,(y+ch/2)/this.height,h/this.height,0,p,false);ctx.restore();
+      }
+    }
+
+    flashback(ctx, scene, t) {
+      const {cue,end}=this.flashbackAt(scene,t),w=this.width,h=this.height,r=this.pixelRatio;
+      const surface=this.flashbackSurface,plate=surface.getContext('2d');
+      this.flashbackPlate(plate,scene,cue,end,t);
+      const local=t-cue.t,enter=this.reducedMotion?1:smooth(local/Math.min(.28,(end-cue.t)*.45));
+      ctx.save();
+      if(cue.layout==='contact'){
+        ctx.drawImage(surface,0,0,w,h);this.flashbackContact(ctx,cue,t);
+      }else if(cue.layout==='aperture'&&!this.reducedMotion){
+        const width=w*(.05+.95*enter);ctx.beginPath();ctx.rect((w-width)/2,0,width,h);ctx.clip();ctx.drawImage(surface,0,0,w,h);
+      }else if(cue.layout==='strips'&&!this.reducedMotion){
+        const count=6;for(let i=0;i<count;i++){
+          const sh=h/count,offset=(i%2?-1:1)*(1-enter)*w*.045;
+          ctx.drawImage(surface,0,i*sh*r,w*r,sh*r,offset,i*sh,w,sh+.5);
+        }
+      }else if(cue.layout==='split'&&!this.reducedMotion){
+        for(let i=0;i<2;i++)ctx.drawImage(surface,i*w*.5*r,0,w*.5*r,h*r,i*w*.5,(i?-1:1)*(1-enter)*h*.065,w*.5,h);
+      }else ctx.drawImage(surface,0,0,w,h);
+      ctx.restore();
+      const length=cue.splice??0;
       const matte=this.props.printShutter;
       if (!this.reducedMotion && length>0 && local<length && matte?.ready) {
         const p=smooth(local/length);ctx.save();ctx.globalAlpha=.7*(1-p);ctx.translate(this.width*p*.12,0);

@@ -1,6 +1,6 @@
-/* DEAD AIR v0.17: faceless memories, analogue signal recovery, physical receiver. */
+/* DEAD AIR v0.18: restored anonymous memories, source MOV animation, object-only flashbacks. */
 window.TIMELINE = {
-  "version": "0.17",
+  "version": "0.18",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -9,27 +9,30 @@ window.TIMELINE = {
     "blackStrings": "assets/backgrounds/black-strings.webp",
     "memoryCut": "assets/backgrounds/print/memory-cut.webp",
     "archiveCut": "assets/backgrounds/print/archive-cut.webp",
-    "voidCut": "assets/backgrounds/print/void-cut.webp"
+    "voidCut": "assets/backgrounds/print/void-cut.webp",
+    "petalRoad": "assets/backgrounds/petal-road.webp",
+    "paperVault": "assets/backgrounds/paper-vault.webp",
+    "morningVault": "assets/backgrounds/morning-vault.webp"
   },
   "props": {
     "frame": "assets/props/frame.webp",
-    "faceA": "assets/character/details/absence-close-v15.png",
-    "faceB": "assets/character/details/letter-close-v16.png",
-    "faceC": "assets/character/details/sob-close-v15.png",
+    "faceA": "assets/props/face-a.webp",
+    "faceB": "assets/props/face-b.webp",
+    "faceC": "assets/props/face-c.webp",
     "faceEmpty": "assets/props/face-empty.webp",
     "frameCut": "assets/props/print/frame-cut.webp",
     "printShutter": "assets/props/print/print-shutter.webp",
-    "sobClose": "assets/character/details/sob-close-v15.png",
-    "letterClose": "assets/character/details/黑影双手紧握象牙信封.png",
-    "reachClose": "assets/character/details/仰首少女伸向画外.png",
-    "keysClose": "assets/character/details/keys-close-v16.png",
-    "absenceClose": "assets/character/details/absence-close-v15.png",
+    "sobClose": "assets/character/details/covered-face.png",
+    "letterClose": "assets/character/details/gripped-envelope.png",
+    "reachClose": "assets/character/details/reach-dark.png",
+    "keysClose": "assets/character/details/clasped-keys.png",
+    "absenceClose": "assets/character/details/open-hands.png",
     "roomKeys": "assets/props/kept/room-keys.png",
     "repairLedger": "assets/props/kept/repair-ledger.png",
     "residentNote": "assets/props/kept/resident-note.png",
     "emptyCup": "assets/props/kept/empty-cup.png",
-    "letterStudyClose": "assets/character/details/letter-close-v16.png",
-    "reachStudyClose": "assets/character/details/reach-close-v16.png",
+    "letterStudyClose": "assets/character/details/held-letter.png",
+    "reachStudyClose": "assets/character/details/reach-light.png",
     "petalRose": "assets/props/fragments/petal-rose.webp",
     "petalBlush": "assets/props/fragments/petal-blush.webp",
     "petalDust": "assets/props/fragments/petal-dust.webp",
@@ -45,28 +48,100 @@ window.TIMELINE = {
     "rainBead": "assets/props/fragments/rain-bead.webp",
     "rainSlide": "assets/props/fragments/rain-slide.webp",
     "rainDouble": "assets/props/fragments/rain-double.webp",
-    "rainRun": "assets/props/fragments/rain-run.webp"
+    "rainRun": "assets/props/fragments/rain-run.webp",
+    "envelope": "assets/props/envelope.webp",
+    "looseKeys": "assets/props/keys.webp",
+    "pressedFlower": "assets/props/pressed-flower.webp",
+    "memoryTrace": "assets/props/print/memory-trace.webp",
+    "vacantDoor": "assets/props/kept/vacant-door.png",
+    "archiveSleeve": "assets/props/kept/archive-sleeve.png"
   },
   "portraits": {
-    "standShadow": "assets/character/shadows/942fdace-12b8-4f7e-9ce5-393a34cc6ab0.png",
-    "standReachShadow": "assets/character/shadows/粉色长发礼服少女举手剪影.png",
-    "reachShadow": "assets/character/shadows/跪姿蕾丝靴粉色蝴蝶结少女.png",
-    "reachSoftShadow": "assets/character/shadows/粉黑奶油配色跪姿动漫少女.png",
-    "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-sit-v14.webp"
+    "standShadow": "assets/character/shadows/stand-bowed.png",
+    "standBowed": "assets/character/shadows/stand-bowed.png",
+    "standReachShadow": "assets/character/shadows/stand-reaching-profile.png",
+    "standReachProfile": "assets/character/shadows/stand-reaching-profile.png",
+    "standReachOpen": "assets/character/shadows/stand-reaching-open.png",
+    "standReachHigh": "assets/character/shadows/stand-reaching-high.png",
+    "reachShadow": "assets/character/shadows/kneel-reaching.png",
+    "reachSoftShadow": "assets/character/shadows/kneel-reaching-soft.png",
+    "sobShadow": "assets/character/shadows/sit-sobbing.png",
+    "letterSit": "assets/character/shadows/sit-letter.webp",
+    "coveredFace": "assets/character/details/covered-face.png"
   },
-  "animations": {},
+  "animations": {
+    "walk": {
+      "src": "assets/character/animations/walk/{frame}.webp",
+      "frameCount": 30,
+      "fps": 10,
+      "loop": true,
+      "posterFrame": 0
+    },
+    "walk2": {
+      "src": "assets/character/animations/walk2/{frame}.webp",
+      "frameCount": 30,
+      "fps": 10,
+      "loop": true,
+      "posterFrame": 0
+    },
+    "cry": {
+      "src": "assets/character/animations/cry/{frame}.webp",
+      "frameCount": 72,
+      "fps": 10,
+      "loop": false,
+      "posterFrame": 71,
+      "width": 684,
+      "height": 1167,
+      "sourceSize": [
+        720,
+        1280
+      ],
+      "crop": {
+        "x": 36,
+        "y": 94,
+        "width": 684,
+        "height": 1167
+      },
+      "sourceName": "cry.mov",
+      "sourceSha256": "63f2acdef99059aeff8389da8ec99f45b40b9e87de92bd79d4c0913b453149b8",
+      "duration": 7.2,
+      "bytes": 23407264
+    },
+    "lookback": {
+      "src": "assets/character/animations/lookback/{frame}.webp",
+      "frameCount": 55,
+      "fps": 10,
+      "loop": false,
+      "posterFrame": 54,
+      "width": 612,
+      "height": 1211,
+      "sourceSize": [
+        720,
+        1280
+      ],
+      "crop": {
+        "x": 85,
+        "y": 44,
+        "width": 612,
+        "height": 1211
+      },
+      "sourceName": "lookback.mov",
+      "sourceSha256": "93409fd22bcfea7adc6ba1c743e041c70f14af6388561aecae21e19c108310bd",
+      "duration": 5.5,
+      "bytes": 18720928
+    }
+  },
   "scenes": [
     {
       "t": 0,
       "id": "rain-and-departure",
       "stage": "rain",
-      "pose": "standShadow",
-      "action": "空站台里只保留无脸剪影。抬手与画外灯光暗示无法挽留，不新增对方人物。",
+      "pose": "walk",
+      "action": "恢复走路动画，以统一深色剪影呈现在雨站；背景运动继续沿用原有设置。",
       "x": 77,
-      "y": 6,
-      "scale": 0.84,
-      "opacity": 0.88,
+      "y": -3,
+      "scale": 1.01,
+      "opacity": 1,
       "treatment": "silhouette",
       "silhouetteColor": "#150009",
       "camera": 2,
@@ -87,7 +162,9 @@ window.TIMELINE = {
       "stickers": [],
       "framing": "full",
       "motion": 0,
-      "followExpressions": false
+      "followExpressions": false,
+      "animationLoop": true,
+      "animationSpeed": 0.7
     },
     {
       "t": 17,
@@ -153,13 +230,13 @@ window.TIMELINE = {
       "t": 24.5,
       "id": "half-in-the-light-return",
       "stage": "departure",
-      "pose": "standReachShadow",
-      "action": "空站台里只保留无脸剪影。抬手与画外灯光暗示无法挽留，不新增对方人物。",
+      "pose": "lookback",
+      "action": "使用用户新增 lookback.mov 的透明动画，在半明半暗中回望；只呈现 Koharu，不新增歌词中 you 的身份。",
       "x": 77,
       "y": 6,
-      "scale": 0.84,
-      "opacity": 0.88,
-      "treatment": "silhouette",
+      "scale": 0.85,
+      "opacity": 1,
+      "treatment": "color",
       "silhouetteColor": "#150009",
       "camera": 2,
       "pan": 0.02,
@@ -182,11 +259,11 @@ window.TIMELINE = {
           "asset": "frame",
           "start": 24.5,
           "end": 31,
-          "x": 76,
+          "x": 40,
           "y": 43,
           "height": 53,
           "rotation": -4.010704565915763,
-          "opacity": 0.35,
+          "opacity": 0.25,
           "layer": "front",
           "content": "faceEmpty",
           "fadeIn": 6.5
@@ -194,7 +271,10 @@ window.TIMELINE = {
       ],
       "framing": "full",
       "motion": 0,
-      "followExpressions": false
+      "followExpressions": false,
+      "animationLoop": false,
+      "animationSpeed": 0.85,
+      "animationTimeStart": 24.5
     },
     {
       "t": 31,
@@ -237,16 +317,16 @@ window.TIMELINE = {
       "t": 52,
       "id": "warm-recollection",
       "stage": "memory",
-      "pose": "letterSit",
-      "action": "无歌词的回忆里仍只使用无脸角色；同一张底板保留到下一段。",
+      "pose": "walk2",
+      "action": "无歌词的回忆中恢复另一组走路剪影，保持同一底板，不显示旧五官立绘。",
       "x": 75,
-      "y": 7,
-      "scale": 0.66,
+      "y": -1,
+      "scale": 1.02,
       "framing": "full",
       "printShadow": false,
       "motion": 0,
-      "opacity": 1,
-      "treatment": "color",
+      "opacity": 0.82,
+      "treatment": "silhouette",
       "camera": 1,
       "subtitleAlign": "left",
       "subtitleX": 6,
@@ -283,7 +363,11 @@ window.TIMELINE = {
         "end": 61,
         "count": 7,
         "drift": -0.1
-      }
+      },
+      "animationLoop": true,
+      "animationSpeed": 0.45,
+      "silhouetteColor": "#291723",
+      "followExpressions": false
     },
     {
       "t": 61,
@@ -321,9 +405,9 @@ window.TIMELINE = {
         {
           "id": "kept-repair-ledger",
           "asset": "repairLedger",
-          "x": 68,
-          "y": 52,
-          "height": 47,
+          "x": 58,
+          "y": 55,
+          "height": 30,
           "rotation": -8,
           "start": 61,
           "end": 69,
@@ -335,9 +419,9 @@ window.TIMELINE = {
         {
           "id": "kept-room-keys",
           "asset": "roomKeys",
-          "x": 83,
-          "y": 58,
-          "height": 24,
+          "x": 54,
+          "y": 69,
+          "height": 19,
           "rotation": 11,
           "start": 61,
           "end": 69,
@@ -349,9 +433,9 @@ window.TIMELINE = {
         {
           "id": "kept-resident-note",
           "asset": "residentNote",
-          "x": 54,
-          "y": 62,
-          "height": 29,
+          "x": 42,
+          "y": 49,
+          "height": 27,
           "rotation": 5,
           "start": 61,
           "end": 69,
@@ -363,9 +447,9 @@ window.TIMELINE = {
         {
           "id": "kept-empty-cup",
           "asset": "emptyCup",
-          "x": 75,
-          "y": 75,
-          "height": 15,
+          "x": 44,
+          "y": 74,
+          "height": 12,
           "rotation": -2,
           "start": 61,
           "end": 69,
@@ -379,9 +463,9 @@ window.TIMELINE = {
           "asset": "rentReceipt",
           "start": 65,
           "end": 69,
-          "x": 48,
-          "y": 58,
-          "height": 26,
+          "x": 32,
+          "y": 62,
+          "height": 24,
           "rotation": 8,
           "opacity": 0.94,
           "layer": "front",
@@ -393,13 +477,27 @@ window.TIMELINE = {
           "asset": "bluePen",
           "start": 65,
           "end": 69,
-          "x": 59,
-          "y": 72,
-          "height": 22,
+          "x": 44,
+          "y": 68,
+          "height": 20,
           "rotation": -12,
           "opacity": 0.94,
           "layer": "front",
           "fadeIn": 0.7,
+          "fadeOut": 0.4
+        },
+        {
+          "id": "pocket-envelope-detail",
+          "asset": "letterClose",
+          "x": 79,
+          "y": 45,
+          "height": 66,
+          "rotation": 0,
+          "start": 61,
+          "end": 69,
+          "opacity": 1,
+          "layer": "back",
+          "fadeIn": 0.65,
           "fadeOut": 0.4
         }
       ],
@@ -648,7 +746,7 @@ window.TIMELINE = {
       "id": "solo-memory-flashback",
       "stage": "flashback",
       "pose": null,
-      "action": "只用 shadows 与 details 中的无脸角色闪回；握信、空抱、掩面与挽留穿插站台、房间牌、收据和蓝笔。",
+      "action": "独奏闪回只使用雨站、匿名黑头相片、房门、信件、账单、钥匙、花与空画框；用切片、接触印相格和遮罩组织记忆，不使用 Koharu 或她的身体局部。",
       "x": 75,
       "y": 8,
       "scale": 0.68,
@@ -677,295 +775,423 @@ window.TIMELINE = {
       "flashbacks": [
         {
           "t": 112,
-          "id": "sleeve-in-rain",
-          "sourceScene": "rain-and-departure",
-          "sourceTime": 7.4,
-          "sourceSpeed": 0.18,
-          "splice": 0.16
-        },
-        {
-          "t": 114.4,
-          "id": "folded-letter",
-          "background": "memoryCut",
-          "backgroundTint": "#17131b40",
+          "id": "rain-without-her",
+          "background": "city",
+          "layout": "strips",
           "layers": [
             {
-              "asset": "letterClose",
-              "x": 66,
-              "y": 51,
-              "height": 116,
-              "rotation": -6,
-              "opacity": 1,
-              "motion": {
-                "xTo": 63,
-                "heightTo": 121,
-                "ease": "smooth"
-              }
-            }
-          ],
-          "splice": 0.14
-        },
-        {
-          "t": 116.8,
-          "id": "anonymous-windows",
-          "background": "archiveCut",
-          "backgroundTint": "#17131b80",
-          "layers": [
-            {
-              "asset": "frame",
-              "content": "faceA",
-              "x": 34,
-              "y": 47,
-              "height": 84,
-              "rotation": -7
-            },
-            {
-              "asset": "frame",
-              "content": "faceC",
-              "x": 70,
-              "y": 43,
-              "height": 66,
-              "rotation": 8
-            }
-          ]
-        },
-        {
-          "t": 119.2,
-          "id": "nothing-in-my-hand",
-          "background": "voidCut",
-          "backgroundTint": "#17131b40",
-          "layers": [
-            {
-              "asset": "absenceClose",
-              "x": 64,
-              "y": 51,
-              "height": 116,
-              "rotation": -4,
-              "opacity": 1,
-              "motion": {
-                "xTo": 61,
-                "heightTo": 121,
-                "ease": "smooth"
-              }
-            }
-          ],
-          "splice": 0.12
-        },
-        {
-          "t": 121.6,
-          "id": "once-warm",
-          "background": "memoryCut",
-          "backgroundTint": "#17131b40",
-          "layers": [
-            {
-              "asset": "letterStudyClose",
-              "x": 70,
-              "y": 53,
-              "height": 107,
-              "rotation": 3
-            },
-            {
-              "asset": "pressedNote",
-              "x": 27,
-              "y": 40,
-              "height": 35,
-              "rotation": -10
-            },
-            {
-              "asset": "roomTag",
-              "x": 36,
-              "y": 71,
-              "height": 28,
-              "rotation": 12
-            }
-          ]
-        },
-        {
-          "t": 123.8,
-          "id": "cover-the-memory",
-          "background": "voidCut",
-          "backgroundTint": "#17131b40",
-          "layers": [
-            {
-              "asset": "sobClose",
-              "x": 69,
-              "y": 55,
-              "height": 124,
-              "rotation": 3,
-              "opacity": 1,
-              "motion": {
-                "xTo": 66,
-                "heightTo": 129,
-                "ease": "smooth"
-              }
-            }
-          ],
-          "splice": 0.13
-        },
-        {
-          "t": 125.6,
-          "id": "the-reach",
-          "background": "voidCut",
-          "backgroundTint": "#17131b40",
-          "layers": [
-            {
-              "asset": "reachClose",
-              "x": 62,
-              "y": 52,
-              "height": 102,
-              "rotation": -4,
-              "opacity": 1,
-              "motion": {
-                "xTo": 60,
-                "heightTo": 104,
-                "ease": "smooth"
-              }
-            }
-          ]
-        },
-        {
-          "t": 127.2,
-          "id": "rain-repeats",
-          "sourceScene": "rain-and-departure",
-          "sourceTime": 12.3,
-          "sourceSpeed": 0.16,
-          "splice": 0.12
-        },
-        {
-          "t": 128.6,
-          "id": "the-fold-again",
-          "background": "memoryCut",
-          "backgroundTint": "#17131b40",
-          "layers": [
-            {
-              "asset": "keysClose",
-              "x": 65,
-              "y": 51,
-              "height": 124,
-              "rotation": 4,
-              "opacity": 1,
-              "motion": {
-                "xTo": 62,
-                "heightTo": 128,
-                "ease": "smooth"
-              }
-            }
-          ]
-        },
-        {
-          "t": 129.8,
-          "id": "erased-face",
-          "background": "archiveCut",
-          "backgroundTint": "#17131b80",
-          "layers": [
-            {
-              "asset": "frame",
-              "content": "faceB",
-              "x": 59,
-              "y": 46,
-              "height": 103,
-              "rotation": -8
-            }
-          ]
-        },
-        {
-          "t": 130.9,
-          "id": "petal-passes",
-          "background": "voidCut",
-          "backgroundTint": "#17131b40",
-          "layers": [
-            {
-              "asset": "repairLedger",
-              "x": 64,
-              "y": 53,
-              "height": 86,
-              "rotation": -8,
-              "opacity": 1
-            },
-            {
-              "asset": "roomKeys",
-              "x": 39,
-              "y": 57,
-              "height": 58,
-              "rotation": 12,
+              "asset": "emptyCup",
+              "x": 67,
+              "y": 69,
+              "height": 24,
+              "rotation": 0,
               "opacity": 1
             },
             {
               "asset": "rentReceipt",
-              "x": 26,
-              "y": 43,
-              "height": 35,
-              "rotation": 7
-            },
-            {
-              "asset": "bluePen",
-              "x": 51,
-              "y": 79,
-              "height": 22,
-              "rotation": -14
+              "x": 47,
+              "y": 58,
+              "height": 30,
+              "rotation": 11,
+              "opacity": 1
             }
           ],
-          "splice": 0.1
-        },
-        {
-          "t": 131.9,
-          "id": "too-far",
-          "background": "voidCut",
-          "backgroundTint": "#17131b40",
-          "sourceScene": "reach-into-absence",
-          "sourceTime": 143,
-          "sourceSpeed": 0.1,
-          "sceneOverrides": {
-            "pose": "reachSoftShadow",
-            "followExpressions": false,
-            "x": 66,
-            "y": 6,
-            "scale": 0.81
+          "splice": 0.09,
+          "backgroundMotion": {
+            "zoom": 1.8,
+            "fromX": -18,
+            "toX": -20,
+            "startTime": 112,
+            "duration": 2.2,
+            "ease": "linear"
           }
         },
         {
-          "t": 132.9,
-          "id": "cannot-look",
-          "background": "voidCut",
-          "backgroundTint": "#17131b40",
+          "t": 114.2,
+          "id": "letter-with-no-addressee",
+          "background": "petalRoad",
+          "layout": "aperture",
           "layers": [
             {
-              "asset": "sobClose",
+              "asset": "envelope",
               "x": 66,
-              "y": 53,
-              "height": 132,
-              "rotation": 2,
+              "y": 48,
+              "height": 73,
+              "rotation": -7,
               "opacity": 1,
               "motion": {
+                "heightTo": 80,
                 "xTo": 63,
-                "heightTo": 137,
+                "ease": "smooth"
+              }
+            },
+            {
+              "asset": "roomTag",
+              "x": 34,
+              "y": 67,
+              "height": 25,
+              "rotation": 8,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 116.3,
+          "id": "windows-pass-too-fast",
+          "background": "emptyWindows",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 32,
+              "y": 46,
+              "height": 87,
+              "rotation": -7,
+              "opacity": 1,
+              "content": "faceA"
+            },
+            {
+              "asset": "frame",
+              "x": 70,
+              "y": 49,
+              "height": 74,
+              "rotation": 7,
+              "opacity": 1,
+              "content": "faceC"
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 118.4,
+          "id": "everything-accounted-for",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0.09,
+          "cells": [
+            "repairLedger",
+            "rentReceipt",
+            "roomKeys",
+            "bluePen",
+            "residentNote",
+            "pressedFlower"
+          ]
+        },
+        {
+          "t": 120.6,
+          "id": "the-room-is-empty",
+          "background": "morningVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 66,
+              "y": 52,
+              "height": 86,
+              "rotation": -2,
+              "opacity": 1,
+              "motion": {
+                "heightTo": 94,
+                "ease": "smooth"
+              }
+            },
+            {
+              "asset": "roomTag",
+              "x": 34,
+              "y": 67,
+              "height": 29,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 122.4,
+          "id": "keys-still-fit",
+          "background": "voidCut",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "looseKeys",
+              "x": 58,
+              "y": 51,
+              "height": 91,
+              "rotation": -11,
+              "opacity": 1,
+              "motion": {
+                "rotationTo": -3,
+                "heightTo": 97,
                 "ease": "smooth"
               }
             }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 124,
+          "id": "papers-we-kept",
+          "background": "archiveCut",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "memoryTrace",
+              "x": 59,
+              "y": 52,
+              "height": 87,
+              "rotation": 6,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedNote",
+              "x": 26,
+              "y": 66,
+              "height": 30,
+              "rotation": -9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 125.4,
+          "id": "anonymous-contact",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 29,
+              "y": 47,
+              "height": 82,
+              "rotation": -6,
+              "opacity": 1,
+              "content": "faceB"
+            },
+            {
+              "asset": "frame",
+              "x": 68,
+              "y": 45,
+              "height": 97,
+              "rotation": 5,
+              "opacity": 1,
+              "content": "faceA"
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 126.8,
+          "id": "a-door-with-no-return",
+          "background": "paperVault",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "vacantDoor",
+              "x": 61,
+              "y": 52,
+              "height": 91,
+              "rotation": 0,
+              "opacity": 1
+            },
+            {
+              "asset": "roomKeys",
+              "x": 32,
+              "y": 67,
+              "height": 32,
+              "rotation": 13,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 128.2,
+          "id": "flowers-between-the-pages",
+          "background": "petalRoad",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "pressedFlower",
+              "x": 63,
+              "y": 51,
+              "height": 69,
+              "rotation": -8,
+              "opacity": 1,
+              "motion": {
+                "heightTo": 76,
+                "ease": "smooth"
+              }
+            },
+            {
+              "asset": "residentNote",
+              "x": 31,
+              "y": 61,
+              "height": 32,
+              "rotation": 8,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 129.4,
+          "id": "a-cup-left-behind",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "emptyCup",
+              "x": 61,
+              "y": 53,
+              "height": 74,
+              "rotation": -3,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 33,
+              "y": 70,
+              "height": 22,
+              "rotation": -12,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 130.5,
+          "id": "objects-in-the-register",
+          "background": "paperVault",
+          "layout": "contact",
+          "layers": [],
+          "splice": 0.09,
+          "cells": [
+            "envelope",
+            "roomTag",
+            "emptyCup",
+            "pressedNote",
+            "looseKeys",
+            "archiveSleeve"
           ]
+        },
+        {
+          "t": 131.4,
+          "id": "receipt-without-a-name",
+          "background": "morningVault",
+          "layout": "split",
+          "layers": [
+            {
+              "asset": "rentReceipt",
+              "x": 60,
+              "y": 52,
+              "height": 87,
+              "rotation": 7,
+              "opacity": 1
+            },
+            {
+              "asset": "bluePen",
+              "x": 31,
+              "y": 70,
+              "height": 23,
+              "rotation": -15,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 132.2,
+          "id": "the-unposted-letter",
+          "background": "petalRoad",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "envelope",
+              "x": 60,
+              "y": 53,
+              "height": 88,
+              "rotation": -5,
+              "opacity": 1
+            },
+            {
+              "asset": "pressedFlower",
+              "x": 28,
+              "y": 69,
+              "height": 29,
+              "rotation": 9,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 133,
+          "id": "only-the-frames",
+          "background": "emptyWindows",
+          "layout": "strips",
+          "layers": [
+            {
+              "asset": "frame",
+              "x": 35,
+              "y": 47,
+              "height": 82,
+              "rotation": -5,
+              "opacity": 1,
+              "content": "faceEmpty"
+            },
+            {
+              "asset": "archiveSleeve",
+              "x": 71,
+              "y": 50,
+              "height": 77,
+              "rotation": 7,
+              "opacity": 1
+            }
+          ],
+          "splice": 0.09
         },
         {
           "t": 133.8,
-          "id": "empty-platform",
-          "sourceScene": "half-in-the-light",
-          "sourceTime": 18.4,
-          "sourceSpeed": 0.1,
-          "splice": 0.1
-        },
-        {
-          "t": 134.45,
-          "id": "held-breath",
-          "background": "voidCut",
-          "backgroundTint": "#17131b40",
+          "id": "wires-and-metal",
+          "background": "blackStrings",
+          "layout": "split",
           "layers": [
             {
-              "asset": "reachStudyClose",
-              "x": 67,
-              "y": 51,
-              "height": 108,
-              "rotation": -3
+              "asset": "roomKeys",
+              "x": 62,
+              "y": 55,
+              "height": 57,
+              "rotation": -9,
+              "opacity": 1
             }
-          ]
+          ],
+          "splice": 0.09
+        },
+        {
+          "t": 134.4,
+          "id": "one-petal-left",
+          "background": "voidCut",
+          "layout": "aperture",
+          "layers": [
+            {
+              "asset": "petalBlush",
+              "x": 62,
+              "y": 53,
+              "height": 35,
+              "rotation": -18,
+              "opacity": 1,
+              "motion": {
+                "xTo": 56,
+                "yTo": 63,
+                "heightTo": 18,
+                "ease": "smooth"
+              }
+            }
+          ],
+          "splice": 0.09
         }
       ]
     },
@@ -1011,12 +1237,12 @@ window.TIMELINE = {
       "t": 146,
       "id": "one-soft-hum",
       "stage": "quiet",
-      "pose": "sobShadow",
-      "action": "夜只回一声低鸣。沿用同一窄光背景，伸手收回成掩面痛哭，留白承担停顿。",
+      "pose": "coveredFace",
+      "action": "静默段用掩面特写，截面落到画面之外；该特写不进入独奏闪回。",
       "x": 66,
-      "y": 9,
-      "scale": 0.59,
-      "framing": "full",
+      "y": -5,
+      "scale": 1.04,
+      "framing": "portrait",
       "printShadow": false,
       "motion": 0,
       "opacity": 1,
@@ -1519,12 +1745,17 @@ window.TIMELINE = {
     }
   },
   "seatedSprites": {
-    "standShadow": "assets/character/shadows/942fdace-12b8-4f7e-9ce5-393a34cc6ab0.png",
-    "standReachShadow": "assets/character/shadows/粉色长发礼服少女举手剪影.png",
-    "reachShadow": "assets/character/shadows/跪姿蕾丝靴粉色蝴蝶结少女.png",
-    "reachSoftShadow": "assets/character/shadows/粉黑奶油配色跪姿动漫少女.png",
-    "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-sit-v14.webp"
+    "standShadow": "assets/character/shadows/stand-bowed.png",
+    "standBowed": "assets/character/shadows/stand-bowed.png",
+    "standReachShadow": "assets/character/shadows/stand-reaching-profile.png",
+    "standReachProfile": "assets/character/shadows/stand-reaching-profile.png",
+    "standReachOpen": "assets/character/shadows/stand-reaching-open.png",
+    "standReachHigh": "assets/character/shadows/stand-reaching-high.png",
+    "reachShadow": "assets/character/shadows/kneel-reaching.png",
+    "reachSoftShadow": "assets/character/shadows/kneel-reaching-soft.png",
+    "sobShadow": "assets/character/shadows/sit-sobbing.png",
+    "letterSit": "assets/character/shadows/sit-letter.webp",
+    "coveredFace": "assets/character/details/covered-face.png"
   },
   "character": {
     "name": "Koharu",
@@ -1546,11 +1777,20 @@ window.TIMELINE = {
   "expressions": [
     {
       "t": 0,
-      "pose": "standShadow"
+      "pose": "walk"
     },
     {
       "t": 31,
       "pose": "letterSit"
+    },
+    {
+      "t": 39,
+      "pose": "standBowed",
+      "layout": {
+        "x": 74,
+        "y": 6,
+        "scale": 0.84
+      }
     },
     {
       "t": 42,
@@ -1562,43 +1802,45 @@ window.TIMELINE = {
       }
     },
     {
-      "t": 52,
-      "pose": "letterSit"
-    },
-    {
       "t": 90,
-      "pose": "reachShadow"
+      "pose": "standReachHigh",
+      "layout": {
+        "x": 71,
+        "y": 6,
+        "scale": 0.85
+      }
     },
     {
       "t": 98,
-      "pose": "sobShadow",
+      "pose": "cry",
       "layout": {
         "x": 73,
-        "y": 7,
-        "scale": 0.65
+        "y": 6,
+        "scale": 0.85,
+        "animationLoop": false
       }
     },
     {
       "t": 135,
-      "pose": "standReachShadow",
+      "pose": "standReachProfile",
       "layout": {
-        "x": 70,
+        "x": 68,
         "y": 6,
-        "scale": 0.85
+        "scale": 0.86
       }
     },
     {
       "t": 142,
       "pose": "reachShadow",
       "layout": {
-        "x": 66,
+        "x": 65,
         "y": 6,
         "scale": 0.81
       }
     },
     {
       "t": 146,
-      "pose": "sobShadow"
+      "pose": "standBowed"
     },
     {
       "t": 151,
@@ -1606,20 +1848,22 @@ window.TIMELINE = {
     },
     {
       "t": 159,
-      "pose": "sobShadow",
+      "pose": "cry",
       "layout": {
         "x": 67,
-        "y": 8,
-        "scale": 0.62
+        "y": 6,
+        "scale": 0.83,
+        "animationStart": 3,
+        "animationLoop": false
       }
     },
     {
       "t": 163,
-      "pose": "standShadow",
+      "pose": "standReachOpen",
       "layout": {
         "x": 67,
         "y": 6,
-        "scale": 0.82
+        "scale": 0.84
       }
     },
     {
@@ -1628,12 +1872,17 @@ window.TIMELINE = {
     }
   ],
   "shadowSprites": {
-    "standShadow": "assets/character/shadows/942fdace-12b8-4f7e-9ce5-393a34cc6ab0.png",
-    "standReachShadow": "assets/character/shadows/粉色长发礼服少女举手剪影.png",
-    "reachShadow": "assets/character/shadows/跪姿蕾丝靴粉色蝴蝶结少女.png",
-    "reachSoftShadow": "assets/character/shadows/粉黑奶油配色跪姿动漫少女.png",
-    "sobShadow": "assets/character/shadows/sob-shadow-v15.png",
-    "letterSit": "assets/character/shadows/letter-sit-v14.webp"
+    "standShadow": "assets/character/shadows/stand-bowed.png",
+    "standBowed": "assets/character/shadows/stand-bowed.png",
+    "standReachShadow": "assets/character/shadows/stand-reaching-profile.png",
+    "standReachProfile": "assets/character/shadows/stand-reaching-profile.png",
+    "standReachOpen": "assets/character/shadows/stand-reaching-open.png",
+    "standReachHigh": "assets/character/shadows/stand-reaching-high.png",
+    "reachShadow": "assets/character/shadows/kneel-reaching.png",
+    "reachSoftShadow": "assets/character/shadows/kneel-reaching-soft.png",
+    "sobShadow": "assets/character/shadows/sit-sobbing.png",
+    "letterSit": "assets/character/shadows/sit-letter.webp",
+    "coveredFace": "assets/character/details/covered-face.png"
   },
   "hdSprites": {},
   "cassette": {
