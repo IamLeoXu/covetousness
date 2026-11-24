@@ -186,10 +186,46 @@
       for(let i=0;i<pcm.length;i++)pcm[i]*=gain;
       this.sounds.set(kind,buffer);return buffer;
     }
+    mechanismSound(kind){
+      const profiles={
+        key:{length:.12,peak:.64,body:760,edge:3300,fall:.006,contacts:[[0,.68],[.026,1],[.043,.12]]},
+        release:{length:.10,peak:.48,body:1040,edge:3800,fall:.0045,contacts:[[0,.85],[.014,.4],[.032,.10]]},
+        stop:{length:.14,peak:.70,body:580,edge:2900,fall:.008,contacts:[[0,.7],[.021,1],[.046,.22]]},
+        switch:{length:.065,peak:.36,body:1000,edge:3400,fall:.0038,contacts:[[0,1],[.009,.35]]},
+        insert:{length:.24,peak:.56,body:570,edge:2600,fall:.007,friction:.1,contacts:[[.018,.18],[.051,.22],[.093,.36],[.142,1],[.162,.3]]},
+        latch:{length:.14,peak:.72,body:390,edge:2750,fall:.010,contacts:[[0,1],[.007,.62],[.024,.16]]},
+        unlatch:{length:.11,peak:.48,body:810,edge:3600,fall:.004,contacts:[[0,.8],[.019,1],[.040,.13]]},
+        eject:{length:.22,peak:.42,body:620,edge:2300,fall:.006,friction:.05,contacts:[[0,.75],[.034,.34],[.067,.25],[.109,.6]]}
+      };
+      const p=profiles[kind],rate=this.context.sampleRate;
+      const buffer=this.context.createBuffer(1,Math.ceil(rate*p.length),rate),pcm=buffer.getChannelData(0);
+      let seed=0x6da9f13;for(const c of kind)seed=Math.imul(seed^c.charCodeAt(0),16777619);
+      const alpha=hz=>1-Math.exp(-2*Math.PI*hz/rate);
+      const bodyA=alpha(p.body),edgeA=alpha(p.edge),dcA=alpha(115),airA=alpha(6200);
+      let body=0,edge=0,dc=0,air=0,peak=0;
+      for(let i=0;i<pcm.length;i++){
+        seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;
+        const white=(seed>>>0)/2147483648-1,t=i/rate;
+        body+=bodyA*(white-body);edge+=edgeA*(white-edge);dc+=dcA*(body-dc);air+=airA*(white-air);
+        let sample=0;
+        for(const [at,level]of p.contacts){
+          const u=t-at;if(u<0)continue;
+          // A broad hollow body and a very short edge: a plastic contact, without a pitched ping.
+          const attack=Math.min(1,u/.00012),shell=Math.exp(-u/p.fall),click=Math.exp(-u/.00095);
+          sample+=level*attack*((body-dc)*2.8*shell+(edge-body)*.52*click+(air-edge)*.13*click);
+        }
+        // Plastic rails brush past the cartridge only during insertion or spring release.
+        if(p.friction){const span=kind==='insert'?.135:.105,q=Math.max(0,Math.min(1,t/span));sample+=(edge-body)*p.friction*4*q*(1-q)*(t<span?1:0);}
+        pcm[i]=sample;peak=Math.max(peak,Math.abs(sample));
+      }
+      const gain=p.peak/Math.max(.001,peak);for(let i=0;i<pcm.length;i++)pcm[i]*=gain;
+      this.sounds.set(kind,buffer);return buffer;
+    }
     makeSound(kind){
       if(this.sounds.has(kind))return this.sounds.get(kind);
       if(kind==='fader')return this.makeSound('detent0');
-      if(['key','release','stop','switch'].includes(kind)||/^detent[0-2]?$/.test(kind))return this.plasticButton(kind);
+      if(['key','release','stop','switch','insert','latch','unlatch','eject'].includes(kind))return this.mechanismSound(kind);
+      if(/^detent[0-2]?$/.test(kind))return this.plasticButton(kind);
       const rate=this.context.sampleRate,wind=kind==='wind';
       const profiles={
         fader:{duration:.055,gap:.009,pitch:1920,body:.015},

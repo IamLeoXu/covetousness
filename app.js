@@ -32,10 +32,9 @@
   const cassetteConfig = { ...data.cassette, duration: data.duration };
   const tape = new window.CharacterCassette($('cassetteMount'), 'deck', cassetteConfig);
   new window.CharacterCassette($('handCassette'), 'selected', cassetteConfig);
-  new window.CharacterCassette($('bayCassette'), 'bay', cassetteConfig);
   const loadingScene = new window.TapeLoadingScene({ root: $('opening'), game, target: $('cassetteMount'),
     config: data.settings.intro, unlock: () => signal.unlock(), sound: kind => signal.mechanical(kind) });
-
+  loadingScene.onDeckState=()=>updateState();
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const pad = value => String(value).padStart(2, '0');
@@ -94,13 +93,15 @@
     game.classList.remove('idle', 'paused', 'playing', 'rewinding', 'forwarding');
     game.classList.add(state);
     const labels = { playing: 'PLAYING', rewinding: 'REWIND', forwarding: 'FAST FORWARD', paused: 'PAUSED', idle: 'READY' };
-    $('deckState').textContent = completed ? 'END OF TAPE' : labels[state];
+    $('deckState').textContent = completed ? (loadingScene.ejected?'TAPE EJECTED':'END OF TAPE') : labels[state];
     $('playIcon').setAttribute('d', playing ? 'M8 3h6v18H8zm11 0h6v18h-6z' : 'M9 2 26 12 9 22z');
     $('playLabel').textContent = playing ? 'PAUSE' : 'PLAY';
     start.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     start.setAttribute('aria-pressed', String(playing));
     $('rew').classList.toggle('selected', rate < 0);
     $('forward').classList.toggle('selected', rate > 1);
+    $('stop').classList.toggle('selected',completed);
+    $('stop').setAttribute('aria-pressed',String(completed));
   }
 
   function syncAudio() {
@@ -114,6 +115,7 @@
 
   function seek(value, reveal = true) {
     if (!loadingScene.loaded) return;
+    loadingScene.restoreDeck();
     const stateChanged = completed || (reveal && !entered);
     completed = false;
     if (reveal) showFilm();
@@ -129,8 +131,14 @@
 
   async function play() {
     if(loadingScene.loading)return;
-    signal.mechanical(rate===1?'release':'key');
+    const loadedBeforePress=loadingScene.loaded;
+    if(loadedBeforePress)signal.mechanical(rate===1?'release':'key');
     if (!loadingScene.loaded && !(await loadingScene.insert())) return;
+    if(!loadedBeforePress)signal.mechanical('key');
+    if(loadingScene.ejected||loadingScene.ejecting){
+      const reloading=++command;
+      if(!(await loadingScene.reload())||reloading!==command)return;
+    }
     if (rate === 1) {
       command++;
       rate = 0;
@@ -174,6 +182,7 @@
 
   function scan(speed) {
     if (!loadingScene.loaded) return;
+    loadingScene.restoreDeck();
     signal.mechanical('key');
     showFilm();
     command++;
@@ -196,11 +205,12 @@
     updateRestoration();
     signal.setTransport('end');
     updateState();
+    signal.mechanical('stop');
+    loadingScene.eject();
   }
 
   function resize() {
-    const scale = Math.min(viewport.clientWidth / 1600, viewport.clientHeight / 900);
-    game.style.transform = `scale(${scale})`;
+    loadingScene.resize(viewport.clientWidth,viewport.clientHeight);
     film.resize();
     display.resize();
   }
@@ -242,7 +252,7 @@
     lastFrame = stamp;
     const audible = rate === 1 && !audio.paused && !audio.seeking && audio.readyState >= 2;
     if (audible) time = clamp(audio.currentTime, 0, duration);
-    if(rate!==0||completed)noiseClock+=delta;
+    if(rate!==0||completed||!entered)noiseClock+=delta;
     if (rate !== 0 && rate !== 1) {
       time = clamp(time + delta * rate, 0, duration);
       if (time <= 0 || time >= duration) {

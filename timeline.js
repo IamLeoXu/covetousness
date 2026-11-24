@@ -1,6 +1,6 @@
-/* DEAD AIR v0.22.1: keep the early lowhead silhouette at a 10 fps cadence. */
+/* DEAD AIR v0.25: begin on the cassette close-up, then pull back to the same workbench. */
 window.TIMELINE = {
-  "version": "0.22.1",
+  "version": "0.25",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -588,7 +588,7 @@ window.TIMELINE = {
       "id": "faces-in-transit",
       "stage": "faces",
       "pose": "walk2",
-      "action": "列车窗段走路。匿名黑脸画框在身后加速流过，76.5 秒换背景时步行动作与站位不重置。",
+      "action": "列车窗段走路。匿名黑脸画框以更快的固定速度流过，不再逐渐加速；76.5 秒换背景时步行动作与站位不重置。",
       "x": 79,
       "y": 5,
       "scale": 0.86,
@@ -623,7 +623,8 @@ window.TIMELINE = {
             "depth": 1,
             "anchorX": -20,
             "startTime": 69,
-            "duration": 8
+            "duration": 8,
+            "speed": 0.14
           }
         },
         {
@@ -645,7 +646,8 @@ window.TIMELINE = {
             "depth": 0.97,
             "anchorX": 4.166666666666668,
             "startTime": 69,
-            "duration": 8
+            "duration": 8,
+            "speed": 0.14
           }
         },
         {
@@ -667,7 +669,8 @@ window.TIMELINE = {
             "depth": 1.03,
             "anchorX": 28.333333333333336,
             "startTime": 69,
-            "duration": 8
+            "duration": 8,
+            "speed": 0.14
           }
         },
         {
@@ -689,7 +692,8 @@ window.TIMELINE = {
             "depth": 1,
             "anchorX": 52.5,
             "startTime": 69,
-            "duration": 8
+            "duration": 8,
+            "speed": 0.14
           }
         },
         {
@@ -711,7 +715,8 @@ window.TIMELINE = {
             "depth": 0.96,
             "anchorX": 76.66666666666667,
             "startTime": 69,
-            "duration": 8
+            "duration": 8,
+            "speed": 0.14
           }
         },
         {
@@ -733,7 +738,8 @@ window.TIMELINE = {
             "depth": 1.04,
             "anchorX": 100.83333333333333,
             "startTime": 69,
-            "duration": 8
+            "duration": 8,
+            "speed": 0.14
           }
         }
       ],
@@ -3983,7 +3989,8 @@ window.TIMELINE = {
     "intro": {
       "insertMs": 850,
       "closeMs": 680,
-      "pullbackMs": 1050
+      "pullbackMs": 1500,
+      "settleMs": 160
     },
     "petalAssets": [
       "petalRose",

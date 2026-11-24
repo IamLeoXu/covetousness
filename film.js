@@ -265,7 +265,7 @@
         const index = Number(motion.index) || 0, depth = Number(motion.depth) || 1;
         const clock = this.reducedMotion ? 72 : 69 + Math.max(0, t - motionStart);
         const anchor = Number(motion.anchorX ?? mix(-20, 125, fract(index / (motion.count || 4))));
-        x += this.facePosition(clock, depth, index, motion.count || 4) * 100 - anchor;
+        x += this.facePosition(clock, depth, index, motion.count || 4, motion.speed ?? .14) * 100 - anchor;
       } else if(motion.preset==='passing'){
         const count=Math.max(1,Number(motion.count)||6),index=Number(motion.index)||0;
         const clock=this.reducedMotion?2:Math.max(0,t-motionStart),speed=Number(motion.speed)||.14;
@@ -485,10 +485,9 @@
       this.drawStickers(ctx, scene, t, 'front');
     }
 
-    facePosition(t, depth, i, count = 4) {
-      // Integral of a ramped speed: motion stays continuous at 73.5s and 77s.
-      const dt = Math.max(0, t - 69), ramp = clamp(t - 73.5, 0, 3.5);
-      const distance = dt * .065 + .5 * .25 / 3.5 * ramp * ramp + Math.max(0, t - 77) * .25;
+    facePosition(t, depth, i, count = 4, speed = .14) {
+      // A quicker, constant conveyor; each frame keeps the same pace through the window wipe.
+      const distance = Math.max(0, t - 69) * Math.max(0, Number(speed) || 0);
       const phase = fract(i / count - distance * depth);
       return mix(-.2, 1.25, phase);
     }

@@ -8,32 +8,26 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2310151e'/%3E%3Cpath d='M8 5h7c14 0 14 22 0 22H8z' fill='%23d2f850'/%3E%3C/svg%3E">
   <link rel="preload" as="image" href="assets/props/city.webp">
   <link rel="preload" as="image" href="assets/ui/koharu-tape-decal.png">
-  <link rel="stylesheet" href="style.css?v=0.22.1">
-  <link rel="stylesheet" href="receiver.css?v=0.22.1">
-  <script defer src="timeline.js?v=0.22.1"></script>
-  <script defer src="assets/audio-analysis.js?v=0.22.1"></script>
-  <script defer src="audio.js?v=0.22.1"></script>
-  <script defer src="tone.js?v=0.22.1"></script>
-  <script defer src="signal.js?v=0.22.1"></script>
-  <script defer src="meters.js?v=0.22.1"></script>
-  <script defer src="film.js?v=0.22.1"></script>
-  <script defer src="cassette.js?v=0.22.1"></script>
-  <script defer src="opening.js?v=0.22.1"></script>
-  <script defer src="app.js?v=0.22.1"></script>
+  <link rel="stylesheet" href="style.css?v=0.25">
+  <link rel="stylesheet" href="receiver.css?v=0.25">
+  <script defer src="timeline.js?v=0.25"></script>
+  <script defer src="assets/audio-analysis.js?v=0.25"></script>
+  <script defer src="audio.js?v=0.25"></script>
+  <script defer src="tone.js?v=0.25"></script>
+  <script defer src="signal.js?v=0.25"></script>
+  <script defer src="meters.js?v=0.25"></script>
+  <script defer src="film.js?v=0.25"></script>
+  <script defer src="cassette.js?v=0.25"></script>
+  <script defer src="opening.js?v=0.25"></script>
+  <script defer src="app.js?v=0.25"></script>
 </head>
 <body>
   <div id="viewport">
-    <section id="opening" class="loading-room" data-step="ready" aria-label="Insert Koharu’s cassette">
+    <div id="workbenchWorld" class="workbench-world">
+      <div class="workbench-surface" aria-hidden="true"><div class="bench-mat"></div><div class="bench-edge"></div><div class="archive-case"><span>AFTER HOURS</span><b>MEMORY ARCHIVE</b><i></i></div><div class="bench-pencil"></div><div class="bench-inventory"><span>DA / 107.9</span><i></i><small>ARCHIVE WORKSTATION</small></div></div>
+    <section id="opening" class="bench-intro" data-step="ready" aria-label="Insert Koharu’s cassette">
       <div id="loadScene" class="loading-scene">
-        <div class="loading-title"><span>DEAD AIR / AFTER HOURS</span><h1>FALLING<br>FLOWERS</h1><p>AMANE KOHARU · SIDE A</p></div>
-        <div class="loading-deck" aria-hidden="true">
-          <div class="loading-vents"></div><div class="loading-brand">AFTER HOURS <i></i></div>
-          <div class="loading-bay" id="loadBay"><div id="bayCassette"></div></div>
-          <div class="loading-door" id="loadDoor"><span>MEMORY RECORDER</span><i></i></div>
-          <div class="loading-hinge" aria-hidden="true"><i></i><i></i></div>
-          <div class="loading-controls"><span class="loading-key"></span><span class="loading-key"></span><span class="loading-key loading-key-lime"></span><b>STEREO<br><small>SIDE A</small></b></div>
-          <div class="loading-foot left-foot"></div><div class="loading-foot right-foot"></div>
-        </div>
+        <div class="loading-title"><span>DEAD AIR / AFTER HOURS</span><h1>FALLING<br>FLOWERS</h1><p>MEMORY ARCHIVE · SIDE A</p></div>
         <button id="enter" class="loading-tape" aria-label="Insert the cassette and start the memory record"><span id="handCassette" class="loading-tape-art"></span><span class="loading-tape-caption">SELECT TAPE / INSERT</span></button>
         <p id="loadStatus" class="loading-status" role="status">INSERT TAPE</p>
         <span class="loading-duration">03:33 / THE THINGS SHE KEPT</span>
@@ -50,8 +44,12 @@
       <div class="machine">
         <aside class="deck" aria-label="Cassette deck">
           <div class="deck-head"><span>CASSETTE</span><span>SIDE A</span></div>
-          <div class="deck-name">KOHARU</div>
-          <div class="deck-hatch"><span class="hatch-hinge hinge-left" aria-hidden="true"></span><span class="hatch-hinge hinge-right" aria-hidden="true"></span><div class="cassette" id="cassetteMount"></div><div class="deck-glass" aria-hidden="true"></div><span class="hatch-caption">MEMORY CARTRIDGE <b>A</b></span><span class="hatch-latch" aria-hidden="true"></span></div>
+          <div class="deck-name">AH–02</div>
+          <div class="deck-hatch" id="deckHatch" data-state="loaded">
+            <div class="cassette" id="cassetteMount"></div>
+            <div class="deck-door" id="deckDoor"><div class="deck-glass" aria-hidden="true"></div><span class="hatch-caption">MEMORY CARTRIDGE <b>A</b></span><span class="hatch-latch" aria-hidden="true"></span></div>
+            <span class="hatch-hinge hinge-left" aria-hidden="true"></span><span class="hatch-hinge hinge-right" aria-hidden="true"></span>
+          </div>
           <div class="transport" aria-label="Transport controls">
             <button id="rew" title="Rewind (J)" aria-label="Rewind"><svg viewBox="0 0 32 24" aria-hidden="true"><path d="M16 3 3 12l13 9zm14 0-13 9 13 9z"/></svg><span>REW</span></button>
             <button id="stop" title="Stop and rewind to the beginning" aria-label="Stop"><svg viewBox="0 0 32 24" aria-hidden="true"><path d="M8 4h16v16H8z"/></svg><span>STOP</span></button>
@@ -154,6 +152,7 @@
       <button id="exitCinema" class="exit-cinema" title="Return to deck (C)" aria-label="Return to deck">DECK</button>
       <audio id="audio" preload="auto" src="assets/bgm.mp3"></audio>
     </main>
+    </div>
   </div>
 </body>
 </html>
