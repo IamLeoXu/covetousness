@@ -26,7 +26,7 @@
     if(!$('profileDialog').open)return;
     const s=state();$('lifeProgress').innerHTML='<b>'+D.lifePieces(s).length+' CUTS</b> 已取片段<br><b>'+s.lifeSolved.length+'</b> 段深入补访<br><span>'+(s.facts.includes('profileComplete')?'已交叉核对完整侧写':s.facts.includes('profileSketch')?'已采用局部侧写':'尚未采用侧写')+'</span>';
     $('lifeModes').querySelectorAll('[data-life-mode]').forEach(button=>{button.classList.toggle('active',button.dataset.lifeMode===mode);button.setAttribute('aria-pressed',String(button.dataset.lifeMode===mode));});
-    if(mode==='inquiry')renderInquiry();else if(mode==='connections')renderConnections();else renderPuzzle();
+    if(mode==='inquiry')renderInquiry();else if(mode==='connections')renderConnections();else renderPuzzle();window.Onboarding?.refresh();
   }
   function renderInquiry(){
     const s=state(),event=current(),done=s.lifeSolved.includes(event.id),primary=event.primary,doc=D.evidence[primary],read=s.collected.includes(primary),heard=s.collected.includes(event.sources[1]),adopted=hasPiece(event.id),deep=s.collected.includes(event.sources[0]);
@@ -37,12 +37,12 @@
     $('liftLifeFacet').onclick=()=>{if(!s.lifeFacets.includes(event.id))s.lifeFacets.push(event.id);G.save();G.sound('paper');G.render();};
     $('useLifePieces').onclick=()=>setMode('portrait');
     $('lifeWorkspace').querySelectorAll('[data-event-choice]').forEach(button=>button.onclick=()=>{eventChoice=button.dataset.eventChoice;eventFeedback=null;renderInquiry();});
-    $('verifyLifeEvent').onclick=()=>{const result=E.episode(event.id,eventChoice,s.collected);eventFeedback=result;s.lifeAttempts.push({type:'event',id:event.id,choice:eventChoice,result:result.kind});if(result.kind==='supported'&&!s.lifeSolved.includes(event.id)){s.lifeSolved.push(event.id);if(!s.lifeFacets.includes(event.id))s.lifeFacets.push(event.id);G.sound('fact');}else if(result.kind!=='supported')G.sound('paper');G.save();G.render();};
+    $('verifyLifeEvent').onclick=()=>{const result=E.episode(event.id,eventChoice,s.collected);eventFeedback=result;window.Onboarding?.event('life-result',{episode:event.id,choice:eventChoice,kind:result.kind});s.lifeAttempts.push({type:'event',id:event.id,choice:eventChoice,result:result.kind});if(result.kind==='supported'&&!s.lifeSolved.includes(event.id)){s.lifeSolved.push(event.id);if(!s.lifeFacets.includes(event.id))s.lifeFacets.push(event.id);G.sound('fact');}else if(result.kind!=='supported')G.sound('paper');G.save();G.render();};
     if($('nextLifeEvent'))$('nextLifeEvent').onclick=()=>{const next=visible().find(item=>!s.lifeSolved.includes(item.id));if(next)focusEvent(next.id);else setMode('connections');};
   }
   function interview(event){
     const s=state();G.playConversation([{who:'主持人',text:event.interview.question}],{label:'LIFE INTERVIEW / '+event.tag,choices:()=>event.interview.options.map(option=>({text:option.text,action:()=>{
-      const wrong=option.id==='assume';s.emotion=wrong?'angry':'thoughtful';
+      window.Onboarding?.event('interview-choice',{episode:event.id,choice:option.id});const wrong=option.id==='assume';s.emotion=wrong?'angry':'thoughtful';
       G.playConversation(option.lines.map(text=>({who:'小春',text})),{label:wrong?'QUESTION THE ASSUMPTION':'A QUESTION SHE CAN ANSWER',result:wrong?'overreach':null,portrait:wrong?'open':'letter',after:()=>{
         if(option.id==='ask'){G.collect(event.sources[1]);eventFeedback={kind:'supported',note:'回答与补访证词已收入本段。现在可以比较两份来源，重建事件。'};G.save();}
         refresh();
@@ -61,7 +61,7 @@
     [0,1].forEach(index=>$('linkEvent'+index).onchange=e=>{linkPair[index]=e.target.value;linkFeedback=null;renderConnections();});
     $('lifeWorkspace').querySelectorAll('[data-link-choice]').forEach(button=>button.onclick=()=>{linkChoice=button.dataset.linkChoice;linkFeedback=null;renderConnections();});
     $('verifyLifeLink').onclick=()=>{
-      const result=E.connection(link.id,linkChoice,linkPair,s.lifeSolved);linkFeedback=result;s.lifeAttempts.push({type:'connection',id:link.id,choice:linkChoice,pair:[...linkPair],result:result.kind});
+      const result=E.connection(link.id,linkChoice,linkPair,s.lifeSolved);linkFeedback=result;window.Onboarding?.event('relation-result',{id:link.id,choice:linkChoice,kind:result.kind});s.lifeAttempts.push({type:'connection',id:link.id,choice:linkChoice,pair:[...linkPair],result:result.kind});
       if(result.kind==='supported'&&!s.lifeLinks.includes(link.id)){s.lifeLinks.push(link.id);G.sound('fact');}G.save();G.render();
     };
     if($('nextLifeLink'))$('nextLifeLink').onclick=()=>{const next=D.lifeConnections.findIndex(item=>!s.lifeLinks.includes(item.id));if(next>=0){linkIndex=next;linkPair=['',''];linkChoice=null;linkFeedback=null;renderConnections();}else setMode('portrait');};
@@ -95,7 +95,7 @@
     };
   }
   function flip(to){side=to;const s=state();if(puzzleCorrect()&&allEvents()&&allLinks()&&s.profileViews.length){if(!s.profileViews.includes(side))s.profileViews.push(side);G.save();finishIfReady();}renderPuzzle();reading(state().profileSlots.find(Boolean));G.sound('paper');}
-  function hint(){const event=current();return ['补访 / '+event.name,['先打开“'+D.evidence[event.primary].title+'”。读完可以取出眼前片段，放到侧写中对应的年龄。','档案最下面有随附材料。点击附页，会调出更多原件或新的旧档索引。','若要深入重建，读完原件、提一个可核对的问题，再比较两个来源。采用局部侧写就能准备播出，无需把所有空位填满。']];}
+  function hint(){const event=current();return ['补访 / '+event.name,['先打开“'+D.evidence[event.primary].title+'”。读完可以取出眼前片段，放到侧写中对应的年龄。','档案最下面有随附材料。点击附页，会调出更多原件或新的旧档索引。','若要深入重建，读完原件、提一个可核对的问题，再比较两个来源。一个片段只能进入摘要。相关两段经历与一条人物关系接起来，才可能支撑正式定性；其他空位可保留。']];}
   $('lifeModes').querySelectorAll('[data-life-mode]').forEach(button=>button.onclick=()=>setMode(button.dataset.lifeMode));
   $('viewer').addEventListener('close',refresh);
   window.LifeUI={open,refresh,hint};

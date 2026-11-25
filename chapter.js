@@ -5,9 +5,9 @@
   const art='execution/assets/character/';
   let hintLevel=0,hintScope='case',previewing=false;
   const state=()=>G.getState();
-  function defaultEmotion(s){return s.ending==='release'?'cry':s.ending==='hold'||s.facts.includes('withheld')?'thoughtful':'neutral';}
+  function defaultEmotion(s){return s.ending==='bad'?'cry':s.ending==='good'||s.facts.includes('withheld')?'thoughtful':'neutral';}
   function portrait(s,options={}){
-    if(options.portrait==='cry'||s.emotion==='cry'||s.ending==='release')return art+'details/covered-face.png';
+    if(options.portrait==='cry'||s.emotion==='cry'||s.ending==='bad')return art+'details/covered-face.png';
     if(['overreach','contradicted'].includes(options.result)||s.emotion==='angry')return art+'details/open-hands.png';
     if(options.portrait==='letter'||s.emotion==='thoughtful')return art+'details/clasped-keys.png';
     return art+'details/held-letter.png';
@@ -30,7 +30,7 @@
     $('phaseQuestion').textContent=D.topics.find(topic=>topic.id===layer.id).question;
     $('phaseHint').textContent=layer.caption;
     $('app').dataset.emotion=s.emotion;$('app').dataset.caseLayer=layer.id;
-    $('emotionTag').textContent={neutral:'LISTENING / OFF AIR',thoughtful:'UNSETTLED / THINKING',angry:'DEFENSIVE / CHALLENGED',cry:'SHATTERED / RECORDED'}[s.ending==='release'?'cry':s.emotion]||'LISTENING / OFF AIR';
+    $('emotionTag').textContent={neutral:'LISTENING / OFF AIR',thoughtful:'UNSETTLED / THINKING',angry:'DEFENSIVE / CHALLENGED',cry:'SHATTERED / RECORDED'}[s.ending==='bad'?'cry':s.emotion]||'LISTENING / OFF AIR';
     const completed={keys:p.first,notice:p.warning,rescue:p.rescue&&p.causation};
     $('caseLayerTabs').innerHTML=D.caseLayers.map(item=>'<button data-layer="'+item.id+'" class="'+(item.id===layer.id?'active ':'')+(completed[item.id]?'done':'')+'" '+(!layerUnlocked(s,item.id)?'disabled':'')+' aria-pressed="'+(item.id===layer.id)+'"><b>'+item.number+'</b><span>'+item.title+'<small>'+item.short+'</small></span><i>'+(completed[item.id]?'✓':layerUnlocked(s,item.id)?'↗':'—')+'</i></button>').join('');
     $('caseLayerTabs').querySelectorAll('[data-layer]').forEach(button=>button.onclick=()=>setLayer(button.dataset.layer));
@@ -44,7 +44,7 @@
     document.querySelectorAll('[data-location]').forEach(button=>{const count=sceneItems(s,D.scenes[button.dataset.location]).length;button.classList.toggle('no-materials',!count);button.title=count?'本卷 '+count+' 件材料':'本卷无材料';});
     $('roundOne').textContent='CASE / '+Object.values(completed).filter(Boolean).length+' OF 3';$('roundTwo').textContent='LIFE / '+D.lifePieces(s).length+' CUTS';
     $('roundOne').className=p.causation?'done':'current';$('roundTwo').className=p.profile?'done':'current';
-    window.LifeUI?.refresh();
+    window.LifeUI?.refresh();$('previewCG').hidden=!window.InquiryEngine.cgUnlocked(s);
   }
   function onResult(s,result){
     s.emotion=['overreach','contradicted'].includes(result.kind)?'angry':result.kind==='incomplete'?'thoughtful':defaultEmotion(s);
@@ -71,29 +71,35 @@
   function renderHint(){const [title,hints]=hintSpec();$('hintTitle').textContent=title;$('hintText').textContent=hints[Math.min(hintLevel,hints.length-1)];$('nextHint').disabled=hintLevel>=hints.length-1;$('nextHint').textContent=hintLevel>=hints.length-1?'提示已完整展开':'再提示一步 →';}
   function openHint(scope){hintScope=scope==='life'?'life':'case';hintLevel=0;renderHint();G.openDialog('hintDialog');}
   function prepareEnding(s){
-    $('ending').querySelector('.dialog-bar>span').textContent='FINAL MIX / YOUR LAST SENTENCE';
-    $('ending').querySelector('.ending-art img').src=s.ending==='release'?art+'details/covered-face.png':art+'details/held-letter.png';
-    $('ending').querySelector('h2').innerHTML='这一期，<br>在这里收尾。';
-    const snapshot=s.radio.phase==='archived'?s.radio.editorialSnapshot:null,known=snapshot?.facts||s.facts,slots=snapshot?.profileSlots||s.profileSlots;
-    const facts=known.filter(id=>D.facts[id]&&D.facts[id].proof!==false);
-    $('endingFacts').innerHTML=facts.map(id=>'<div class="ending-fact">'+esc(D.facts[id].title)+'</div>').join('')+(known.includes('profileSketch')?'<div class="ending-fact">采用的人物片段：'+D.lifeEpisodes.filter(event=>slots.includes(event.id)).map(event=>esc(event.name)).join('、')+'</div>':'');
-    $('ending').querySelector('.ending-context').textContent='最后一句将跟随你选定的播出稿公开。你仍然可以返回取材。';
-    $('endingOptions').querySelector('[data-ending="hold"]').innerHTML='<b>HOLD / 暂缓裁决</b><span>播出采用的材料，把最终裁决留在下一期。</span>';
-    $('endingOptions').querySelector('[data-ending="release"]').innerHTML='<b>RELEASE / 签发裁决</b><span>以本期采用的版本作出裁决，封存她的来访记录。</span>';
+    $('ending').querySelector('.dialog-bar>span').textContent='FINAL MIX / ARGUMENT & JUDGMENT';
+    $('ending').querySelector('.ending-art img').src=s.ending==='bad'?art+'details/covered-face.png':art+'details/held-letter.png';
+    $('ending').querySelector('h2').innerHTML=s.ending==='zero'?'这次，只剩摘要。':'你用什么，<br>给她下这个定义？';
+    const snapshot=s.radio.phase==='archived'?s.radio.editorialSnapshot:null,known=snapshot?.facts||s.facts;
+    $('endingFacts').innerHTML=known.filter(id=>D.facts[id]&&D.facts[id].proof!==false).map(id=>'<div class="ending-fact">'+esc(D.facts[id].title)+'</div>').join('');
+    const status=window.InquiryEngine.verdictStatus(s);
+    $('verdictChains').hidden=!!s.ending;
+    $('verdictChains').innerHTML=['bad','good'].map(id=>'<section class="verdict-chain '+(status[id].ready?'ready':'')+'"><h3>'+(id==='bad'?'负面定性 / 论证':'正面定性 / 论证')+'</h3>'+status[id].steps.map(step=>'<p class="'+(step.ok?'linked':'missing')+'"><b>'+(step.ok?'●':'○')+' '+step.title+'</b><span>'+esc(step.text)+'</span></p>').join('')+'</section>').join('');
+    for(const id of ['good','bad']){$('endingOptions').querySelector('[data-ending="'+id+'"]').disabled=!status[id].ready;}
+    $('ending').querySelector('.ending-context').textContent='零散材料可以收成一期摘要。要给这个人下定义，需要把行为、相关经历与推断一同接入节目。';
+  }
+  function continueReporting(){
+    const s=state();if(s.ending==='zero'){s.ending=null;s.radio.phase='off-air';s.radio.previousSummary=s.radio.airScript;s.radio.previewed='';s.radio.airedEnding=null;s.radio.editorialSnapshot=null;s.radio.airScript=null;s.cgWatched=false;G.save();}
+    G.closeDialog('ending');G.render();
   }
   function renderEndingResult(s){
-    const hold=s.ending==='hold',snapshot=s.radio.editorialSnapshot;
-    $('endingResult').innerHTML='<span>'+(hold?'JUDGMENT RESERVED':'RECORD SEALED')+'</span><p>'+esc(s.radio.airScript?.at(-1)?.body||'本期已归档。')+'</p><p>采用 '+(snapshot?.queued?.length||0)+' 轨。原件与未采用材料仍留在台内。</p><button id="endingPlay" class="ink-button">'+(hold?'ARCHIVE PREVIEW / 磁带预览':'PLAY HER TAPE / 打开封存磁带')+' ↗</button><button id="endingUncut" class="secondary-button">回到台内 / 继续翻阅原件</button>';
-    $('endingPlay').onclick=()=>launchCG(hold);$('endingUncut').onclick=()=>{G.closeDialog('ending');G.notify('本期播出版本已封存。之后查阅的材料不会倒写进刚才的节目。');};
+    const unlocked=window.InquiryEngine.cgUnlocked(s),zero=s.ending==='zero';
+    $('endingResult').innerHTML='<span>'+(zero?'ENDING 00 / DEAD AIR':s.ending==='good'?'ENDING 01 / A GOOD PERSON':'ENDING 02 / A BAD PERSON')+'</span><p>'+esc(s.radio.airScript?.at(-1)?.body||'这一期没有形成足以定性的论证。')+'</p>'+(zero?'<p>红灯熄灭。她的档案没有封签，磁带仍未入库。</p>':'<p>你把一条有根据的链，收束成了对一个人的定义。来访磁带已封存。</p><button id="endingPlay" class="ink-button">PLAY HER TAPE / 打开封存磁带 ↗</button>')+'<button id="endingUncut" class="secondary-button">'+(zero?'继续取材 / 保留现有调查':'回到台内 / 翻阅原件')+'</button>';
+    if($('endingPlay')){$('endingPlay').disabled=!unlocked;$('endingPlay').onclick=()=>launchCG(false);}
+    $('endingUncut').onclick=continueReporting;
   }
   function onVerdict(choice,s){
-    s.emotion=choice==='release'?'cry':'thoughtful';G.save();G.render();prepareEnding(s);G.closeDialog('ending');
-    const lines=choice==='release'?[{who:'记录',text:'红灯熄灭。本期采用的片段已封存，文件夹里还有没拆开的订页。'},{who:'小春',text:'……钥匙先放这里吧。我怕一伸手，又带回去了。'},{who:'导播内线',text:'她留下了一盒磁带。现在打开，还是先回台内？'}]:[{who:'主持人',text:'本期到这里。采用的材料照常保留，最终裁决暂缓。'},{who:'小春',text:'好。你下次要问哪张，先告诉我。'}];
-    G.playConversation(lines,{label:'OFF AIR / AFTER THE BROADCAST',portrait:choice==='release'?'cry':'letter',after:()=>G.openEnding()});
+    s.emotion=choice==='bad'?'cry':'thoughtful';G.save();G.render();prepareEnding(s);G.closeDialog('ending');
+    const lines=choice==='zero'?[{who:'导播内线',text:'只有几段摘要，还没有接成能定性的论证。这期到这里。'},{who:'记录',text:'没有新的档案入库，磁带口仍然关着。你可以带着已核实的材料继续下一轮取材。'}]:choice==='bad'?[{who:'小春',text:'你说的那些事，我没有说它没发生。'},{who:'小春',text:'所以，后面就只剩下“我就是这样的人”了？'},{who:'记录',text:'封签压住了还没翻开的页角。她把钥匙留在桌面上，没有再拿起。'}]:[{who:'小春',text:'你说……我还是个好人。'},{who:'小春',text:'那张告示呢？她现在走路还会疼。那些也留着吧。'},{who:'记录',text:'你保留了她的责任，也给整个人写下了一个定义。磁带入库，未采用的原件仍在桌上。'}];
+    G.playConversation(lines,{label:'OFF AIR / '+(choice==='zero'?'NO VERDICT':'THE PERSON YOU NAMED'),portrait:choice==='bad'?'cry':'letter',after:()=>G.openEnding()});
   }
-  function launchCG(preview){previewing=preview;document.querySelectorAll('dialog[open]').forEach(node=>node.close());$('cgStatus').textContent=preview?'ARCHIVE PREVIEW / 不改变当前判断':'HER TAPE / THE THINGS SHE KEPT';$('cgScreen').hidden=false;$('app').inert=true;$('cgFrame').src='execution/index.html?chapter=01';document.body.classList.add('watching-cg');$('cgFrame').focus();}
+  function launchCG(preview){if(!window.InquiryEngine.cgUnlocked(state())){G.notify('这份记录尚未形成正式定性结局，磁带没有解锁。');return;}previewing=preview;document.querySelectorAll('dialog[open]').forEach(node=>node.close());$('cgStatus').textContent=preview?'ARCHIVE PREVIEW / 不改变当前判断':'HER TAPE / THE THINGS SHE KEPT';$('cgScreen').hidden=false;$('app').inert=true;$('cgFrame').src='execution/index.html?chapter=01';document.body.classList.add('watching-cg');$('cgFrame').focus();}
   function exitCG(){const frame=$('cgFrame');try{frame.contentWindow.postMessage({channel:'dead-air-chapter',action:'pause'},'*');}catch(_){}frame.src='about:blank';$('cgScreen').hidden=true;$('app').inert=false;document.body.classList.remove('watching-cg');if(state().ending)G.openEnding();else G.render();}
-  window.addEventListener('message',event=>{if($('cgScreen').hidden||event.source!==$('cgFrame').contentWindow||event.data?.channel!=='dead-air-chapter')return;if(event.data.event==='complete'){if(!previewing){state().cgWatched=true;G.save();}$('cgStatus').textContent='END OF TAPE / 记录已保存';}if(event.data.event==='ready')$('cgStatus').textContent=previewing?'ARCHIVE PREVIEW / 点击磁带放入':'HER TAPE / 点击磁带放入，播放记录';});
+  window.addEventListener('message',event=>{if($('cgScreen').hidden||event.source!==$('cgFrame').contentWindow||event.data?.channel!=='dead-air-chapter')return;if(event.data.event==='complete'){if(!previewing&&window.InquiryEngine.cgUnlocked(state())){state().cgWatched=true;G.save();}$('cgStatus').textContent='END OF TAPE / 记录已保存';}if(event.data.event==='ready')$('cgStatus').textContent=previewing?'ARCHIVE PREVIEW / 点击磁带放入':'HER TAPE / 点击磁带放入，播放记录';});
   window.ChapterExtension={portrait,render,sceneItems,layerUnlocked,onResult,onCollect,onConversationEnd,prepareEnding,renderEndingResult,onVerdict,talkToHer,setLayer};
   $('profileButton').onclick=()=>window.LifeUI.open();$('lifeLaneButton').onclick=()=>window.LifeUI.open();
   $('lifeHintButton').onclick=()=>openHint('life');

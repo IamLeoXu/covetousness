@@ -1,6 +1,6 @@
 /* A programme can close before its reporter has opened every envelope. */
 (function(){
-  'use strict';const D=window.InquiryData;D.version='0.5';
+  'use strict';const D=window.InquiryData;D.version='0.6.5';
   D.initialLife=['boxes','choice','break','phone'];
   D.lifeVisible=(event,s)=>D.initialLife.includes(event.id)||s.collected.includes(event.sources[0])||s.lifeSolved.includes(event.id);
   D.lifePieces=s=>D.lifeEpisodes.filter(event=>s.lifeSolved.includes(event.id)||(s.lifeFacets||[]).includes(event.id));
@@ -34,6 +34,8 @@
   D.radioColdOpen[3].body[1]='你可以核实来稿、补访她的过去，也可以在已有材料上收尾。播出单只采用你实际选进去的内容。值班倒计时不会替你决定何时结束。';
   D.intro=[{who:'主持人',text:'安置的钱，为什么先交了房租？'},{who:'小春',text:'那两笔一直在催。修了多少地方，账上都记着。'},{who:'主持人',text:'住客知道报告里要求停用吗？'},{who:'小春',text:'……你先把东西看完，别只拿那九秒钟来问我。'},{who:'导播内线',text:'先试一条可核实的追问。原通话是 22:19，去调首次报警记录，再回编辑台。两个时间都摆上来，我带你录第一条。'}];
   const baseNew=D.newRadioState,baseRestore=D.restoreRadioState;
+  D.newOnboarding=()=>({enabled:true,core:{},life:{},seen:[],quiz:{},paused:false,complete:false,panelPosition:null});
+  D.restoreOnboarding=(value,started)=>value&&typeof value==='object'?{...D.newOnboarding(),...value,core:value.core||{},life:value.life||{},seen:Array.isArray(value.seen)?value.seen:[],quiz:value.quiz||{}}:{...D.newOnboarding(),complete:started===true,enabled:started!==true};
   D.newRadioState=()=>({...baseNew(),scope:'conduct',lessonDismissed:false,editorialSnapshot:null});
   D.restoreRadioState=(value,ending)=>{const r={...baseRestore(value,ending),scope:value?.scope==='person'?'person':'conduct',lessonDismissed:value?.lessonDismissed===true,editorialSnapshot:value?.editorialSnapshot||null};if(D.lifeEpisodes.some(event=>event.id===value?.lifeQuote))r.lifeQuote=value.lifeQuote;if(Array.isArray(value?.airScript)&&value.airScript.length>=3&&value.airScript.length<=6&&value.airScript.every(item=>item&&['id','title','body'].every(key=>typeof item[key]==='string')))r.airScript=value.airScript.map(item=>({id:item.id.slice(0,30),title:item.title.slice(0,100),body:item.body.slice(0,3000)}));return r;};
 })();

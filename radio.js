@@ -22,8 +22,10 @@
   function segmentText(id){
     if(id==='rumor'){const fact=firstFact();return fact?D.facts[fact].title+'。'+D.facts[fact].body:'';}
     if(id!=='life')return segmentFacts(id).map(fact=>D.facts[fact].title+'。'+D.facts[fact].body).join(' ');
-    const event=portraitPieces().find(item=>item.id===rs().lifeQuote)||portraitPieces()[0];if(!event)return '';
-    return state().lifeSolved.includes(event.id)?'关于'+event.age+'岁那段经历，补访核对的是：'+event.options.find(([id])=>id===event.answer)[1]+' 她留下这句原话：“'+event.voice+'”':'人物档案摘录：'+D.lifeFacetText[event.id]+' 来源是《'+D.evidence[event.primary].title+'》。';
+    const pieces=portraitPieces(),event=pieces.find(item=>item.id===rs().lifeQuote)||pieces[0];if(!event)return '';
+    const accounts=pieces.map(item=>state().lifeSolved.includes(item.id)?item.options.find(([id])=>id===item.answer)[1]:D.lifeFacetText[item.id]);
+    const relations=D.lifeConnections.filter(link=>state().lifeLinks.includes(link.id)&&link.pair.every(id=>pieces.some(item=>item.id===id)));
+    return accounts.join(' ')+' '+relations.map(link=>'人物推断：'+link.options.find(([id])=>id===link.answer)[1]).join(' ')+(state().lifeSolved.includes(event.id)?' 她留下这句原话：“'+event.voice+'”':'');
   }
   function ordered(){const ids=['rumor','warning','rescue'];return rs().order==='life-first'?['life',...ids]:[...ids,'life'];}
   function segments(){return ordered().filter(id=>rs().queued.includes(id)&&segmentReady(id)).map(id=>({id,title:D.radioSegments.find(item=>item.id===id).title,body:segmentText(id)}));}
@@ -35,9 +37,9 @@
     if(r.phase==='archived')return ['ARCHIVED / 本期版本已封存','可以回到原档继续取材；后来的发现不会倒写进刚才的节目。','rundown'];
     if(!r.introDone)return ['01:00 / AFTER HOURS · 开播前','接入值班线路。',null];
     if(r.tutorial==='log')return ['导播内线 / 先调首次报警记录','原通话在 22:19。点击右侧按钮去档案台，打开首次报警记录。','log'];
-    if(r.tutorial==='argument'&&!r.lessonDismissed)return ['导播内线 / 录第一条 TAKE','编辑台会带你依次选追问、放入两个来源、CUE 预听，再 ARM / REC。','argument'];
+    if(r.tutorial==='argument'&&!r.lessonDismissed)return ['导播内线 / 录第一条 TAKE','进入编辑台后可自行选说法与来源；需要详细步骤时可打开 H 提示。','argument'];
     if(!G.progress().ready)return ['EDIT DESK / 来稿还在手边','核对一项说法，或从私人档案采用一块人物侧写。','argument'];
-    return [ready()?'CUE CONFIRMED / 可以准备收尾':'TAKE READY / 已有可用录音','可以继续取材，也可以按 R 选入已有片段，预听后签发本期裁决。','rundown'];
+    return [ready()?'CUE CONFIRMED / 可以准备收尾':'TAKE READY / 已有可用录音','R 可以整理本期；只有行为与人物链接起来，才能签发正式定性。零散稿件可作为摘要收尾。','rundown'];
   }
   function render(){
     const r=rs(),onAir=r.phase==='on-air',label=onAir?'ON AIR':recording&&r.phase!=='archived'?'REC':r.phase==='archived'?'ARCHIVED':'OFF AIR';
@@ -48,8 +50,8 @@
     $('radioCueAction').onclick=()=>{if(cue==='log'){window.ChapterExtension.setLayer('keys');document.querySelector('[data-location="archive"]').click();}if(cue==='argument')G.openBuilder();if(cue==='life')window.LifeUI.open();if(cue==='rundown')openRundown();};
     const lamp=document.querySelector('.header-actions .off-air');lamp.innerHTML='<i></i>'+label;
     document.querySelectorAll('[data-radio-guide]').forEach(node=>node.removeAttribute('data-radio-guide'));
-    if(r.introDone&&r.tutorial==='log'){document.querySelector('[data-location="archive"]').dataset.radioGuide='next';const material=document.querySelector('[data-evidence="rescue"]');if(material)material.dataset.radioGuide='next';}
-    if(r.introDone&&r.tutorial==='argument')$('buildButton').dataset.radioGuide='next';
+    if(!window.Onboarding?.moduleNotes&&r.introDone&&r.tutorial==='log'){document.querySelector('[data-location="archive"]').dataset.radioGuide='next';const material=document.querySelector('[data-evidence="rescue"]');if(material)material.dataset.radioGuide='next';}
+    if(!window.Onboarding?.moduleNotes&&r.introDone&&r.tutorial==='argument')$('buildButton').dataset.radioGuide='next';
     if($('rundownDialog').open)renderRundown();if($('builder').open)decorateBuilder();
   }
   function showScene(kind){sceneMode=kind;$('radioScene').hidden=false;$('app').inert=true;$('titleScreen').inert=true;document.body.classList.add('radio-scene-open');}
@@ -76,6 +78,7 @@
     if(review){hideScene();review=false;render();return;}
     rs().introDone=true;rs().prologueStep=4;
     rs().tutorial=skip||G.progress().first?'done':state().collected.includes('rescue')?'argument':'log';
+    if(skip)window.Onboarding?.skip();
     G.save();hideScene();G.render();
     if(state().ending){G.openEnding();return;}
     G.playConversation(D.intro,{label:'STUDIO A / PRE-INTERVIEW · NOT ON AIR',portrait:'keys'});
@@ -90,9 +93,9 @@
   function onResult(result){if(result.fact&&['oldKeys','freeExit','afterCall'].includes(result.fact)){rs().firstFact=result.fact;rs().tutorial='done';}}
   function onConversation(value){recording=value;render();}
   function hint(){
-    if(rs().tutorial==='log')return ['导播内线 / 第一条录音',['去台内档案，打开首次报警记录。原通话在 22:19，报警在 22:13。','然后按 B。黄色便签会逐步指出下一次要点的按钮。']];
-    if(rs().tutorial==='argument'&&!rs().lessonDismissed)return ['编辑台 / 跟随导播便签',['选“别走发生在事故后，说给安置站值班员”。','点击原通话和首次报警记录，分别进入两个来源位。','点 CUE 核对两份转录，确认后点 ARM，再点 REC。听完回答就得到第一条 TAKE。']];
-    if(G.progress().ready)return ['值班编排 / 可以现在收尾',['R 打开播出单，任选一条可用 TAKE 收进待播轨。','CUE 预听本期稿件并确认，再进入“最后一句”。无需取齐案件或人物侧写。','若想继续调查，翻阅原件底部的附页与附件号；P 可以采用局部侧写，也可以做更长的交叉补访。']];return null;
+    if(rs().tutorial==='log')return ['导播内线 / 第一条录音',['去台内档案，打开首次报警记录。原通话在 22:19，报警在 22:13。','然后按 B 比较原件，依据受话人与两个时刻组合追问。']];
+    if(rs().tutorial==='argument'&&!rs().lessonDismissed)return ['编辑台 / 核对原件与时间',['选“别走发生在事故后，说给安置站值班员”。','点击原通话和首次报警记录，分别进入两个来源位。','点 CUE 核对两份转录，确认后点 ARM，再点 REC。听完回答就得到第一条 TAKE。']];
+    if(G.progress().ready)return ['值班编排 / 可以现在收尾',['R 打开播出单，任选一条可用 TAKE 收进待播轨。','CUE 确认后检查论证链。正式结局需相关两段人生和一条关系，无需六段全收集。','若想继续调查，翻阅原件底部的附页与附件号；P 可以采用局部侧写，也可以做更长的交叉补访。']];return null;
   }
   function editFingerprint(){const b=state().builder;return JSON.stringify([b.topic,b.claim,[...b.selected].sort()]);}
   function canRecord(){return armed===editFingerprint()&&editPreview===editFingerprint();}
@@ -106,7 +109,7 @@
     $('editCue').onclick=()=>{previewMode='edit';previewStamp=stamp;const claim=D.topics.flatMap(t=>t.claims).find(item=>item.id===b.claim);$('radioScriptBody').innerHTML='<article><span>QUESTION BUS / 待录追问</span><p>'+esc(claim.text)+'</p></article>'+b.selected.map((id,i)=>{const item=D.evidence[id]||D.facts[id];return '<article><span>SOURCE '+(i+1)+' / '+esc(item.title)+'</span><p>'+esc(item.lead||item.body||'')+'</p>'+(item.transcript||item.rows||[]).map(([who,text])=>'<p><b>'+esc(who)+'</b> '+esc(text)+'</p>').join('')+(item.paragraphs||[]).map(text=>'<p>'+esc(text)+'</p>').join('')+'</article>';}).join('');$('radioScriptConfirm').textContent='CUE OK / 确认来源，返回编辑台 →';G.openDialog('radioScript');sound('cue');};
     $('editArm').onclick=()=>{armed=canRecord()?'':editFingerprint();G.sound('click');decorateBuilder();};
     document.querySelectorAll('[data-coach-target]').forEach(node=>node.removeAttribute('data-coach-target'));
-    if(!guided){$('editCoach').hidden=true;return;}
+    if(!guided||window.Onboarding?.moduleNotes){$('editCoach').hidden=true;return;}
     let step=1,target='[data-claim="afterCall"]',text='先选择追问：“别走”发生在事故后，说给安置站值班员。';
     if(b.claim==='afterCall'){step=2;target='[data-select="call"]';text='点击“原通话”，把 22:19 的受话人与原话送进来源位。';
       if(b.selected.includes('call')){step=3;target='[data-select="rescue"]';text='再点击“首次报警记录”，把 22:13 放入第二个来源位。';
@@ -133,34 +136,34 @@
     $('rundownProof').disabled=locked||!choices.length;$('rundownQuote').disabled=locked||!pieces.length;$('rundownQuote').value=r.lifeQuote;
     $('rundownProof').onchange=e=>{r.firstFact=e.target.value;r.previewed='';G.save();renderRundown();};$('rundownQuote').onchange=e=>{r.lifeQuote=e.target.value;r.previewed='';G.save();renderRundown();};
     $('rundownRead').disabled=locked?!r.airScript?.length:!hasSelected();$('rundownArm').disabled=!ready();$('rundownArm').textContent=locked?'回到本期结尾 →':'进入播出 / 最后一句 ↗';
-    $('rundownReadyNote').textContent=locked?'这一期已封存。之后翻到的原件不会自动加入当时的播出稿。':!hasSelected()?'接入至少一条已有 TAKE。其他轨道可以留空。':r.previewed!==fingerprint()?'已选 '+segments().length+' 轨。送入 CUE，确认你要播出的这一版。':'CUE 已确认。可以现在收尾，也可以继续取材。';
+    $('rundownReadyNote').textContent=locked?'这一期已封存。之后翻到的原件不会自动加入当时的播出稿。':!hasSelected()?'接入至少一条已有 TAKE。其他轨道可以留空。':r.previewed!==fingerprint()?'已选 '+segments().length+' 轨。送入 CUE，确认你要播出的这一版。':'CUE 已确认。接下来检查论证链；零散摘要只会结束本次值班。';
   }
   function openScript(){
     previewMode='rundown';previewStamp=fingerprint();const items=archived()&&rs().airScript?.length?rs().airScript:segments();
-    $('radioScriptBody').innerHTML=items.map((item,i)=>'<article><span>'+String(i+1).padStart(2,'0')+' / '+esc(item.title)+'</span><p>'+esc(item.body)+'</p></article>').join('')+(!archived()?'<p class="radio-script-last">最后一句尚未署名。评价范围：'+(rs().scope==='person'?'她是怎样的人':'这次发生的事')+'。</p>':'');
+    $('radioScriptBody').innerHTML=items.map((item,i)=>'<article><span>'+String(i+1).padStart(2,'0')+' / '+esc(item.title)+'</span><p>'+esc(item.body)+'</p></article>').join('')+(!archived()?'<p class="radio-script-last">最后一句尚未署名。下一页会检查行为与人物逻辑链，再决定是否能够定性。</p>':'');
     $('radioScriptConfirm').textContent=archived()?'返回本期记录 →':'确认这份编排 / 返回播出单 →';G.openDialog('radioScript');sound('cue');
   }
   function confirmScript(){if(previewMode==='edit'){if(previewStamp===editFingerprint())editPreview=previewStamp;G.closeDialog('radioScript');G.renderBuilder();return;}if(hasSelected()&&!archived()&&previewStamp===fingerprint())rs().previewed=previewStamp;G.save();G.closeDialog('radioScript');renderRundown();}
   function guardEnding(){if(ready())return true;openRundown();return false;}
   function airScript(choice){
-    const body=choice==='hold'?'本期采用的记录已经播出。对这一期没有查明的部分，我保留最终裁决，下一次取材继续。':rs().scope==='person'?'我以本期采用的这些片段，对天音小春这个人作出裁决：她把自己的需要放在别人的选择之前。我不再把她看作值得托付的人。这一判断，由我署名。':'我就本期采用的行为记录签发裁决：不再由她独立承担对住客的托付。未采用或未核实的事实，仍留在原始卷宗。';
-    return [{id:'ident',title:'01:00 / AFTER HOURS',body:'这里是 AFTER HOURS，FM 107.9。今晚的来访者是小春。以下采用本期播出单中的原件与采访文字转录。'},...segments(),{id:'editorial',title:'最后一句 / 主持人署名',body}];
+    const body=choice==='zero'?'这里是本期已经核实的摘要。现有材料尚未接成能够对她定性的论证。本次值班结束，调查原件留在台内。':choice==='good'?'我承认她在告知上的责任，也保留伤者仍在承受的后果。但从她实际返身的选择、当时所知的信息与那些真实关系里，我仍然认定：她是个值得相信的人。这个判断，由我署名。':'我依据她已知却未完整传达的危险、安置款的选择，以及她把投入与未结束的安排留给对方的人物链，认定她把自己的需要置于别人的选择之前。我给她下的定义是：不值得托付。这由我署名。';
+    return [{id:'ident',title:'01:00 / AFTER HOURS',body:'这里是 AFTER HOURS，FM 107.9。今晚的来访者是小春。以下采用本期播出单中的原件与采访文字转录。'},...segments(),{id:'editorial',title:choice==='zero'?'本期摘要 / 没有定性':'最后一句 / 你给她的定义',body}];
   }
   function renderTransmission(){
     const r=rs(),script=r.airScript,index=Math.min(r.transmitIndex,script.length-1),item=script[index];$('radioScene').dataset.kind='broadcast';$('radioSceneStatus').textContent='ON AIR / 本期播出转录';$('radioSceneSkip').hidden=true;
     $('radioStoryTime').textContent='01:00';$('radioStoryTag').textContent=index===script.length-1?'THE LAST SENTENCE / YOUR SIGNATURE':'PROGRAMME / '+(r.order==='life-first'?'先人后事':'先事后人');$('radioStoryTitle').textContent=item.title;$('radioStoryBody').innerHTML='<p class="radio-on-air-copy">'+esc(item.body)+'</p>';$('radioStoryActions').innerHTML='';$('radioStoryFeedback').textContent='导播：红灯已亮。这一版的原稿与来源会一并归档。';$('radioStoryCount').textContent=String(index+1).padStart(2,'0')+' / '+String(script.length).padStart(2,'0');$('radioStoryNext').disabled=false;$('radioStoryNext').textContent=index===script.length-1?'播出结束 / 切回录音室 →':'播出下一段 →';
     $('radioStoryArt').innerHTML='<div class="radio-air-sign"><i></i><span>ON AIR</span><b>AFTER HOURS</b><small>FM 107.9 / RECORD 001</small></div><div class="radio-air-progress">'+script.map((part,i)=>'<span class="'+(i<=index?'played':'')+'">'+esc(part.id==='life'?'B':part.id==='editorial'?'END':part.id==='ident'?'ID':D.radioSegments.find(segment=>segment.id===part.id).code)+'</span>').join('')+'</div>';
     $('radioStoryNext').onclick=()=>{if(r.transmitIndex<script.length-1){r.transmitIndex++;G.save();renderTransmission();}else finishTransmission();};
-    $('radioStoryNext').focus({preventScroll:true});
+    $('radioStoryNext').focus({preventScroll:true});window.Onboarding?.refresh();
   }
-  function transmit(choice,resume=false){document.querySelectorAll('dialog[open]').forEach(node=>node.close());if(!resume||!rs().airScript?.length){rs().airScript=airScript(choice);rs().transmitIndex=0;rs().editorialSnapshot={facts:[...state().facts],collected:[...state().collected],lifeSolved:[...state().lifeSolved],lifeFacets:[...state().lifeFacets],profileSlots:[...state().profileSlots],queued:segments().map(item=>item.id),scope:rs().scope,choice,script:rs().airScript.map(item=>({...item}))};}rs().phase='on-air';rs().airedEnding=choice;G.save();showScene('air');renderTransmission();render();sound('air');}
+  function transmit(choice,resume=false){document.querySelectorAll('dialog[open]').forEach(node=>node.close());if(!resume||!rs().airScript?.length){rs().airScript=airScript(choice);rs().transmitIndex=0;rs().editorialSnapshot={facts:[...state().facts],collected:[...state().collected],lifeSolved:[...state().lifeSolved],lifeLinks:[...state().lifeLinks],lifeFacets:[...state().lifeFacets],profileSlots:[...state().profileSlots],queued:segments().map(item=>item.id),scope:rs().scope,choice,script:rs().airScript.map(item=>({...item}))};}rs().phase='on-air';rs().airedEnding=choice;G.save();window.Onboarding?.event('transmit',{choice});showScene('air');renderTransmission();render();sound('air');}
   function finishTransmission(){const choice=state().ending;rs().phase='archived';G.save();hideScene();render();chapterVerdict(choice,state());}
   window.ChapterExtension.onVerdict=(choice)=>transmit(choice);
   window.ChapterExtension.prepareEnding=(s)=>{chapterEnding(s);$('ending').querySelector('.dialog-bar>span').textContent=archived()?'AFTER HOURS / ARCHIVED BROADCAST':'ON AIR / YOU SIGN THE LAST SENTENCE';if(!s.ending)$('ending').querySelector('h2').innerHTML='材料已在待播盘。<br>最后一句，怎么说？';};
   $('rundownButton').onclick=openRundown;$('rundownRead').onclick=openScript;$('radioScriptConfirm').onclick=confirmScript;$('rundownArm').onclick=()=>{G.closeDialog('rundownDialog');G.openEnding();};$('radioSceneSkip').onclick=()=>finishPrologue(true);
   const rehear=document.createElement('button');rehear.id='rehearOpening';rehear.className='radio-rehear';rehear.textContent='重听本期开场 / 电台与前情';rehear.onclick=()=>openPrologue(true);document.querySelector('.title-copy').append(rehear);
   const rehearMenu=document.createElement('button');rehearMenu.id='rehearFromMenu';rehearMenu.className='text-button';rehearMenu.textContent='重听本期开场';rehearMenu.onclick=()=>{G.closeDialog('helpDialog');openPrologue(true);};document.querySelector('.chapter-help-links').append(rehearMenu);
-  $('startButton').firstChild.nodeValue='TAKE THE NIGHT SHIFT ';document.querySelector('.title-control-hint').textContent='一夜电台 · 来稿核实 · 人生补访 · 你的播出版本';document.querySelector('.title-bottom span:last-child').textContent='CHAPTER BUILD / 0.5';
+  $('startButton').firstChild.nodeValue='TAKE THE NIGHT SHIFT ';document.querySelector('.title-control-hint').textContent='一夜电台 · 来稿核实 · 人生补访 · 你的播出版本';document.querySelector('.title-bottom span:last-child').textContent='CHAPTER BUILD / 0.6.2';
   document.addEventListener('keydown',event=>{if(!busy()||document.querySelector('dialog[open]'))return;if(event.key==='Enter'&&!event.target.closest('button')&&!$('radioStoryNext').disabled){event.preventDefault();$('radioStoryNext').click();}if(event.key==='Escape'&&review)finishPrologue(true);if(!event.target.closest('button')||!['Enter',' '].includes(event.key))event.stopImmediatePropagation();},true);
   document.addEventListener('keydown',event=>{if(event.key.toLowerCase()!=='r'||event.ctrlKey||event.altKey||event.metaKey||/INPUT|TEXTAREA|SELECT/.test(event.target.tagName)||!$('titleScreen').hidden||busy()||!$('cgScreen').hidden||document.querySelector('dialog[open]'))return;event.preventDefault();openRundown();});
   window.Radio={start,render,onCollect,onResult,onViewerClosed,onConversation,guardEnding,ready,busy,openRundown,openPrologue,hint,decorateBuilder,canRecord};
