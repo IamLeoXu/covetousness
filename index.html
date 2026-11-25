@@ -6,16 +6,20 @@
   <meta name="theme-color" content="#111019">
   <title>DEAD AIR · 她留下的东西 / 第一章整合版</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath fill='%23d2f850' d='M0 0h40v40H0z'/%3E%3Cpath fill='%23111019' d='M9 6h9q16 0 16 14T18 34H9zm8 7v14h2q8 0 8-7t-8-7z'/%3E%3C/svg%3E">
-  <link rel="preload" as="image" href="assets/koharu-neutral.png">
+  <link rel="preload" as="image" href="execution/assets/character/details/held-letter.png">
   <link rel="preload" as="image" href="assets/city.webp">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="chapter.css">
+  <link rel="stylesheet" href="life.css">
   <script defer src="case-data.js"></script>
   <script defer src="chapter-data.js"></script>
+  <script defer src="life-data.js"></script>
   <script defer src="case-engine.js"></script>
   <script defer src="chapter-engine.js"></script>
+  <script defer src="life-engine.js"></script>
   <script defer src="game.js"></script>
   <script defer src="chapter.js"></script>
+  <script defer src="life.js"></script>
 </head>
 <body>
   <div id="app" class="app" data-scene="studio" data-phase="first">
@@ -30,11 +34,14 @@
     </header>
 
     <main id="playArea">
+      <nav class="investigation-lanes" aria-label="两条调查线"><div class="case-lane"><span>01 / THE CASE</span><b>案件核实</b><small id="caseProgress">0 / 3 卷</small></div><button id="lifeLaneButton"><span>02 / HER LIFE</span><b>人生侧写 ↗</b><small id="lifeQuickStatus">0 / 6 事件 · 0 / 3 关系</small></button></nav>
       <section class="case-heading" aria-label="当前调查问题">
         <div class="question-number" id="phaseNumber">01</div>
         <div class="question-copy"><span id="phaseEyebrow">A DOOR THAT WASN'T LOCKED</span><h1 id="phaseQuestion">她把人锁住了吗？</h1><p id="phaseHint">查看物件，组合材料，向小春提出一个有根据的说法。</p></div>
         <div class="round-indicators" aria-label="调查进度"><span id="roundOne" class="current">01<span>THE DOOR</span></span><i></i><span id="roundTwo">02<span>THE WARNING</span></span></div>
       </section>
+
+      <nav id="caseLayerTabs" class="case-layer-tabs" aria-label="案件卷宗分层"></nav>
 
       <section class="stage" id="stage" aria-label="调查场景">
         <div class="stage-backdrop" aria-hidden="true"></div>
@@ -43,10 +50,11 @@
         <div class="window-frame" aria-hidden="true"><i></i><i></i></div>
         <div class="scene-marker"><i></i><span id="sceneCode">STUDIO / 01</span><b id="sceneTitle">录音室</b></div>
         <div class="portrait-halo" aria-hidden="true"></div>
-        <img id="portrait" class="portrait" src="assets/koharu-neutral.png" alt="小春的常态立绘" draggable="false">
+        <img id="portrait" class="portrait" src="execution/assets/character/details/held-letter.png" alt="小春的常态立绘" draggable="false">
         <span id="emotionTag" class="emotion-tag">CALM / LISTENING</span>
         <div class="desk-surface" aria-hidden="true"><span>AH–02 / INTERVIEW DESK</span><i></i></div>
         <div class="hotspots" id="hotspots"></div>
+        <div id="sceneEmpty" class="scene-empty" hidden></div>
         <button class="talk-person" id="talkPerson"><i></i><span>TALK TO HER<small>和小春谈谈</small></span><b>↗</b></button>
         <div class="scene-caption"><span id="captionSpeaker">小春</span><p id="sceneCaption">这些材料，我都带来了。先别拿一张照片就下结论。</p></div>
         <div class="scene-count" id="sceneCount">MATERIALS / 0</div>
@@ -70,10 +78,10 @@
   <section class="title-screen" id="titleScreen" aria-label="游戏开始画面">
     <div class="title-backdrop" aria-hidden="true"></div><div class="title-slash" aria-hidden="true"></div>
     <div class="title-mast">DEAD AIR<span>AFTER HOURS / CASE 001</span></div>
-    <div class="title-copy"><span class="pilot-label">CHAPTER 01 / THE THINGS SHE KEPT</span><p class="title-kicker">SHE GAVE THEM A HOME.<br>SHE COULDN'T LET THEM GO.</p><h2>她留下的<br><em>东西。</em></h2><p class="title-description">她隐瞒过危险，也返身救过人。<br>你将决定，这个人最后怎样被记住。</p><div class="title-buttons"><button id="startButton">BEGIN INQUIRY <span>↗</span></button><button id="resumeButton" hidden>CONTINUE <span>→</span></button></div><p class="title-control-hint">调查 · 对质 · 正反人物拼图 · 完整处决 CG</p><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">WALKTHROUGH / 攻略与全部组合 ↗</a></div>
-    <img class="title-person" src="assets/koharu-standing.png" alt="小春的常态站姿" draggable="false">
+    <div class="title-copy"><span class="pilot-label">CHAPTER 01 / THE THINGS SHE KEPT</span><p class="title-kicker">SHE LOVED. SHE CHOSE.<br>SHE COULDN'T LET GO.</p><h2>她留下的<br><em>东西。</em></h2><p class="title-description">先核实她做过什么，再拼回她怎样爱过。<br>她的人生，不只发生在这场事故里。</p><div class="title-buttons"><button id="startButton">BEGIN INQUIRY <span>↗</span></button><button id="resumeButton" hidden>CONTINUE <span>→</span></button></div><p class="title-control-hint">三卷案件 · 六段人生 · 关系推断 · 处决记录</p><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">WALKTHROUGH / 攻略与全部组合 ↗</a></div>
+    <img class="title-person" src="execution/assets/character/shadows/stand-reaching-profile.png" alt="小春的常态站姿" draggable="false">
     <div class="title-record"><img src="assets/tape-decal.png" alt="蝴蝶结、心形钥匙与信封图案"><span>AMANE KOHARU / SIDE A</span></div>
-    <div class="title-bottom"><span>AN AFTER HOURS RECORD</span><span>CHAPTER BUILD / 0.2</span></div>
+    <div class="title-bottom"><span>AN AFTER HOURS RECORD</span><span>CHAPTER BUILD / 0.3</span></div>
   </section>
 
   <dialog id="viewer" class="viewer-dialog">
@@ -86,7 +94,7 @@
     <header class="dialog-bar"><span>ASSEMBLE / QUESTION THE RECORD</span><button data-close="builder" class="close-button" aria-label="返回调查场景">×</button></header>
     <div class="builder-top"><div><span class="eyebrow">THE CASE YOU MAKE</span><h2>你准备怎么说？</h2></div><p>把相关材料放到下面。<br>原始线索和已核实的推论，都可以使用。</p></div>
     <div class="builder-layout">
-      <section class="evidence-drawer" aria-label="已获得的材料"><header><span>YOUR MATERIALS</span><span id="materialCount">00</span></header><div id="evidencePool" class="evidence-pool"></div></section>
+      <section class="evidence-drawer" aria-label="当前卷宗材料"><header><span>THIS FILE ONLY</span><span id="materialCount">00</span></header><p id="poolScope" class="pool-scope"></p><div id="materialTabs" class="material-tabs"></div><div id="evidencePool" class="evidence-pool"></div></section>
       <section class="argument-area" aria-label="组合与说法">
         <div id="topicTabs" class="topic-tabs" role="tablist" aria-label="正在讨论的问题"></div>
         <div class="claim-block"><span class="field-label">01 / THE QUESTION</span><p id="builderQuestion" class="builder-question"></p><div id="claimOptions" class="claim-options"></div></div>
@@ -97,7 +105,7 @@
   </dialog>
 
   <dialog id="conversation" class="conversation-dialog">
-    <div class="conversation-art" aria-hidden="true"><img id="conversationPortrait" src="assets/koharu-open.png" alt=""></div>
+    <div class="conversation-art" aria-hidden="true"><img id="conversationPortrait" src="execution/assets/character/details/open-hands.png" alt=""></div>
     <div class="conversation-content"><span id="conversationLabel" class="eyebrow">INTERVIEW / OFF AIR</span><span class="speaker-tag" id="conversationSpeaker">小春</span><p id="conversationText"></p><div id="conversationChoices" class="conversation-choices"></div><div class="conversation-bottom"><span id="conversationCounter"></span><button class="ink-button" id="conversationNext">NEXT →</button></div></div>
   </dialog>
 
@@ -108,10 +116,10 @@
 
   <dialog id="helpDialog" class="help-dialog">
     <header class="dialog-bar"><span>FIELD GUIDE / CONTROLS</span><button data-close="helpDialog" class="close-button" aria-label="关闭操作说明">×</button></header>
-    <h2>先看材料，<br>再决定怎么说。</h2>
-    <ol><li><b>调查</b><p>切换三个地点，打开物件。看过的材料会自动放进线索夹。报告可以翻到签收附页。</p></li><li><b>组合</b><p>按 B 打开记录台。选择讨论的问题与说法，点击或拖入最多三份相关材料。</p></li><li><b>对质</b><p>提交后听小春回应。证据不足可以重新调查；已核实的推论也能继续参与组合。</p></li></ol>
+    <h2>一卷案件，<br>一段人生。</h2>
+    <ol><li><b>案件分三卷</b><p>最初指控、危险告知、救援后果依次展开。场景与材料池只显示当前卷；原始材料和已核实推论分开切换。</p></li><li><b>人生独立调查</b><p>P 打开人物侧写。每段先读旧档，再选一个可核对的问题补访，比较两份来源、重建经历。</p></li><li><b>事件之间也要推理</b><p>重建六段经历，再为三条关系选出事件和有根据的读法。最后拼回时间顺序、翻看正反两面，才能作最终评价。</p></li></ol>
     <div class="help-keys"><span><kbd>B</kbd>组合</span><span><kbd>N</kbd>笔记</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>地点</span><span><kbd>ESC</kbd>返回</span><span><kbd>ENTER</kbd>继续对话</span></div>
-    <p class="help-note">游戏自动保存。P 打开人物拼图，H 打开分阶段提示。录音和录像使用标明来源的文字摘录；处决 CG 含完整歌曲、动画与设备音效。</p>
+    <p class="help-note">游戏自动保存。P 人生调查，H 分阶段提示。人生材料不进入案件证据池。旧版案件进度可继承，新增的人生调查需要重新完成。CG 的手动 STOP 显示带纹理黑屏；暂停保留当前画面。</p>
     <div class="chapter-help-links"><button id="hintButton" class="secondary-button">HINT / 当前提示</button><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">完整攻略 ↗</a><a class="guide-link" href="case-notes.html" target="_blank" rel="noopener">案件与判例参照 ↗</a><button id="previewCG" class="text-button">ARCHIVE / 演出预览</button></div>
     <div class="help-actions"><button id="restartButton" class="text-button">RESTART THIS RECORD</button><button class="ink-button" data-close="helpDialog">BACK TO THE CASE →</button></div>
     <div id="restartConfirm" class="restart-confirm" hidden><p>重新开始会清除这个 demo 的当前进度。</p><button id="confirmRestart" class="danger-button">确认重新开始</button><button id="cancelRestart" class="secondary-button">取消</button></div>
@@ -119,7 +127,7 @@
 
   <dialog id="ending" class="ending-dialog">
     <header class="dialog-bar"><span>END OF THE PILOT / RECORD 001</span><button data-close="ending" class="close-button" aria-label="继续查看材料">×</button></header>
-    <div class="ending-layout"><div class="ending-art"><span>WHAT<br>REMAINS.</span><img src="assets/koharu-letter.png" alt="小春握着信封的剪影"></div><section class="ending-copy"><span class="eyebrow">THE NEXT QUESTION</span><h2>门没锁。<br>他们知道多少？</h2><div id="endingFacts"></div><p class="ending-context">你确认了危险信息没有完整传达。事故的因果、款项与其他人的责任，还需要下一段调查。</p><div id="endingOptions" class="ending-options"><button data-ending="hold"><b>HOLD THE VERDICT</b><span>公布已核实的事实，保留最终判断。</span></button><button data-ending="release"><b>STATE YOUR JUDGMENT</b><span>明确反对再由她独立照料住客。</span></button></div><div id="endingResult" class="ending-result" hidden></div><div class="ending-actions"><button id="saveRecord" class="secondary-button">YOUR RECORD ↗</button><button data-close="ending" class="ink-button">RETURN TO MATERIALS →</button></div></section></div>
+    <div class="ending-layout"><div class="ending-art"><span>WHAT<br>REMAINS.</span><img src="execution/assets/character/details/held-letter.png" alt="小春握着信封的剪影"></div><section class="ending-copy"><span class="eyebrow">THE NEXT QUESTION</span><h2>门没锁。<br>他们知道多少？</h2><div id="endingFacts"></div><p class="ending-context">你确认了危险信息没有完整传达。事故的因果、款项与其他人的责任，还需要下一段调查。</p><div id="endingOptions" class="ending-options"><button data-ending="hold"><b>HOLD THE VERDICT</b><span>公布已核实的事实，保留最终判断。</span></button><button data-ending="release"><b>STATE YOUR JUDGMENT</b><span>明确反对再由她独立照料住客。</span></button></div><div id="endingResult" class="ending-result" hidden></div><div class="ending-actions"><button id="saveRecord" class="secondary-button">YOUR RECORD ↗</button><button data-close="ending" class="ink-button">RETURN TO MATERIALS →</button></div></section></div>
   </dialog>
 
   <dialog id="recordDialog" class="record-dialog">
@@ -133,9 +141,10 @@
   <div id="transitionFlash" class="transition-flash" aria-hidden="true"></div>
 
   <dialog id="profileDialog" class="profile-dialog">
-    <header class="dialog-bar"><span>ONE PERSON / TWO READINGS</span><button data-close="profileDialog" class="close-button" aria-label="关闭人物侧写">×</button></header>
-    <div class="profile-heading"><div><span class="eyebrow">SIX PIECES OF A LIFE</span><h2>把她的一生，<br>拼回一个人。</h2></div><div class="profile-sides"><button id="profileFront" class="active">SIDE A<small>她把门撑开</small></button><button id="profileBack">SIDE B<small>她把人留下</small></button></div></div>
-    <div class="profile-layout"><div class="puzzle-wrap"><div id="puzzleBoard" class="puzzle-board" aria-label="两列三行的人生拼图"></div><p id="puzzleStatus"></p><button id="checkProfile" class="ink-button">ASSEMBLE THE PORTRAIT ↗</button></div><section class="profile-fragments"><div class="profile-instruction">选一片，再点要放的位置；也可拖放。拼好后翻面，同一段人生会出现另一种读法。</div><div id="fragmentTray"></div><article id="fragmentReading" class="fragment-reading"></article></section></div>
+    <header class="dialog-bar"><span>HER LIFE / NOT JUST THE CASE</span><div class="life-bar-actions"><button id="lifeHintButton" class="text-button">HINT / 侧写提示</button><button data-close="profileDialog" class="close-button" aria-label="关闭人物侧写">×</button></div></header>
+    <div class="life-heading"><div><span class="eyebrow">A LIFE WITH OTHER PEOPLE</span><h2>她不是从这场事故<br>才开始生活。</h2></div><p id="lifeProgress"></p></div>
+    <nav id="lifeModes" class="life-modes" aria-label="人物调查步骤"><button data-life-mode="inquiry">01 / 经历核对 <small>旧档 · 补访 · 重建</small></button><button data-life-mode="connections">02 / 关系推断 <small>连接经历，而非贴标签</small></button><button data-life-mode="portrait">03 / 正反拼图 <small>同一个人的两种读法</small></button></nav>
+    <div id="lifeWorkspace" class="life-workspace"></div>
   </dialog>
 
   <dialog id="hintDialog" class="hint-dialog"><header class="dialog-bar"><span>FIELD NOTES / A LITTLE HELP</span><button data-close="hintDialog" class="close-button" aria-label="关闭提示">×</button></header><h2 id="hintTitle"></h2><p id="hintText"></p><div><button id="nextHint" class="ink-button">再提示一步 →</button><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">看完整攻略 ↗</a></div></dialog>

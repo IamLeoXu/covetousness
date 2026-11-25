@@ -48,12 +48,12 @@
   D.scenes.archive.items=[{id:'entry',x:14,y:32,label:'ENTRY / 22:07',hint:'查看当晚出入',art:'video'},{id:'report',x:38,y:32,label:'ASSESSMENT',hint:'查看报告及签收附页',art:'report'},{id:'rescue',x:63,y:32,label:'FIRST CALL',hint:'核对首次报警时间',art:'folder'},{id:'dispatch',x:86,y:32,label:'DISPATCH',hint:'查看完整接应指示',art:'folder'},{id:'returnVideo',x:14,y:77,label:'SHE WENT BACK',hint:'查看返身救人的摘录',art:'video'},{id:'handoff',x:39,y:77,label:'HANDOVER',hint:'核对首次专业检查',art:'report'},{id:'expert',x:70,y:77,label:'CAUSATION',hint:'查看损害归责复核',art:'report'}];
   D.scenes.studio.caption='这些我都带来了。糖在上面，你先拿一块。';
   D.profiles=[
-    {id:'shelter',age:'18',name:'第一次住下',source:'firstRoom',front:'她记得被接住是什么感觉。',back:'后来，她难以接受这里不再需要自己。',voice:'那时我是住客。第一次有一个地址，连续过了好几个季节。',image:'assets/koharu-neutral.png'},
+    {id:'shelter',age:'18',name:'第一次住下',source:'firstRoom',front:'她记得被接住是什么感觉。',back:'后来，她难以接受这里不再需要自己。',voice:'那时我是住客。第一次有一个地址，连续过了好几个季节。',image:'execution/assets/character/details/held-letter.png'},
     {id:'choice',age:'20',name:'主动留下',source:'transfer',front:'她有别的愿望，也认真选择过照顾他人。',back:'那条没走的路，渐渐变成不能白费的投入。',voice:'我喜欢橱窗。你别连我自己选的事，也写成谁害了我。',image:'assets/envelope.webp'},
     {id:'ability',age:'23',name:'真的撑过去',source:'repairs',front:'她精明、能扛，确实解决过别人的困境。',back:'每次成功，都让“再撑一下”更像一个保证。',voice:'钱不能白给，漏的地方就得重做。那次我真的让他回来修了。',image:'assets/keys.webp'},
     {id:'departure',age:'24',name:'送别人离开',source:'postcard',front:'她也会为别人过上新生活而高兴。',back:'旧物留下了，关系却不能一直停在原地。',voice:'他寄东西回来的时候，我看了好几次地址。真的搬过去了。',image:'assets/envelope.webp'},
     {id:'boundary',age:'26',name:'替你决定',source:'renewal',front:'她能意识到越界，会道歉，会想补偿。',back:'道歉没有阻止她再次替别人作安排。',voice:'我以为先留着总比没有好。她问我，那为什么不先问她。',image:'assets/keys.webp'},
-    {id:'return',age:'27',name:'最后一次返身',source:'returnVideo',front:'她没有只顾自己，危险里也真的回去了。',back:'她仍然无法安心把照顾交给别人接手。',voice:'我听见上面又响了。我知道有人在来，可她还在里面。',image:'assets/koharu-cry.png'}
+    {id:'return',age:'27',name:'最后一次返身',source:'returnVideo',front:'她没有只顾自己，危险里也真的回去了。',back:'她仍然无法安心把照顾交给别人接手。',voice:'我听见上面又响了。我知道有人在来，可她还在里面。',image:'execution/assets/character/details/covered-face.png'}
   ];
   D.intro=[{who:'小春',text:'糖在上面，证物在下面。那块碎了，我吃。'}, {who:'主持人',text:'照片、九秒录音、停用报告。还有你后来返身救人的记录。我们把它们分开核实。'}, {who:'小春',text:'我没有锁门。我也没有只顾着拿自己的东西跑。……但告示是我写的，这个我知道。'}, {who:'主持人',text:'先确认你实际做过什么，再讨论伤害能归责到哪一步。你的过去，也会听。'}];
 })();

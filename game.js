@@ -3,23 +3,32 @@
   const D = window.InquiryData, E = window.InquiryEngine;
   const $ = id => document.getElementById(id);
   const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-  const KEY = 'dead-air-chapter01-v02';
+  const KEY = 'dead-air-chapter01-v03';
   const allClaims = D.topics.flatMap(topic=>topic.claims);
-  const fresh = () => ({version:D.version,started:false,scene:'studio',collected:[],facts:[],attempts:[],audio:true,ending:null,studioQuote:null,emotion:'neutral',profileSlots:[null,null,null,null,null,null],profileViews:[],cgWatched:false,builder:{topic:'keys',claim:null,selected:[]}});
+  const fresh = () => ({version:D.version,started:false,scene:'studio',caseLayer:'keys',collected:[],facts:[],attempts:[],audio:true,ending:null,studioQuote:null,emotion:'neutral',profileSlots:[null,null,null,null,null,null],profileViews:[],lifeSolved:[],lifeLinks:[],lifeAttempts:[],lifeFocus:'boxes',cgWatched:false,builder:{topic:'keys',claim:null,selected:[],source:'evidence'}});
   let state = fresh(), flow = null, toastTimer, currentViewer = null, audioContext = null, lastSound = 0;
   try {
-    const stored = JSON.parse(localStorage.getItem(KEY));
-    if (stored && stored.version === D.version) {
+    const stored = JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('dead-air-chapter01-v02'));
+    if (stored && [D.version,'0.2'].includes(stored.version)) {
+      const legacy=stored.version==='0.2';
       state.started = stored.started === true;
       state.scene = D.scenes[stored.scene] ? stored.scene : 'studio';
       state.collected = [...new Set(Array.isArray(stored.collected) ? stored.collected.filter(id=>D.evidence[id]) : [])];
-      state.facts = [...new Set(Array.isArray(stored.facts) ? stored.facts.filter(id=>D.facts[id]) : [])];
+      state.facts = [...new Set(Array.isArray(stored.facts) ? stored.facts.filter(id=>D.facts[id]&&(!legacy||id!=='profileComplete')) : [])];
       state.attempts = Array.isArray(stored.attempts) ? stored.attempts.filter(a=>a && allClaims.some(c=>c.id===a.claim) && Array.isArray(a.materials)).slice(-100) : [];
       state.audio = stored.audio !== false;
-      state.ending = ['hold','release'].includes(stored.ending) ? stored.ending : null;
+      state.ending = !legacy&&['hold','release'].includes(stored.ending) ? stored.ending : null;
       state.studioQuote = typeof stored.studioQuote === 'string' ? stored.studioQuote.slice(0,160) : null;
-      state.profileSlots=Array.from({length:6},(_,i)=>D.profiles.some(p=>p.id===stored.profileSlots?.[i])?stored.profileSlots[i]:null);
-      state.profileViews=Array.isArray(stored.profileViews)?stored.profileViews.filter(v=>v==='front'||v==='back'):[];
+      state.profileSlots=Array.from({length:6},(_,i)=>!legacy&&D.profiles.some(p=>p.id===stored.profileSlots?.[i])?stored.profileSlots[i]:null);
+      state.profileViews=!legacy&&Array.isArray(stored.profileViews)?stored.profileViews.filter(v=>v==='front'||v==='back'):[];
+      state.lifeSolved=!legacy&&Array.isArray(stored.lifeSolved)?[...new Set(stored.lifeSolved.filter(id=>D.lifeEpisodes.some(event=>event.id===id)))]:[];
+      state.lifeLinks=!legacy&&Array.isArray(stored.lifeLinks)?[...new Set(stored.lifeLinks.filter(id=>D.lifeConnections.some(link=>link.id===id)))]:[];
+      state.lifeAttempts=!legacy&&Array.isArray(stored.lifeAttempts)?stored.lifeAttempts.slice(-60):[];
+      state.lifeFocus=D.lifeEpisodes.some(event=>event.id===stored.lifeFocus)?stored.lifeFocus:'boxes';
+      const p=E.milestones(state.facts);
+      state.caseLayer=D.caseLayers.some(layer=>layer.id===stored.caseLayer)?stored.caseLayer:!p.first?'keys':!p.warning?'notice':'rescue';
+      state.builder={topic:state.caseLayer,claim:null,selected:[],source:'evidence'};
+      if(state.facts.includes('profileComplete')&&!window.LifeEngine.complete(state)){state.facts=state.facts.filter(id=>id!=='profileComplete');state.ending=null;}
       state.cgWatched=stored.cgWatched===true;
     }
   } catch (_) { /* file: storage may be unavailable; the session still works. */ }
@@ -27,7 +36,7 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} }
   function notify(text) { $('toast').textContent=text; $('toast').classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3300); }
   function known(id) { return state.collected.includes(id) || state.facts.includes(id); }
-  function owned() { return [...state.collected,...state.facts.filter(id=>D.facts[id].proof!==false)]; }
+  function owned() { return [...state.collected.filter(id=>D.evidence[id].lane!=='life'),...state.facts.filter(id=>D.facts[id].proof!==false)]; }
   function progress() { return E.milestones(state.facts); }
   function openDialog(id) { const node=$(id); if(!node.open) node.showModal(); }
   function closeDialog(id) { if($(id).open) $(id).close(); }
@@ -55,12 +64,12 @@
     } catch (_) { /* Audio is optional and never blocks the game. */ }
   }
 
-  function objectArt(kind) {
+  function objectArt(kind,item={}) {
     if(kind==='photo') return '<div class="object-photo"><img src="assets/keys.webp" alt="转发照片中的钥匙"><small>SHARED / 11.17</small></div>';
     if(kind==='keys') return '<img src="assets/keys.webp" alt="旧钥匙">';
     if(kind==='letter') return '<img src="assets/envelope.webp" alt="旧信封">';
     if(kind==='tape') return '<div class="object-tape"><img src="assets/tape-decal.png" alt=""><span>KOHARU / TRANSCRIPT</span></div>';
-    if(kind==='video') return '<div class="object-video"><b>22:07</b><small>ENTRY / 11.16</small></div>';
+    if(kind==='video') return '<div class="object-video"><b>'+(item.id==='returnVideo'?'22:15':'22:07')+'</b><small>'+(item.id==='returnVideo'?'RETURN':'ENTRY')+' / 11.16</small></div>';
     if(kind==='folder') return '<div class="object-folder"><span>AH / 001</span><small>RECORD COPY</small></div>';
     const text={ledger:'RETURN',notice:'NOTICE',report:'REPORT'}[kind]||'RECORD';
     return '<div class="object-paper '+esc(kind)+'"><b>'+text+'</b><i></i><i></i><i></i></div>';
@@ -78,12 +87,13 @@
     $('sceneTypeset').innerHTML={studio:'AFTER<br>HOURS.',lobby:'THEY<br>LEFT.',archive:'ON THE<br>RECORD.'}[state.scene];
     $('captionSpeaker').textContent=scene.speaker;
     $('sceneCaption').textContent=state.scene==='studio'&&state.studioQuote?state.studioQuote:scene.caption;
-    $('portrait').src=window.ChapterExtension?.portrait(state)||'assets/koharu-neutral.png';
+    $('portrait').src=window.ChapterExtension?.portrait(state)||'execution/assets/character/details/held-letter.png';
     $('portrait').alt='小春的角色剪影';
-    $('hotspots').innerHTML=scene.items.map(item=>'<button class="hotspot '+(known(item.id)?'seen':'')+'" data-evidence="'+item.id+'" style="--x:'+item.x+'%;--y:'+item.y+'%" aria-label="'+esc(item.hint)+'"><span class="hotspot-art '+item.art+'">'+objectArt(item.art)+'</span><span class="hotspot-name"><i>'+D.evidence[item.id].code+'</i>'+item.label+'</span><span class="hotspot-hint">'+esc(item.hint)+'</span></button>').join('');
+    const sceneItems=window.ChapterExtension?.sceneItems(state,scene)||scene.items.filter(item=>D.caseLayers.find(layer=>layer.id===state.caseLayer).materials.includes(item.id));
+    $('hotspots').innerHTML=sceneItems.map(item=>'<button class="hotspot '+(known(item.id)?'seen':'')+'" data-evidence="'+item.id+'" style="--x:'+item.x+'%;--y:'+item.y+'%" aria-label="'+esc(item.hint)+'"><span class="hotspot-art '+item.art+'">'+objectArt(item.art,item)+'</span><span class="hotspot-name"><i>'+D.evidence[item.id].code+'</i>'+item.label+'</span><span class="hotspot-hint">'+esc(item.hint)+'</span></button>').join('');
     $('hotspots').querySelectorAll('[data-evidence]').forEach(button=>button.addEventListener('click',()=>openViewer(button.dataset.evidence)));
     document.querySelectorAll('[data-location]').forEach(button=>{const active=button.dataset.location===state.scene;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','location');else button.removeAttribute('aria-current');});
-    $('sceneCount').textContent='MATERIALS / '+String(state.collected.length).padStart(2,'0');
+    $('sceneCount').textContent='THIS FILE / '+sceneItems.filter(item=>known(item.id)).length+' / '+sceneItems.length;
     $('noteCount').textContent=state.facts.length+' FACT'+(state.facts.length===1?'':'S');
     $('audioToggle').textContent=state.audio?'SOUND ON':'SOUND OFF';$('audioToggle').setAttribute('aria-pressed',String(state.audio));
     $('resumeButton').hidden=!state.started;
@@ -95,8 +105,8 @@
   }
 
   function documentVisual(item,id) {
-    if(item.type==='transcript') return '<div class="clip-visual">'+objectArt('tape')+'<b>'+(id==='snippet'?'00:09':'22:19')+'</b><span>TRANSCRIPT / TEXT COPY</span></div>';
-    if(item.image) return '<img src="'+item.image+'" alt="'+esc(item.title)+'">'+(item.type==='video'?'<span class="timecode">11.16 / 22:07:16</span>':'')+'<span class="visual-caption">'+esc(item.label)+'<br>AFTER HOURS / RECORD COPY</span>';
+    if(item.type==='transcript') return '<div class="clip-visual">'+objectArt('tape')+'<b>'+(item.lane==='life'?'VOICE':id==='snippet'?'00:09':item.clock||'22:19')+'</b><span>TRANSCRIPT / TEXT COPY</span></div>';
+    if(item.image) return '<img src="'+item.image+'" alt="'+esc(item.title)+'">'+(item.type==='video'?'<span class="timecode">'+esc(item.timecode||'11.16 / 22:07:16')+'</span>':'')+'<span class="visual-caption">'+esc(item.label)+'<br>AFTER HOURS / RECORD COPY</span>';
     return '<div class="document-art"><span class="doc-art-label">AFTER HOURS / 001</span><strong>'+esc(({ledger:'RETURN<br>LOG.',notice:'PLEASE<br>WAIT.',report:'STOP<br>USE.',receipt:'SIGNED<br>COPY.'})[item.type]||'ON THE<br>RECORD.').replace(/&lt;br&gt;/g,'<br>')+'</strong><div class="doc-art-line"></div><div class="doc-art-line"></div><div class="doc-art-line"></div><span class="doc-art-stamp">'+(item.type==='receipt'?'11.13 / 18:20':item.type==='ledger'?'RETURNED':item.type==='notice'?'11.14':'FILE COPY')+'</span></div>';
   }
 
@@ -112,8 +122,8 @@
     if(item.note) content+='<div class="exhibit-note">'+esc(item.note)+'</div>';
     content+='</article>';
     $('viewerContent').innerHTML=content;$('viewerContent').scrollTop=0;
-    $('viewerLabel').textContent=(fact?'INFERENCE':'EVIDENCE')+' / '+item.code+' / '+item.label;
-    $('viewerSaved').innerHTML='<i></i>'+(fact?'VERIFIED / YOUR INFERENCE':newly?'ADDED TO CASE FILE':'IN YOUR CASE FILE');
+    $('viewerLabel').textContent=(fact?'INFERENCE':item.lane==='life'?'LIFE SOURCE':'EVIDENCE')+' / '+item.code+' / '+item.label;
+    $('viewerSaved').innerHTML='<i></i>'+(fact?'VERIFIED / YOUR INFERENCE':item.lane==='life'?'SAVED TO HER LIFE FILE':newly?'ADDED TO CASE FILE':'IN YOUR CASE FILE');
     $('companionButton').hidden=!item.companion;
     if(item.companion){$('companionButton').textContent=id==='report'?'TURN PAGE / 签收附页 ↗':'BACK TO REPORT ↗';$('companionButton').onclick=()=>{sound('paper');openViewer(item.companion);};}
     if($('builder').open) renderBuilder();
@@ -128,18 +138,24 @@
   function materialTitle(id) { return (D.evidence[id]||D.facts[id]).title; }
   function renderBuilder() {
     const b=state.builder;
-    b.selected=b.selected.filter(known).slice(0,3);
-    $('materialCount').textContent=String(owned().length).padStart(2,'0');
-    $('evidencePool').innerHTML=owned().length?owned().map(id=>{
+    const topic=D.topics.find(t=>t.id===b.topic)||D.topics[0],layer=D.caseLayers.find(item=>item.id===topic.id);
+    b.source=b.source==='facts'?'facts':'evidence';
+    const inLayer=id=>layer.materials.includes(id)||layer.facts.includes(id);
+    b.selected=b.selected.filter(id=>known(id)&&inLayer(id)).slice(0,3);
+    const materials=owned().filter(id=>inLayer(id)&&(b.source==='facts'?!!D.facts[id]:!!D.evidence[id]));
+    $('materialCount').textContent=String(materials.length).padStart(2,'0');
+    $('materialTabs').innerHTML=[['evidence','原始材料'],['facts','已核实推论']].map(([id,label])=>'<button data-source="'+id+'" aria-pressed="'+(b.source===id)+'" class="'+(b.source===id?'active':'')+'">'+label+' <small>'+owned().filter(key=>inLayer(key)&&(id==='facts'?!!D.facts[key]:!!D.evidence[key])).length+'</small></button>').join('');
+    $('materialTabs').querySelectorAll('[data-source]').forEach(button=>button.onclick=()=>{b.source=button.dataset.source;renderBuilder();});
+    $('poolScope').textContent=layer.number+' / '+layer.title+' · 仅显示本卷';
+    $('evidencePool').innerHTML=materials.length?materials.map(id=>{
       const item=D.evidence[id]||D.facts[id],inference=!!D.facts[id],selected=b.selected.includes(id);
       return '<div class="material-card '+(inference?'inference ':'')+(selected?'selected':'')+'" draggable="true" data-material="'+id+'"><button class="material-select" data-select="'+id+'" aria-pressed="'+selected+'" aria-label="'+(selected?'移除：':'放入：')+esc(item.title)+'"><span>'+(inference?'VERIFIED INFERENCE':'EVIDENCE / '+item.code)+'</span><strong>'+esc(item.short||item.title)+'</strong><small>'+esc(item.label)+'</small></button><button class="material-inspect" data-inspect="'+id+'" aria-label="重看：'+esc(item.title)+'">↗</button></div>';
-    }).join(''):'<p class="pool-empty">线索夹还是空的。<br>先到场景里打开一件材料。</p>';
+    }).join(''):'<p class="pool-empty">'+(b.source==='facts'?'本卷尚无已核实推论。<br>先使用原始材料。':'本卷还没有收集材料。<br>回到场景，查看这一层的物件。')+'</p>';
     $('evidencePool').querySelectorAll('[data-select]').forEach(button=>button.onclick=()=>selectMaterial(button.dataset.select));
     $('evidencePool').querySelectorAll('[data-inspect]').forEach(button=>button.onclick=()=>openViewer(button.dataset.inspect));
     $('evidencePool').querySelectorAll('[data-material]').forEach(card=>card.ondragstart=event=>{event.dataTransfer.setData('text/plain',card.dataset.material);event.dataTransfer.effectAllowed='copy';});
-    $('topicTabs').innerHTML=D.topics.map(topic=>'<button role="tab" aria-selected="'+(topic.id===b.topic)+'" class="'+(topic.id===b.topic?'active':'')+'" data-topic="'+topic.id+'"><span>'+topic.en+'</span>'+topic.title+'</button>').join('');
-    $('topicTabs').querySelectorAll('[data-topic]').forEach(button=>button.onclick=()=>{b.topic=button.dataset.topic;b.claim=null;renderBuilder();});
-    const topic=D.topics.find(t=>t.id===b.topic)||D.topics[0];
+    $('topicTabs').innerHTML=D.topics.map(topic=>'<button role="tab" aria-selected="'+(topic.id===b.topic)+'" class="'+(topic.id===b.topic?'active':'')+'" data-topic="'+topic.id+'" '+(window.ChapterExtension&&!window.ChapterExtension.layerUnlocked(state,topic.id)?'disabled':'')+'><span>'+topic.en+'</span>'+topic.title+'</button>').join('');
+    $('topicTabs').querySelectorAll('[data-topic]').forEach(button=>button.onclick=()=>{b.topic=state.caseLayer=button.dataset.topic;b.claim=null;b.selected=[];b.source='evidence';save();render();renderBuilder();});
     if($('builderQuestion'))$('builderQuestion').textContent=topic.question;
     $('claimOptions').innerHTML=topic.claims.map(claim=>'<button class="claim-option '+(claim.id===b.claim?'selected':'')+'" data-claim="'+claim.id+'" aria-pressed="'+(claim.id===b.claim)+'">'+esc(claim.text)+'</button>').join('');
     $('claimOptions').querySelectorAll('[data-claim]').forEach(button=>button.onclick=()=>{b.claim=button.dataset.claim;renderBuilder();});
@@ -184,7 +200,7 @@
 
   function playConversation(lines,options={}) {
     flow={lines,index:0,...options};$('conversation').dataset.result=options.result||'';
-    $('conversationPortrait').src=window.ChapterExtension?.portrait(state,options)||'assets/koharu-neutral.png';
+    $('conversationPortrait').src=window.ChapterExtension?.portrait(state,options)||'execution/assets/character/details/held-letter.png';
     renderConversation();openDialog('conversation');
   }
   function renderConversation() {
@@ -199,6 +215,7 @@
   function advanceConversation() {if(!flow)return;if(flow.index<flow.lines.length-1){flow.index++;renderConversation();}else finishConversation();}
   function finishConversation() {const after=flow?.after;flow=null;closeDialog('conversation');window.ChapterExtension?.onConversationEnd(state);render();after?.();}
   function talkToHer() {
+    if(window.ChapterExtension?.talkToHer){window.ChapterExtension.talkToHer();return;}
     playConversation([{who:'小春',text:'你想先问哪件？'}],{portrait:'keys',choices:()=>[
       {text:'那些旧钥匙，为什么一直留着？',action:()=>playConversation([{who:'小春',text:'牌子是他们自己写的。有个人借了我的笔，连盖子都没拔开。'},{who:'主持人',text:'后来他去了哪里？'},{who:'小春',text:'换了工作，搬走了。我帮他借的车。他后来寄过东西来，说新地方挺好。'},{who:'小春',text:'你看，我也不是从来都不让人走。'}],{portrait:'keys'})},
       {text:'你以前也住在这儿？',action:()=>playConversation([{who:'小春',text:'十八岁。二楼最靠里面那间，冬天冷，不过晒得到太阳。'},{who:'主持人',text:'那时候就打算接手？'},{who:'小春',text:'没有。我那时在服装店做事，后来还有一次去外地培训的机会。'},{who:'小春',text:'橱窗里还是那些衣服，换个位置，就有人愿意停下来。我挺喜欢那个。'},{who:'主持人',text:'后来呢？'},{who:'小春',text:'我留下来了。是我自己选的。你别写成谁把我拴在这里。'}],{portrait:'letter'})},
@@ -222,11 +239,12 @@
   function openNotebook() {
     const p=progress();let html='<div class="notebook-body">';
     if(!state.facts.length)html+='<p class="empty-note">还没有核实一项完整说法。<br>场景里的材料已经可以打开，记录台在右下角。</p>';
-    html+=state.facts.map(id=>{const fact=D.facts[id],attempt=state.attempts.find(a=>a.fact===id&&a.result==='supported');return '<article class="fact-note"><span>'+fact.label+'</span><h3>'+esc(fact.title)+'</h3><p>'+esc(fact.body)+'</p>'+(attempt?'<small>依据：'+attempt.materials.filter(id=>D.evidence[id]||D.facts[id]).map(id=>esc(materialTitle(id))).join(' ＋ ')+'</small>':'')+'</article>';}).join('');
-    html+='<div class="unresolved"><span>STILL OPEN</span>'+unresolvedQuestions().map(text=>'<p>'+esc(text)+'</p>').join('')+'</div>';
+    html+=D.caseLayers.map(layer=>{const ids=state.facts.filter(id=>layer.facts.includes(id));return '<details class="case-note-group" '+(state.caseLayer===layer.id?'open':'')+'><summary>'+layer.number+' / '+layer.title+' <span>'+ids.length+' 项已核实</span></summary>'+ids.map(id=>{const fact=D.facts[id],attempt=state.attempts.find(a=>a.fact===id&&a.result==='supported');return '<article class="fact-note"><span>'+fact.label+'</span><h3>'+esc(fact.title)+'</h3><p>'+esc(fact.body)+'</p>'+(attempt?'<small>依据：'+attempt.materials.filter(id=>D.evidence[id]||D.facts[id]).map(id=>esc(materialTitle(id))).join(' ＋ ')+'</small>':'')+'</article>';}).join('')+'</details>';}).join('');
+    html+='<div class="life-note-summary"><b>HER LIFE / 人物侧写</b><p>已重建 '+state.lifeSolved.length+' / 6 段经历，核对 '+state.lifeLinks.length+' / 3 条关系。人物侧写不混入定罪证据池。</p><button id="notebookLife" class="secondary-button">打开人生调查 ↗</button></div>';
+    html+='<details class="unresolved"><summary>STILL OPEN / 尚待核查</summary>'+unresolvedQuestions().map(text=>'<p>'+esc(text)+'</p>').join('')+'</details>';
     if(p.ready)html+='<button class="finish-case" id="finishCase">MAKE YOUR JUDGMENT <small>进入最后评价 →</small></button>';
     if(state.attempts.length){html+='<h3 class="attempts-title">YOUR QUESTIONS / 最近的质询</h3>'+state.attempts.slice(-6).reverse().map(attempt=>{const claim=allClaims.find(c=>c.id===attempt.claim);return '<article class="attempt-note"><span>'+esc((labels[attempt.result]||'RECORDED').split(' / ')[0])+'</span><p>'+esc(claim.text)+'</p><p>'+esc(attempt.note||'')+'</p></article>';}).join('');}
-    html+='</div>';$('notebookContent').innerHTML=html;if($('finishCase'))$('finishCase').onclick=()=>{closeDialog('notebook');openEnding();};openDialog('notebook');
+    html+='</div>';$('notebookContent').innerHTML=html;if($('finishCase'))$('finishCase').onclick=()=>{closeDialog('notebook');openEnding();};$('notebookLife').onclick=()=>{closeDialog('notebook');window.LifeUI.open();};openDialog('notebook');
   }
 
   function openEnding() {
@@ -245,6 +263,7 @@
   function openPlayerRecord() {
     const lines=['DEAD AIR / 她留下的钥匙','公开评价：'+(state.ending==='hold'?'保留最终判断':state.ending==='release'?'反对再由她独立照料住客':'尚未选择'),'','已经核实：'];
     state.facts.forEach(id=>{const attempt=state.attempts.find(a=>a.fact===id&&a.result==='supported');lines.push('· '+D.facts[id].title,D.facts[id].body);if(attempt)lines.push('依据：'+attempt.materials.filter(id=>D.evidence[id]||D.facts[id]).map(materialTitle).join(' ＋ '));lines.push('');});
+    lines.push('人物经历：',...D.lifeEpisodes.filter(event=>state.lifeSolved.includes(event.id)).map(event=>'· '+event.age+'岁 / '+event.name+'：'+event.options.find(option=>option[0]===event.answer)[1]),'','人生关系：',...D.lifeConnections.filter(link=>state.lifeLinks.includes(link.id)).map(link=>'· '+link.title+' '+link.note),'');
     lines.push('仍待核查：',...unresolvedQuestions().map(text=>'· '+text),'','提出过的说法：');
     state.attempts.forEach((attempt,index)=>{lines.push(String(index+1)+'. '+allClaims.find(c=>c.id===attempt.claim).text,'依据：'+attempt.materials.filter(id=>D.evidence[id]||D.facts[id]).map(materialTitle).join(' ＋ '),'反馈：'+(attempt.note||''),'');});
     $('recordText').value=lines.join('\n');$('recordCopyStatus').textContent='可以选中文字保存。';openDialog('recordDialog');
@@ -283,6 +302,6 @@
     if(event.key.toLowerCase()==='n'){event.preventDefault();openNotebook();}
     if(['1','2','3'].includes(event.key)){event.preventDefault();switchScene(['studio','lobby','archive'][Number(event.key)-1]);}
   });
-  window.ChapterGame={getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,openEnding,openViewer,progress,sound};
+  window.ChapterGame={getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,openEnding,openViewer,collect,progress,sound,openBuilder,renderBuilder};
   render();$('startButton').focus();
 })();

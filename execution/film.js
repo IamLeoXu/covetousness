@@ -165,6 +165,14 @@
       this.lyric.style.opacity = cue ? String(this.reducedMotion ? 1 : Math.min(smooth((t - cue.time) / .17), smooth((cue.end - t) / .16))) : '0';
     }
 
+    renderStopped() {
+      fill(this.ctx,this.width,this.height,'#030509');
+      this.currentLyric=null;
+      this.lines.forEach(line=>line.textContent='');
+      this.lyric.dataset.empty='true';this.lyric.style.opacity='0';
+      this.needsPaint=false;
+    }
+
     render(t) {
       const { scene, index } = this.getScene(t);
       const fade = this.data.settings.transitionSeconds ?? .6;

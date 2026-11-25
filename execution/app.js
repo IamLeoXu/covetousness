@@ -45,6 +45,7 @@
   let command = 0;
   let entered = false;
   let completed = false;
+  let manuallyStopped = false;
   let paintedTime = -1;
   let waveformTime = -1;
   let lastFrame = 0;
@@ -68,10 +69,11 @@
     }
     $('signalAuto').textContent=values.automatic?'AUTO':'HOLD';
     $('signalAuto').setAttribute('aria-pressed',String(values.automatic));
-    $('trackingState').textContent=values.tracking>.94?'SIGNAL LOCK':values.tracking>.25?'TRACKING':'SIGNAL LOST';
+    $('trackingState').textContent=manuallyStopped?'SOURCE STOPPED':values.tracking>.94?'SIGNAL LOCK':values.tracking>.25?'TRACKING':'SIGNAL LOST';
     signal.setRestoration(values.restoration);
-    const blank=film.getScene(time).scene.stage==='black';
+    const blank=manuallyStopped||film.getScene(time).scene.stage==='black';
     display.render(time,blank?1:values.tracking,noiseClock);
+    $('picture').dataset.transport=manuallyStopped?'stopped':completed?'ended':'source';
   }
   updateRestoration();
 
@@ -93,15 +95,15 @@
     game.classList.remove('idle', 'paused', 'playing', 'rewinding', 'forwarding');
     game.classList.add(state);
     const labels = { playing: 'PLAYING', rewinding: 'REWIND', forwarding: 'FAST FORWARD', paused: 'PAUSED', idle: 'READY' };
-    $('deckState').textContent = completed ? (loadingScene.ejected?'TAPE EJECTED':'END OF TAPE') : labels[state];
+    $('deckState').textContent = manuallyStopped ? 'STOPPED' : completed ? (loadingScene.ejected?'TAPE EJECTED':'END OF TAPE') : labels[state];
     $('playIcon').setAttribute('d', playing ? 'M8 3h6v18H8zm11 0h6v18h-6z' : 'M9 2 26 12 9 22z');
     $('playLabel').textContent = playing ? 'PAUSE' : 'PLAY';
     start.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     start.setAttribute('aria-pressed', String(playing));
     $('rew').classList.toggle('selected', rate < 0);
     $('forward').classList.toggle('selected', rate > 1);
-    $('stop').classList.toggle('selected',completed);
-    $('stop').setAttribute('aria-pressed',String(completed));
+    $('stop').classList.toggle('selected',completed||manuallyStopped);
+    $('stop').setAttribute('aria-pressed',String(completed||manuallyStopped));
   }
 
   function syncAudio() {
@@ -116,7 +118,8 @@
   function seek(value, reveal = true) {
     if (!loadingScene.loaded) return;
     loadingScene.restoreDeck();
-    const stateChanged = completed || (reveal && !entered);
+    const stateChanged = completed || manuallyStopped || (reveal && !entered);
+    manuallyStopped = false;
     completed = false;
     if (reveal) showFilm();
     time = clamp(Number(value) || 0, 0, duration);
@@ -149,6 +152,8 @@
     }
     showFilm();
     const operation = ++command;
+    manuallyStopped = false;
+    paintedTime = -1;
     completed = false;
     if (time >= duration - .03) {time = noiseClock = 0;automation.follow(0);}
     updateRestoration();
@@ -177,6 +182,10 @@
     rate = 0;
     pauseAudio();
     seek(0, false);
+    manuallyStopped = true;
+    signal.setTransport('stop');
+    paintedTime = -1;
+    updateRestoration();
     updateState();
   }
 
@@ -188,6 +197,8 @@
     command++;
     pauseAudio();
     completed = false;
+    manuallyStopped = false;
+    paintedTime = -1;
     rate = rate === speed ? 0 : speed;
     signal.setTransport(rate<0?'rew':rate>1?'forward':'pause');
     signal.unlock();
@@ -201,6 +212,7 @@
     time = duration;
     audio.pause();
     completed = true;
+    manuallyStopped = false;
     automation.follow(time);
     updateRestoration();
     signal.setTransport('end');
@@ -261,7 +273,7 @@
       }
     }
     if (time !== paintedTime || film.needsPaint) {
-      film.render(time);
+      if(manuallyStopped)film.renderStopped();else film.render(time);
       showTime();
       paintedTime = time;
     }
