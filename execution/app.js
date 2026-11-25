@@ -69,11 +69,13 @@
     }
     $('signalAuto').textContent=values.automatic?'AUTO':'HOLD';
     $('signalAuto').setAttribute('aria-pressed',String(values.automatic));
-    $('trackingState').textContent=manuallyStopped?'SOURCE STOPPED':values.tracking>.94?'SIGNAL LOCK':values.tracking>.25?'TRACKING':'SIGNAL LOST';
+    const standby=manuallyStopped||completed;
+    $('trackingState').textContent=standby?'STANDBY':values.tracking>.94?'SIGNAL LOCK':values.tracking>.25?'TRACKING':'SIGNAL LOST';
     signal.setRestoration(values.restoration);
-    const blank=manuallyStopped||film.getScene(time).scene.stage==='black';
+    const blank=standby||film.getScene(time).scene.stage==='black';
     display.render(time,blank?1:values.tracking,noiseClock);
     $('picture').dataset.transport=manuallyStopped?'stopped':completed?'ended':'source';
+    $('picture').dataset.screen=standby?'standby':'source';
   }
   updateRestoration();
 
@@ -178,6 +180,7 @@
   function stop() {
     if (!loadingScene.loaded) return;
     signal.mechanical('stop');
+    if(completed){pauseAudio();signal.setTransport('stop');film.needsPaint=true;updateRestoration();updateState();return;}
     command++;
     rate = 0;
     pauseAudio();
@@ -210,12 +213,13 @@
     command++;
     rate = 0;
     time = duration;
-    audio.pause();
+    pauseAudio();
     completed = true;
     manuallyStopped = false;
+    paintedTime = -1;
+    signal.setTransport('stop');
     automation.follow(time);
     updateRestoration();
-    signal.setTransport('end');
     updateState();
     signal.mechanical('stop');
     loadingScene.eject();
@@ -273,7 +277,7 @@
       }
     }
     if (time !== paintedTime || film.needsPaint) {
-      if(manuallyStopped)film.renderStopped();else film.render(time);
+      if(manuallyStopped||completed)film.renderStopped();else film.render(time);
       showTime();
       paintedTime = time;
     }

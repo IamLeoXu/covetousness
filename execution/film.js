@@ -166,7 +166,27 @@
     }
 
     renderStopped() {
-      fill(this.ctx,this.width,this.height,'#030509');
+      const ctx=this.ctx,w=this.width,h=this.height;
+      // A powered CRT at rest: a dim phosphor field, static mask and recessed edges.
+      // The texture has no time component, so standby never becomes television snow.
+      const field=ctx.createRadialGradient(w*.47,h*.43,0,w*.5,h*.5,w*.65);
+      field.addColorStop(0,'#131e23');field.addColorStop(.53,'#0c141b');field.addColorStop(1,'#04070c');
+      ctx.fillStyle=field;ctx.fillRect(0,0,w,h);
+      if(!this.standbyMask){
+        const tile=document.createElement('canvas');tile.width=12;tile.height=12;
+        const mask=tile.getContext('2d'),pixels=mask.createImageData(12,12);
+        let seed=0x6d2b79f5;
+        for(let i=0;i<pixels.data.length;i+=4){
+          seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;
+          pixels.data[i]=139;pixels.data[i+1]=162;pixels.data[i+2]=172;
+          pixels.data[i+3]=2+(seed>>>0)%5;
+        }
+        mask.putImageData(pixels,0,0);this.standbyMask=ctx.createPattern(tile,'repeat');
+      }
+      ctx.fillStyle=this.standbyMask;ctx.fillRect(0,0,w,h);
+      const edge=ctx.createLinearGradient(0,0,0,h);
+      edge.addColorStop(0,'#01030990');edge.addColorStop(.16,'#01030900');edge.addColorStop(.8,'#01030900');edge.addColorStop(1,'#01030990');
+      ctx.fillStyle=edge;ctx.fillRect(0,0,w,h);
       this.currentLyric=null;
       this.lines.forEach(line=>line.textContent='');
       this.lyric.dataset.empty='true';this.lyric.style.opacity='0';
