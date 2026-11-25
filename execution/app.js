@@ -21,6 +21,7 @@
   new window.FaderDetents(signal);
   const automation = new window.TapeSignalAutomation(data.settings.signalAutomation);
   const film = new window.ExecutionFilm(data);
+  const screenPower = new window.CRTPower($('picture'),$('scenery'));
   const display = new window.AnalogueDisplay($('signalNoise'), $('picture'));
   const meters = new window.StereoVUMeter($('meterL'), $('meterR'));
   const overview = $('overview');
@@ -119,6 +120,7 @@
 
   function seek(value, reveal = true) {
     if (!loadingScene.loaded) return;
+    screenPower.cancel();
     loadingScene.restoreDeck();
     const stateChanged = completed || manuallyStopped || (reveal && !entered);
     manuallyStopped = false;
@@ -154,6 +156,7 @@
     }
     showFilm();
     const operation = ++command;
+    screenPower.cancel();
     manuallyStopped = false;
     paintedTime = -1;
     completed = false;
@@ -181,10 +184,12 @@
     if (!loadingScene.loaded) return;
     signal.mechanical('stop');
     if(completed){pauseAudio();signal.setTransport('stop');film.needsPaint=true;updateRestoration();updateState();return;}
+    const collapse=!manuallyStopped;
     command++;
     rate = 0;
     pauseAudio();
     seek(0, false);
+    if(collapse)screenPower.shutdown();
     manuallyStopped = true;
     signal.setTransport('stop');
     paintedTime = -1;
@@ -194,6 +199,7 @@
 
   function scan(speed) {
     if (!loadingScene.loaded) return;
+    screenPower.cancel();
     loadingScene.restoreDeck();
     signal.mechanical('key');
     showFilm();
@@ -210,6 +216,7 @@
 
   function finish() {
     if(completed)return;
+    screenPower.shutdown();
     command++;
     rate = 0;
     time = duration;

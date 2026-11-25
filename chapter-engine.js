@@ -18,5 +18,5 @@
     if(claim==='rescueHarmed')return answer(limit?'contradicted':'overreach',['你给我的记录是后来查出来的伤。','我没法说抱的时候一定没错。可“有可能”，也不是“已经证明全是这样”。'],'后发生的检查不能自行完成因果证明；缺少前后对照时，不能把全部新增损害认定为已证实。');
     return answer(limit?'contradicted':'overreach',['我也希望一句“我是去救她的”，就能把所有问题说完。','但我知道，不能。'],'因果未能查明，不能推成搬动已获证实安全；返身救人也不抵销先前隐瞒。');
   };
-  E.milestones=function(facts){const m=new Set(facts),first=['oldKeys','freeExit','afterCall'].some(id=>m.has(id)),warning=m.has('withheld')&&m.has('misuse'),rescue=m.has('rescueAct')&&m.has('rescueContext'),causation=m.has('causationLimit'),profile=m.has('profileComplete');return {first,warning,rescue,causation,profile,second:warning&&rescue&&causation&&profile,ready:first&&warning&&rescue&&causation&&profile};};
+  E.milestones=function(facts){const m=new Set(facts),first=['oldKeys','freeExit','afterCall'].some(id=>m.has(id)),warning=m.has('withheld')&&m.has('misuse'),rescue=m.has('rescueAct')&&m.has('rescueContext'),causation=m.has('causationLimit'),profile=m.has('profileComplete');return {first,warning,rescue,causation,profile,second:warning&&rescue&&causation&&profile,ready:first||warning||rescue||causation||m.has('knowledge')||m.has('noticeGap')||m.has('misuse')||m.has('rescueAct')||m.has('rescueContext')||m.has('profileSketch')||profile};};
 })();

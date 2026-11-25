@@ -1,0 +1,41 @@
+/* Graphite equipment, coral record bus, lime cue and violet source lanes. */
+:root{--record:#ff756a;--record-dark:#722f37;--equipment:#292731}
+.broadcast-strip{border-left:7px solid var(--record);background:linear-gradient(100deg,#48232c 0,#211e28 40%,#191820 100%);box-shadow:inset 0 1px #ffb5a428,0 4px 0 #08070e}
+.brand-dot{background:var(--record)!important}.broadcast-status{border-color:var(--record);color:var(--record)}
+.header-actions .off-air{border-bottom:2px solid var(--record)}
+#rundownButton{background:linear-gradient(#6a343b,#3c222c);border:1px solid #d06e6877;box-shadow:inset 0 1px #ffb9a140,0 3px 0 #0a090f;color:#fff0e4}
+.case-layer-tabs button.active{border-bottom-color:var(--record)}
+.investigation-lanes .case-lane>span{color:var(--record)}
+.assemble-button{background:linear-gradient(130deg,#f18a7b,#d95d61);box-shadow:inset 0 1px #fff3,0 4px 0 #642a36!important;color:#170e19!important}
+.stage .desk-surface{border-top-color:#98605a55}.scene-marker>i{background:var(--record)}
+.source-attachments{margin-top:25px;border-top:1px dashed #867f8959;padding-top:18px;display:grid;gap:9px}
+.source-attachments>span{font:10px/1.6 Consolas,monospace;letter-spacing:1px;color:var(--purple)}
+.source-attachments>button{display:flex;justify-content:space-between;gap:15px;padding:12px 14px;background:#29232e;border:1px solid #8d72844d;color:var(--paper);text-align:left;font-size:13px;line-height:1.7;border-left:3px solid var(--record)}
+.source-attachments>button:hover{background:#3c2b35;border-color:var(--record)}
+.edit-coach{margin:0 30px 22px;padding:16px 18px;display:flex;align-items:center;gap:16px;background:#e9ddbd;color:#282132;border:1px solid #f9ecc9;box-shadow:4px 4px 0 #0005;transform:rotate(-.25deg)}
+.edit-coach[hidden]{display:none}.edit-coach>div{flex:1}.edit-coach span{font:11px/1.4 Consolas,monospace;letter-spacing:.7px;color:#943d42}.edit-coach p{font-size:14px;line-height:1.8;margin:7px 0 0}
+.edit-coach .secondary-button,.edit-coach .text-button{color:#342835;border-color:#897368;white-space:nowrap}
+[data-coach-target="next"]{outline:3px solid var(--record)!important;outline-offset:4px;box-shadow:0 0 0 7px #ff756a20!important;scroll-margin:45px}
+.builder-dialog{border-top:5px solid var(--record)}
+.evidence-drawer{background:linear-gradient(125deg,#25232f,#1b1923);box-shadow:inset 1px 1px #ffffff0b;border-right:1px solid #67576355}
+.evidence-drawer>header{color:var(--purple)}.material-card.selected{border-left:4px solid var(--purple)}
+.support-block{border-left:3px solid var(--purple);padding-left:16px}.evidence-slot{background:linear-gradient(#2e2c36,#24232c);box-shadow:inset 0 1px #ffffff13,0 2px #08070d}
+.edit-transport{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:17px 15px;margin-top:22px;background:linear-gradient(175deg,#39353e,#211f29);border:1px solid #80737d55;border-radius:4px;box-shadow:inset 0 1px #ffffff12,0 5px 0 #0c0a12,0 7px 14px #0004}
+.edit-bus-label{flex:1;min-width:120px;font:10px/1.6 Consolas,monospace;color:#b5a8b1;letter-spacing:1px}
+.deck-key{min-width:80px;padding:11px 12px 9px;border:1px solid #8c8390;border-radius:4px;color:var(--lime);background:linear-gradient(#48454e,#302e38);box-shadow:inset 0 1px #ffffff20,0 4px 0 #0b0a11;font:700 14px/1.4 Consolas,monospace;text-align:center}
+.deck-key small{display:block;font:10px/1.8 sans-serif;color:#d4c8ce}.record-key{color:var(--record);border-color:#b16d6b}.deck-key.armed{background:linear-gradient(#853c47,#5d2d38);box-shadow:inset 0 2px 3px #160c18;color:#ffe0cf;transform:translateY(3px)}
+.edit-take-state{font:11px/1.5 Consolas,monospace;color:var(--record);min-width:65px;text-align:center}
+.submit-argument{background:var(--record)!important;color:#231520!important}.deck-key:disabled{opacity:.35;cursor:default}
+.builder-top,.edit-coach{flex-shrink:0}.builder-layout{overflow:hidden}.argument-area{overflow:auto;scroll-padding:20px}.argument-area .claim-block{flex:0 0 auto;min-height:0;overflow:visible}.argument-area>.topic-tabs,.argument-area>.support-block,.argument-area>.edit-transport,.argument-area>.argument-footer{flex-shrink:0}
+.rundown-card{border-left:3px solid #65545e}.rundown-card.queued{border-color:#ff756a91;background:linear-gradient(100deg,#3e252f,#25202d)}
+.rundown-card.queued .rundown-code{background:var(--record);color:#241824}.rundown-card.queued small{color:var(--record)}
+.rundown-card.waiting{opacity:.65}.rundown-code{border-radius:3px;box-shadow:inset 0 1px #fff2,0 3px #0005}
+.editorial-scope{border:1px solid #7a5c6d66;display:flex;gap:22px;flex-wrap:wrap;margin:12px 0 25px;padding:15px 17px}.editorial-scope legend{font-size:12px;color:#e9b0ac;padding:0 8px}.editorial-scope label{font-size:13px;line-height:1.7}.editorial-scope input{accent-color:var(--record);margin-right:8px}
+.life-facet{margin:20px 0;padding:19px;border:1px solid #836b7e55;border-left:4px solid var(--record);background:#2b2330}.life-facet p{font-size:15px;line-height:1.9}.life-facet>small{display:block;font-size:11px;line-height:1.8;margin-top:10px;color:#a99ba9}
+.life-deep{margin:18px 0}.life-deep>summary{cursor:pointer;padding:13px 0;color:var(--purple);border-bottom:1px solid #8f7f8d44;font-size:13px}
+.life-to-rundown{margin-top:16px}.life-event-nav .solved>b{color:var(--record)}
+.radio-air-sign{border-color:var(--record);box-shadow:inset 0 1px #fff2,0 8px 0 #0c0b12,0 0 80px #ff756a11}
+#endingResult .secondary-button{display:block;margin-top:12px}
+@media(max-width:700px){.edit-coach{margin:0 16px 20px;gap:10px;flex-wrap:wrap}.edit-coach>div{flex-basis:100%}.edit-coach p{font-size:13px}.edit-transport{gap:9px;padding:13px 10px}.edit-bus-label{flex-basis:100%}.deck-key{flex:1;min-width:70px}.edit-take-state{font-size:10px}.source-attachments>button{font-size:12px}.support-block{padding-left:10px}.editorial-scope{gap:12px}.broadcast-strip{border-left-width:4px}}
+@media(prefers-reduced-motion:reduce){.edit-coach{transform:none}}
+@media(max-width:700px){.builder-layout{overflow:auto}.argument-area{overflow:visible}.builder-top{padding-bottom:15px}.edit-coach{padding:13px}.argument-area .claim-block{min-height:0}}

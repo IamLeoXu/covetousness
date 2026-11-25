@@ -12,7 +12,7 @@
     if(options.portrait==='letter'||s.emotion==='thoughtful')return art+'details/clasped-keys.png';
     return art+'details/held-letter.png';
   }
-  function layerUnlocked(s,id){const p=window.InquiryEngine.milestones(s.facts);return id==='keys'||id==='notice'&&p.first||id==='rescue'&&p.warning;}
+  function layerUnlocked(s,id){const p=window.InquiryEngine.milestones(s.facts);return id==='keys'||id==='notice'&&p.first||id==='rescue'&&p.first;}
   function sceneItems(s,scene){
     const layer=D.caseLayers.find(item=>item.id===s.caseLayer)||D.caseLayers[0];
     const items=scene.items.filter(item=>layer.materials.includes(item.id));
@@ -35,14 +35,14 @@
     $('caseLayerTabs').innerHTML=D.caseLayers.map(item=>'<button data-layer="'+item.id+'" class="'+(item.id===layer.id?'active ':'')+(completed[item.id]?'done':'')+'" '+(!layerUnlocked(s,item.id)?'disabled':'')+' aria-pressed="'+(item.id===layer.id)+'"><b>'+item.number+'</b><span>'+item.title+'<small>'+item.short+'</small></span><i>'+(completed[item.id]?'✓':layerUnlocked(s,item.id)?'↗':'—')+'</i></button>').join('');
     $('caseLayerTabs').querySelectorAll('[data-layer]').forEach(button=>button.onclick=()=>setLayer(button.dataset.layer));
     $('caseProgress').textContent=Object.values(completed).filter(Boolean).length+' / 3 卷';
-    $('lifeQuickStatus').textContent=s.lifeSolved.length+' / 6 事件 · '+s.lifeLinks.length+' / 3 关系';
-    $('profileCount').textContent=(s.lifeSolved.length+s.lifeLinks.length)+' / 9';
+    $('lifeQuickStatus').textContent=D.lifePieces(s).length+' 块已取片段 · '+s.lifeSolved.length+' 段深入补访';
+    $('profileCount').textContent=D.lifePieces(s).length+' CUTS';
     $('profileButton').classList.toggle('complete',p.profile);$('profileButton').classList.toggle('ready',!p.profile&&(s.lifeSolved.length>0||p.causation));
     const items=sceneItems(s,D.scenes[s.scene]);
     $('sceneEmpty').hidden=items.length>0;
     if(!items.length){const places=Object.keys(D.scenes).filter(key=>sceneItems(s,D.scenes[key]).length);$('sceneEmpty').innerHTML='<span>THIS FILE / '+layer.number+'</span><h3>这里没有这一卷的材料。</h3><p>其他卷宗暂时收起。换一个地点继续核对。</p>'+places.map(key=>'<button data-jump="'+key+'">'+esc(D.scenes[key].title)+' →</button>').join('');$('sceneEmpty').querySelectorAll('[data-jump]').forEach(button=>button.onclick=()=>document.querySelector('[data-location="'+button.dataset.jump+'"]').click());}
     document.querySelectorAll('[data-location]').forEach(button=>{const count=sceneItems(s,D.scenes[button.dataset.location]).length;button.classList.toggle('no-materials',!count);button.title=count?'本卷 '+count+' 件材料':'本卷无材料';});
-    $('roundOne').textContent='CASE / '+Object.values(completed).filter(Boolean).length+' OF 3';$('roundTwo').textContent='LIFE / '+(s.lifeSolved.length+s.lifeLinks.length)+' OF 9';
+    $('roundOne').textContent='CASE / '+Object.values(completed).filter(Boolean).length+' OF 3';$('roundTwo').textContent='LIFE / '+D.lifePieces(s).length+' CUTS';
     $('roundOne').className=p.causation?'done':'current';$('roundTwo').className=p.profile?'done':'current';
     window.LifeUI?.refresh();
   }
@@ -57,6 +57,7 @@
   function talkToHer(){window.LifeUI.open('inquiry');}
   function hintSpec(){
     if(hintScope==='life')return window.LifeUI.hint();
+    const radioHint=window.Radio?.hint();if(radioHint)return radioHint;
     const s=state(),p=G.progress();
     if(!p.first)return ['第一卷 / 最初的指控',['每次只核对一项。现在场景和证据池都只显示第一卷。','可以从钥匙归属、当晚出入、原通话三条路任选一条查。','最快路线：资料台“当晚入口录像摘录” → B →“持自己的钥匙自行离开” → 只放这份记录。']];
     if(!s.facts.includes('withheld'))return ['第二卷 / 收到与告知',['报告出具、本人签收、住客看到，是三个事实。','完整报告可翻到签收附页，前台保留了住客告示。','完整报告＋签收回执＋住客告示 →“她收到停用要求，却没有完整传达”。']];
@@ -70,23 +71,25 @@
   function renderHint(){const [title,hints]=hintSpec();$('hintTitle').textContent=title;$('hintText').textContent=hints[Math.min(hintLevel,hints.length-1)];$('nextHint').disabled=hintLevel>=hints.length-1;$('nextHint').textContent=hintLevel>=hints.length-1?'提示已完整展开':'再提示一步 →';}
   function openHint(scope){hintScope=scope==='life'?'life':'case';hintLevel=0;renderHint();G.openDialog('hintDialog');}
   function prepareEnding(s){
-    $('ending').querySelector('.dialog-bar>span').textContent='FINAL REVIEW / A PERSON, NOT A FILE';
+    $('ending').querySelector('.dialog-bar>span').textContent='FINAL MIX / YOUR LAST SENTENCE';
     $('ending').querySelector('.ending-art img').src=s.ending==='release'?art+'details/covered-face.png':art+'details/held-letter.png';
-    $('ending').querySelector('h2').innerHTML='她也曾经，<br>舍不得却放了手。';
-    $('endingFacts').innerHTML='<div class="ending-fact">案件：隐瞒停用要求、改变安置款用途、返身救人；搬动新增损害未明。</div><div class="ending-fact life-conclusion">人生：真实相爱过，自己选择过，送走过朋友，也仍被家人牵挂。后来她把没有回应，越来越多地听成失去。</div>';
-    $('ending').querySelector('.ending-context').textContent='她的过去不能抵销伤者的损失；现在的过错也不能把她的一生改写成全是虚假。你愿意如何公开评价她，还给不给她学习放手的以后？';
-    $('endingOptions').querySelector('[data-ending="hold"]').innerHTML='<b>HOLD / 保留最终判断</b><span>公开过错、支持外部接管与追责，保留伤害因果疑点，以及她今后改变和重新建立关系的可能。</span>';
-    $('endingOptions').querySelector('[data-ending="release"]').innerHTML='<b>RELEASE / 公开断罪</b><span>承认她的真心与救援，仍判断反复替人决定已破坏信任，公开反对再由她独立承担安置。</span>';
+    $('ending').querySelector('h2').innerHTML='这一期，<br>在这里收尾。';
+    const snapshot=s.radio.phase==='archived'?s.radio.editorialSnapshot:null,known=snapshot?.facts||s.facts,slots=snapshot?.profileSlots||s.profileSlots;
+    const facts=known.filter(id=>D.facts[id]&&D.facts[id].proof!==false);
+    $('endingFacts').innerHTML=facts.map(id=>'<div class="ending-fact">'+esc(D.facts[id].title)+'</div>').join('')+(known.includes('profileSketch')?'<div class="ending-fact">采用的人物片段：'+D.lifeEpisodes.filter(event=>slots.includes(event.id)).map(event=>esc(event.name)).join('、')+'</div>':'');
+    $('ending').querySelector('.ending-context').textContent='最后一句将跟随你选定的播出稿公开。你仍然可以返回取材。';
+    $('endingOptions').querySelector('[data-ending="hold"]').innerHTML='<b>HOLD / 暂缓裁决</b><span>播出采用的材料，把最终裁决留在下一期。</span>';
+    $('endingOptions').querySelector('[data-ending="release"]').innerHTML='<b>RELEASE / 签发裁决</b><span>以本期采用的版本作出裁决，封存她的来访记录。</span>';
   }
   function renderEndingResult(s){
-    const hold=s.ending==='hold';
-    $('endingResult').innerHTML='<span>'+(hold?'JUDGMENT RESERVED':'JUDGMENT RELEASED')+'</span><p>'+(hold?'主持人：过错需要公开，伤害需要继续查明。她曾会放手，也仍有人愿意来往；我不把这段人生封成一个永远没有以后的人。':'主持人：她真心照顾、真心爱过，救援也应完整播出。但她无权用自己的投入，替别人延长一个未经同意的以后。我反对再由她独立承担安置。')+'</p><p>'+(hold?'小春：那包针，她居然还留着。……我先问问她，什么时候有空。':'小春：那两张票也放进去吧。别只剩最后那封信。')+'</p><button id="endingPlay" class="ink-button">'+(hold?'ARCHIVE PREVIEW / 查看处决演出':'PLAY HER TAPE / 播放处决记录')+' ↗</button>';
-    $('endingPlay').onclick=()=>launchCG(hold);
+    const hold=s.ending==='hold',snapshot=s.radio.editorialSnapshot;
+    $('endingResult').innerHTML='<span>'+(hold?'JUDGMENT RESERVED':'RECORD SEALED')+'</span><p>'+esc(s.radio.airScript?.at(-1)?.body||'本期已归档。')+'</p><p>采用 '+(snapshot?.queued?.length||0)+' 轨。原件与未采用材料仍留在台内。</p><button id="endingPlay" class="ink-button">'+(hold?'ARCHIVE PREVIEW / 磁带预览':'PLAY HER TAPE / 打开封存磁带')+' ↗</button><button id="endingUncut" class="secondary-button">回到台内 / 继续翻阅原件</button>';
+    $('endingPlay').onclick=()=>launchCG(hold);$('endingUncut').onclick=()=>{G.closeDialog('ending');G.notify('本期播出版本已封存。之后查阅的材料不会倒写进刚才的节目。');};
   }
   function onVerdict(choice,s){
     s.emotion=choice==='release'?'cry':'thoughtful';G.save();G.render();prepareEnding(s);G.closeDialog('ending');
-    if(choice==='release')G.playConversation([{who:'主持人',text:'救人的记录会播出。那段恋爱、你没有去的培训、送纱纪上车的那天，也都会留下。'},{who:'小春',text:'那两张票也放进去吧。别只剩最后那封信。'},{who:'主持人',text:'它们都是真的。最后的判断，是我负责。'},{who:'小春',text:'钥匙先放你这里。我怕我又带回去。'},{who:'记录',text:'她遮住脸。那只杯子留在桌上，电话还没有拨出去。磁带开始等待播放。'}],{label:'AFTER THE VERDICT',portrait:'cry',after:()=>launchCG(false)});
-    else G.playConversation([{who:'纱纪',text:'那包针还在。你什么时候来？'},{who:'小春',text:'我先问你有空的日子。……这次不先订了。'},{who:'奈央',text:'这个袋子我自己拿。别再替我留房间。'},{who:'小春',text:'好。杯子你要吗？'},{who:'记录',text:'她等对方回答，没有替她把杯子塞进袋里。门仍由外部接管，澪也仍没有来见她。'}],{label:'HOLD / 一个可以询问的以后',portrait:'letter',after:()=>G.openEnding()});
+    const lines=choice==='release'?[{who:'记录',text:'红灯熄灭。本期采用的片段已封存，文件夹里还有没拆开的订页。'},{who:'小春',text:'……钥匙先放这里吧。我怕一伸手，又带回去了。'},{who:'导播内线',text:'她留下了一盒磁带。现在打开，还是先回台内？'}]:[{who:'主持人',text:'本期到这里。采用的材料照常保留，最终裁决暂缓。'},{who:'小春',text:'好。你下次要问哪张，先告诉我。'}];
+    G.playConversation(lines,{label:'OFF AIR / AFTER THE BROADCAST',portrait:choice==='release'?'cry':'letter',after:()=>G.openEnding()});
   }
   function launchCG(preview){previewing=preview;document.querySelectorAll('dialog[open]').forEach(node=>node.close());$('cgStatus').textContent=preview?'ARCHIVE PREVIEW / 不改变当前判断':'HER TAPE / THE THINGS SHE KEPT';$('cgScreen').hidden=false;$('app').inert=true;$('cgFrame').src='execution/index.html?chapter=01';document.body.classList.add('watching-cg');$('cgFrame').focus();}
   function exitCG(){const frame=$('cgFrame');try{frame.contentWindow.postMessage({channel:'dead-air-chapter',action:'pause'},'*');}catch(_){}frame.src='about:blank';$('cgScreen').hidden=true;$('app').inert=false;document.body.classList.remove('watching-cg');if(state().ending)G.openEnding();else G.render();}
