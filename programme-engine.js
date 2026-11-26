@@ -18,9 +18,10 @@
   function library(s,track){
     if(track!=='life')return (sets[track]||[]).filter(id=>(s.facts||[]).includes(id)).map(id=>({key:'fact:'+id,id,kind:'fact',title:D.facts[id].title,body:D.facts[id].body,eligible:true,sources:proof(s,id),role:D.inferenceRoles[id]||''}));
     const accepted=adopted(s),pieces=D.lifeEpisodes.filter(e=>(s.lifeFacets||[]).includes(e.id)||(s.lifeSolved||[]).includes(e.id));
-    return [...pieces.map(e=>({key:'event:'+e.id,id:e.id,kind:'event',title:e.age+' 岁 / '+e.name,body:(s.lifeSolved||[]).includes(e.id)?e.options.find(([id])=>id===e.answer)[1]:D.lifeFacetText[e.id],eligible:accepted.includes(e.id),sources:(s.lifeSolved||[]).includes(e.id)?e.sources:[e.primary],role:accepted.includes(e.id)?((s.lifeSolved||[]).includes(e.id)?'已核对经历 · 可用于人物链':'档案片段 · 仅能支撑摘要'):'尚未在拼图按日期确认'})),
+    return [...pieces.map(e=>({key:'event:'+e.id,id:e.id,kind:'event',title:e.age+' 岁 / '+e.name,body:(s.lifeSolved||[]).includes(e.id)?e.options.find(([id])=>id===e.answer)[1]:D.lifeFacetText[e.id],eligible:accepted.includes(e.id),sources:fieldProof(s,e.id)||((s.lifeSolved||[]).includes(e.id)?e.sources:[e.primary]),role:accepted.includes(e.id)?((s.lifeSolved||[]).includes(e.id)?'已核对经历 · 可用于人物链':'档案片段 · 仅能支撑摘要'):'尚未在人物拼图确认年代'})),
       ...D.lifeConnections.filter(l=>(s.lifeLinks||[]).includes(l.id)).map(l=>({key:'link:'+l.id,id:l.id,kind:'link',title:'人物推断 / '+l.title,body:l.options.find(([id])=>id===l.answer)[1],eligible:l.pair.every(id=>accepted.includes(id)&&(s.lifeSolved||[]).includes(id)),pair:l.pair,sources:l.pair,role:'采用时会一并带入相关两段经历'}))];
   }
+  function fieldProof(s,event){const entry=(D.fieldStories||[]).find(story=>s.fieldProofs?.[story.id]?.length===2&&D.lifeConnections.find(l=>l.id===story.id).pair.includes(event));return entry?[...s.fieldProofs[entry.id]]:null;}
   function keys(s,track){
     const r=radio(s),eligible=library(s,track).filter(item=>item.eligible).map(item=>item.key);
     if(Object.prototype.hasOwnProperty.call(r.cuts||{},track))return unique(r.cuts[track]).filter(key=>eligible.includes(key));
@@ -53,7 +54,10 @@
   function usedLinks(s,queued){return active(s,queued).includes('life')?selected(s,'life').filter(item=>item.kind==='link').map(item=>item.id):[];}
   function body(s,track){
     const items=selected(s,track);let text=items.map(item=>(item.kind==='link'?'人物推断：':item.title+'。')+item.body).join(' ');
-    if(track==='life'){const selectedEvents=items.filter(item=>item.kind==='event').map(item=>item.id),event=D.lifeEpisodes.find(e=>e.id===radio(s).lifeQuote&&selectedEvents.includes(e.id))||D.lifeEpisodes.find(e=>selectedEvents.includes(e.id));if(event&&(s.lifeSolved||[]).includes(event.id))text+=' 她留下这句原话：“'+event.voice+'”';}
+    if(track==='life'){
+      const side=s.portraitSide||'front',events=items.filter(item=>item.kind==='event');
+      text=(side==='front'?'正面侧写。':'反面侧写。')+events.map(item=>{const event=D.lifeEpisodes.find(e=>e.id===item.id);return event.age+'岁，'+event.name+'：'+(side==='front'?event.front:event.back);}).join(' ')+items.filter(item=>item.kind==='link').map(item=>' '+item.body).join('');
+    }
     return text;
   }
   function acceptPortrait(s){
@@ -61,7 +65,7 @@
     s.profileAdopted=unique([...adopted(s),...placed]);if(!s.facts.includes('profileSketch'))s.facts.push('profileSketch');return true;
   }
   function freeze(s,choice,script){
-    return {schema:'selected-cuts-v1',recordId:Date.now().toString(36)+'-'+(s.radio.history||[]).length,facts:[...s.facts],collected:[...s.collected],factProofs:JSON.parse(JSON.stringify(s.factProofs||{})),lifeSolved:[...s.lifeSolved],lifeLinks:[...s.lifeLinks],lifeFacets:[...s.lifeFacets],profileSlots:[...s.profileSlots],profileAdopted:[...adopted(s)],queued:active(s),cuts:allCuts(s),scope:s.radio.scope,choice,script:script.map(item=>({...item}))};
+    return {schema:'selected-cuts-v3',version:D.version,portraitSide:s.portraitSide||'front',portraitRead:[...(s.portraitRead||[])],portraitHeard:[...(s.portraitHeard||[])],portraitReceived:[...(s.portraitReceived||[])],inquiry:JSON.parse(JSON.stringify(s.inquiry||{done:[],received:{}})),recordId:Date.now().toString(36)+'-'+(s.radio.history||[]).length,facts:[...s.facts],collected:[...s.collected],factProofs:JSON.parse(JSON.stringify(s.factProofs||{})),lifeSolved:[...s.lifeSolved],lifeLinks:[...s.lifeLinks],lifeFacets:[...s.lifeFacets],profileSlots:[...s.profileSlots],profileAdopted:[...adopted(s)],fieldProofs:JSON.parse(JSON.stringify(s.fieldProofs||{})),fieldSeen:[...(s.fieldSeen||[])],journey:JSON.parse(JSON.stringify(s.journey||{seen:[],choices:{},voiceCuts:[]})),queued:active(s),cuts:allCuts(s),scope:s.radio.scope,choice,script:script.map(item=>({...item}))};
   }
   function archive(s){
     const r=s.radio,snapshot=r.editorialSnapshot;if(!snapshot||!['good','bad','zero'].includes(snapshot.choice))return;

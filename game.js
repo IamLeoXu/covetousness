@@ -5,11 +5,11 @@
   const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const KEY = 'dead-air-chapter01-v03';
   const allClaims = D.topics.flatMap(topic=>topic.claims);
-  const fresh = () => ({version:D.version,started:false,scene:'studio',caseLayer:'keys',collected:[],facts:[],factProofs:{},profileAdopted:[],attempts:[],audio:true,ending:null,studioQuote:null,emotion:'neutral',profileSlots:[null,null,null,null,null,null],profileViews:[],lifeSolved:[],lifeFacets:[],lifeLinks:[],lifeAttempts:[],lifeFocus:'boxes',cgWatched:false,radio:D.newRadioState(),onboarding:D.newOnboarding(),builder:{topic:'keys',claim:null,selected:[],source:'evidence'}});
+  const fresh = () => ({version:D.version,started:false,scene:'studio',caseLayer:'keys',collected:[],facts:[],factProofs:{},profileAdopted:[],attempts:[],audio:true,ending:null,studioQuote:null,emotion:'neutral',profileSlots:[null,null,null,null,null,null],profileViews:[],lifeSolved:[],lifeFacets:[],lifeLinks:[],lifeAttempts:[],lifeFocus:'boxes',inquiry:{done:[],received:{}},portraitReceived:[],portraitRead:[],portraitHeard:[],portraitSide:'front',fieldFocus:'not-fate',fieldSeen:[],fieldProofs:{},journey:{seen:[],choices:{},voiceCuts:[]},cgWatched:false,radio:D.newRadioState(),onboarding:D.newOnboarding(),builder:{topic:'keys',claim:null,selected:[],source:'evidence'}});
   let state = fresh(), flow = null, toastTimer, currentViewer = null, audioContext = null, lastSound = 0;
   try {
     const stored = JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('dead-air-chapter01-v02'));
-    if (stored && [D.version,'0.8.0','0.7.0','0.6.5','0.6.4','0.6.3','0.6.2','0.6.1','0.6','0.5','0.4','0.3','0.2'].includes(stored.version)) {
+    if (stored && [D.version,'0.9.0','0.8.1','0.8.0','0.7.0','0.6.5','0.6.4','0.6.3','0.6.2','0.6.1','0.6','0.5','0.4','0.3','0.2'].includes(stored.version)) {
       const legacy=stored.version==='0.2';
       state.started = stored.started === true;
       state.scene = D.scenes[stored.scene] ? stored.scene : 'studio';
@@ -30,6 +30,19 @@
       state.dialogueLog=Array.isArray(stored.dialogueLog)?stored.dialogueLog.filter(entry=>entry&&Array.isArray(entry.lines)).slice(-30):[];
       state.chatRead=Array.isArray(stored.chatRead)?stored.chatRead.filter(id=>typeof id==='string'):[];
       state.lifeFocus=D.lifeEpisodes.some(event=>event.id===stored.lifeFocus)?stored.lifeFocus:'boxes';
+      state.fieldFocus=D.fieldStories.some(item=>item.id===stored.fieldFocus)?stored.fieldFocus:'not-fate';
+      state.fieldSeen=Array.isArray(stored.fieldSeen)?[...new Set(stored.fieldSeen.filter(id=>D.fieldStories.some(item=>item.id===id)))]:[];
+      state.fieldProofs=stored.fieldProofs&&typeof stored.fieldProofs==='object'?Object.fromEntries(Object.entries(stored.fieldProofs).filter(([id,ids])=>D.fieldStories.some(item=>item.id===id)&&Array.isArray(ids)).map(([id,ids])=>[id,ids.filter(key=>D.evidence[key]).slice(0,2)])):{};
+      state.journey={seen:Array.isArray(stored.journey?.seen)?stored.journey.seen.filter(id=>D.journeyScenes[id]):[],choices:{},voiceCuts:[]};
+      for(const [id,value] of Object.entries(stored.journey?.choices||{}))if(D.journeyChoices[id]?.options.some(option=>option.id===value))state.journey.choices[id]=value;
+      state.journey.voiceCuts=Array.isArray(stored.journey?.voiceCuts)?[...new Set(stored.journey.voiceCuts.filter(id=>D.voiceTakes.some(take=>take.id===id&&state.journey.seen.includes(take.scene))))]:[];
+      state.inquiry={done:Array.isArray(stored.inquiry?.done)?stored.inquiry.done.filter(id=>D.inquirySteps.some(step=>step.id===id)):[],received:{}};
+      for(const [id,receipt] of Object.entries(stored.inquiry?.received||{}))if(D.evidence[id]&&receipt&&typeof receipt==='object')state.inquiry.received[id]={step:String(receipt.step||'legacy'),from:String(receipt.from||'原有取材')};
+      if(!stored.inquiry)for(const step of D.inquirySteps)if(step.gives.length&&step.gives.every(id=>state.collected.includes(id))){state.inquiry.done.push(step.id);for(const id of step.gives)state.inquiry.received[id]={step:step.id,from:'旧存档已取得'};}
+      state.portraitReceived=[...new Set([...(Array.isArray(stored.portraitReceived)?stored.portraitReceived:[]),...state.collected.filter(id=>D.evidence[id]?.lane==='life')])].filter(id=>D.evidence[id]?.lane==='life');
+      state.portraitRead=[...new Set([...(Array.isArray(stored.portraitRead)?stored.portraitRead:[]),...state.collected.filter(id=>D.evidence[id]?.lane==='life')])].filter(id=>D.evidence[id]?.lane==='life');
+      state.portraitHeard=[...new Set([...(Array.isArray(stored.portraitHeard)?stored.portraitHeard:[]),...state.lifeSolved])].filter(id=>D.lifeEpisodes.some(event=>event.id===id));
+      state.portraitSide=stored.portraitSide==='back'?'back':'front';
       const p=E.milestones(state.facts);
       state.caseLayer=D.caseLayers.some(layer=>layer.id===stored.caseLayer)?stored.caseLayer:!p.first?'keys':!p.warning?'notice':'rescue';
       state.builder={topic:state.caseLayer,claim:null,selected:[],source:'evidence'};
@@ -108,10 +121,11 @@
     $('audioToggle').textContent=state.audio?'SOUND ON':'SOUND OFF';$('audioToggle').setAttribute('aria-pressed',String(state.audio));
     $('resumeButton').hidden=!state.started;
     window.ChapterExtension?.render(state);
-    window.Radio?.render();window.Onboarding?.refresh();
+    window.Radio?.render();window.InquiryUI?.render();window.Onboarding?.refresh();
   }
 
   function collect(id) {
+    if(D.evidence[id]&&window.InvestigationEngine&&!window.InvestigationEngine.canAccess(state,id))return false;
     if(D.evidence[id]&&!state.collected.includes(id)){state.collected.push(id);window.ChapterExtension?.onCollect(state,id);window.Radio?.onCollect(id);save();render();return true;}return false;
   }
 
@@ -123,6 +137,8 @@
 
   function openViewer(id) {
     if(!D.evidence[id]&&!D.facts[id]) return;
+    if(window.InvestigationEngine&&!window.InvestigationEngine.canAccess(state,id)){notify('还没取得这份材料，先沿当前问题继续询问。');return;}
+    if(D.evidence[id]?.lane==='life'&&!state.portraitRead.includes(id)){state.portraitRead.push(id);save();}
     const newly=collect(id), fact=D.facts[id];
     currentViewer=id;
     const item=fact?{...fact,code:'F',label:fact.label,type:'report',source:'你的调查笔记 / 已核实推论',lead:fact.title,paragraphs:[fact.body],note:'这是一项由已有材料核实的推论。它可以继续参与组合，但不是新增的外部证物。'}:D.evidence[id];
@@ -173,7 +189,8 @@
     $('topicTabs').innerHTML=D.topics.map(topic=>'<button role="tab" aria-selected="'+(topic.id===b.topic)+'" class="'+(topic.id===b.topic?'active':'')+'" data-topic="'+topic.id+'" '+(window.ChapterExtension&&!window.ChapterExtension.layerUnlocked(state,topic.id)?'disabled':'')+'><span>'+topic.en+'</span>'+topic.title+'</button>').join('');
     $('topicTabs').querySelectorAll('[data-topic]').forEach(button=>button.onclick=()=>{b.topic=state.caseLayer=button.dataset.topic;b.claim=null;b.selected=[];b.source='evidence';save();render();renderBuilder();});
     if($('builderQuestion'))$('builderQuestion').textContent=topic.question;
-    $('claimOptions').innerHTML=topic.claims.filter(claim=>!D.claimVisible||D.claimVisible(claim,state)).map(claim=>'<button class="claim-option '+(claim.id===b.claim?'selected':'')+'" data-claim="'+claim.id+'" aria-pressed="'+(claim.id===b.claim)+'">'+esc(claim.text)+'</button>').join('');
+    $('claimOptions').innerHTML=(window.InvestigationEngine?window.InvestigationEngine.visibleClaims(state,topic.id):topic.claims).map(claim=>'<button class="claim-option '+(claim.id===b.claim?'selected':'')+'" data-claim="'+claim.id+'" aria-pressed="'+(claim.id===b.claim)+'">'+esc(claim.text)+'</button>').join('');
+    if(!$('claimOptions').children.length)$('claimOptions').innerHTML='<p class="empty-note">先沿采访中的问题取得材料，这里才有可核对的说法。</p>';
     $('claimOptions').querySelectorAll('[data-claim]').forEach(button=>button.onclick=()=>{b.claim=button.dataset.claim;if((D.inferenceRecipes[b.claim]||[]).some(recipe=>recipe.some(id=>D.facts[id])))b.source='mixed';renderBuilder();});
     const deep=(D.inferenceRecipes[b.claim]||[]).some(recipe=>recipe.some(id=>D.facts[id]));$('claimRole').classList.toggle('deep',deep);$('claimRole').textContent=deep?'深层推论：必须把已核实推论和新原件放在同一组。切换左侧标签不会清空已选来源。':b.claim?(D.inferenceRoles[b.claim]||'先核实当前说法，再决定是否采用。'):'';
     $('evidenceSlots').innerHTML=[0,1,2].map(index=>{const id=b.selected[index];return '<button class="evidence-slot '+(id?'filled':'empty')+'" data-slot="'+index+'" aria-label="'+(id?'移除：'+esc(materialTitle(id)):'第 '+(index+1)+' 个证据位')+'">'+(id?'<span>'+String(index+1).padStart(2,'0')+' / '+(D.facts[id]?'INFERENCE':'EVIDENCE')+'</span><strong>'+esc(materialTitle(id))+'</strong>':'<span>来源位 '+(index+1)+' / 可留空</span>')+'</button>';}).join('');
@@ -186,7 +203,7 @@
     $('submitArgument').disabled=!b.claim||!b.selected.length;
     const chosen=topic.claims.find(c=>c.id===b.claim);
     $('submitHint').textContent=!chosen?'先选择一个明确、可以核实的说法。':(chosen.check||'放入能支持这句话的材料。')+' 已选 '+b.selected.length+' 份。';
-    window.Radio?.decorateBuilder();window.Onboarding?.refresh();
+    window.Radio?.decorateBuilder();window.DebugInference?.render();window.Onboarding?.refresh();
   }
   function selectMaterial(id) {
     if(!known(id)) return;
@@ -194,25 +211,28 @@
     if(index>=0) selected.splice(index,1);else if(selected.length<3) selected.push(id);else {notify('一次最多三份材料，先取下一份。');return;}
     sound('paper');renderBuilder();
   }
-  function openBuilder() {renderBuilder();$('builder').scrollTop=0;openDialog('builder');window.Onboarding?.event('builder-open');}
+  function openBuilder() {if(state.builder.topic!==state.caseLayer)state.builder={topic:state.caseLayer,claim:null,selected:[],source:'evidence'};renderBuilder();$('builder').scrollTop=0;openDialog('builder');window.Onboarding?.event('builder-open');}
 
   const labels={supported:'SUPPORTED / 一项可以成立的说法',incomplete:'KEEP LOOKING / 证据还缺一环',overreach:'BEYOND THE RECORD / 结论超出了材料',contradicted:'CHECK YOUR CLAIM / 材料与说法冲突'};
   function submitArgument() {
-    const b=state.builder;if(!b.claim||!b.selected.length||window.Radio&&!window.Radio.canRecord())return;
+    const b=state.builder;if(!b.claim||!b.selected.length)return;
+    const allowed=window.InvestigationEngine?.visibleClaims(state,b.topic)||D.topics.find(t=>t.id===b.topic).claims;if(!allowed.some(c=>c.id===b.claim)||!b.selected.every(known))return;
     const result=E.evaluate(b.claim,b.selected),claim=allClaims.find(item=>item.id===b.claim);
+    const note=(result.fact?D.caseNotes?.[result.fact]:D.caseFailureNotes?.[claim.id])||result.note;
     const newFact=result.fact&&!state.facts.includes(result.fact),before=progress();
-    state.attempts.push({claim:b.claim,topic:b.topic,materials:[...b.selected],result:result.kind,note:result.note,fact:result.fact});
+    state.attempts.push({claim:b.claim,topic:b.topic,materials:[...b.selected],result:result.kind,note,fact:result.fact});
     if(newFact) state.facts.push(result.fact);
     if(result.fact)state.factProofs[result.fact]=[...b.selected];
     state.studioQuote=result.lines[0];state.scene='studio';
-    if(newFact&&!before.first&&progress().first) state.builder={topic:'notice',claim:null,selected:[]};
     window.ChapterExtension?.onResult(state,result);
     window.Radio?.onResult(result);window.Onboarding?.event('case-result',{...result,claim:b.claim});
     save();render();closeDialog('builder');sceneFlash();
-    const lines=[{who:'主持人',text:claim.text},...result.lines.map(text=>({who:'小春',text})),{who:'调查笔记',text:result.note}];
+    const replies=result.fact?(D.caseReplies?.[result.fact]||result.lines):(D.caseFailureReplies?.[claim.id]||D.caseFailureReplies?.default||result.lines);
+    const lines=[{who:'主持人',text:claim.text},...replies.map(text=>({who:'小春',text}))];
+    if(!result.fact)lines.push({who:'推理反馈',text:note});
     if(newFact) lines.push({who:'调查笔记',text:'已记下：'+D.facts[result.fact].title+'。这项推论可以继续参与组合。'});
     playConversation(lines,{label:labels[result.kind],result:result.kind,portrait:result.kind==='supported'?(result.fact==='oldKeys'?'front-keys':'neutral'):'open',choices:()=>{
-      if(progress().ready&&!state.ending&&!window.Onboarding?.coreActive())return [{text:'把事实与人物侧写带入最后的公开评价。',action:()=>{finishConversation();openEnding();}},{text:'继续核查其他材料。',action:finishConversation}];
+      if(progress().ready&&!state.ending&&!window.Onboarding?.coreActive())return [{text:'编排本期节目，准备审判。',action:()=>{finishConversation();openEnding();}},{text:'继续核查其他材料。',action:finishConversation}];
       return null;
     }});
     if(newFact) sound('fact');
@@ -227,6 +247,7 @@
   function renderConversation() {
     if(!flow) return;
     const line=flow.lines[flow.index];$('conversationLabel').textContent=flow.label||'INTERVIEW / OFF AIR';$('conversationSpeaker').textContent=line.who;$('conversationText').textContent=line.text;
+    window.InquiryUI?.speaker(line,flow);
     $('conversationPortrait').src=window.ChapterExtension?.portrait(state,{...flow,portrait:line.portrait||flow.portrait})||'execution/assets/character/details/calm-empty-hands.png';
     $('conversationPortrait').dataset.framing=/\/(?:calm-empty-hands|clasped-keys|front-clasped-keys|front-held-letter)\.png/.test($('conversationPortrait').src)?'waist':'';
     const tape=line.visual==='tape';$('conversation').classList.toggle('is-tape',tape);
@@ -269,14 +290,14 @@
     if(!f.has('rescueAct'))items.push('事故后她是否实际返身救人，尚未核实。');
     if(!f.has('rescueContext'))items.push('她返身前面对的指示与现场变化，尚未完整核对。');
     if(!f.has('causationLimit'))items.push('搬动是否新增损害，仍需核对专业接手与复核意见。');
-    if(!f.has('profileComplete'))items.push('人物侧写尚未拼合正反两面。');
+    if(!state.lifeLinks.length)items.push('人物拼图还没有确认相关经历，P 可继续取材和拼合。');
     items.push('此前的款项用途与其他人的责任独立保留，救援不抵销它们。');return items;
   }
   function openNotebook() {
     const p=progress();let html='<div class="notebook-body">';
     if(!state.facts.length)html+='<p class="empty-note">还没有核实一项完整说法。<br>场景里的材料已经可以打开，记录台在右下角。</p>';
     html+=D.caseLayers.map(layer=>{const ids=state.facts.filter(id=>layer.facts.includes(id));return '<details class="case-note-group" '+(state.caseLayer===layer.id?'open':'')+'><summary>'+layer.number+' / '+layer.title+' <span>'+ids.length+' 项已核实</span></summary>'+ids.map(id=>{const fact=D.facts[id],attempt=state.attempts.find(a=>a.fact===id&&a.result==='supported');return '<article class="fact-note"><span>'+fact.label+'</span><h3>'+esc(fact.title)+'</h3><p>'+esc(fact.body)+'</p>'+(attempt?'<small>依据：'+attempt.materials.filter(id=>D.evidence[id]||D.facts[id]).map(id=>esc(materialTitle(id))).join(' ＋ ')+'</small>':'')+'</article>';}).join('')+'</details>';}).join('');
-    html+='<div class="life-note-summary"><b>HER LIFE / 人物侧写</b><p>已重建 '+state.lifeSolved.length+' 段完整经历、'+state.lifeFacets.length+' 块片段，核对 '+state.lifeLinks.length+' 条关系。人物侧写不混入定罪证据池。</p><button id="notebookLife" class="secondary-button">打开人生调查 ↗</button></div>';
+    html+='<div class="life-note-summary"><b>HER LIFE / 人物侧写</b><p>已重建 '+state.lifeSolved.length+' 段完整经历、'+state.lifeFacets.length+' 块片段，核对 '+state.lifeLinks.length+' 条关系。关系理解不直接替代案件原件。</p><button id="notebookLife" class="secondary-button">打开人物侧写与拼图 ↗</button></div>';
     html+='<details class="unresolved"><summary>STILL OPEN / 尚待核查</summary>'+unresolvedQuestions().map(text=>'<p>'+esc(text)+'</p>').join('')+'</details>';
     if(p.ready)html+='<button class="finish-case" id="finishCase">MAKE YOUR JUDGMENT <small>进入最后评价 →</small></button>';
     if(state.attempts.length){html+='<h3 class="attempts-title">YOUR QUESTIONS / 最近的质询</h3>'+state.attempts.slice(-6).reverse().map(attempt=>{const claim=allClaims.find(c=>c.id===attempt.claim);return '<article class="attempt-note"><span>'+esc((labels[attempt.result]||'RECORDED').split(' / ')[0])+'</span><p>'+esc(claim.text)+'</p><p>'+esc(attempt.note||'')+'</p></article>';}).join('');}
@@ -342,6 +363,6 @@
     if(event.key.toLowerCase()==='n'){event.preventDefault();openNotebook();}
     if(['1','2','3'].includes(event.key)){event.preventDefault();switchScene(['studio','lobby','archive'][Number(event.key)-1]);}
   });
-  window.ChapterGame={getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,reviewLastConversation,openEnding,openViewer,collect,progress,sound,openBuilder,renderBuilder,viewerId:()=>currentViewer};
+  window.ChapterGame={debugInfer:(claim,sources)=>{if(!window.DebugInference?.enabled)return;const item=window.DebugInference.solutions(state,state.builder.topic).find(x=>x.claim===claim&&x.sources.every(id=>sources.includes(id)));if(!item)return;state.builder.claim=claim;state.builder.selected=[...item.sources];state.builder.source='mixed';submitArgument();},getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,reviewLastConversation,openEnding,openViewer,collect,progress,sound,openBuilder,renderBuilder,viewerId:()=>currentViewer};
   render();$('startButton').focus();
 })();

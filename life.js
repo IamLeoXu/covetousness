@@ -1,103 +1,92 @@
 (function(){
-  'use strict';
-  const G=window.ChapterGame,D=window.InquiryData,E=window.LifeEngine,$=id=>document.getElementById(id);
+  'use strict';const G=window.ChapterGame,D=window.InquiryData,E=window.PortraitEngine,$=id=>document.getElementById(id),state=()=>G.getState();
   const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const state=()=>G.getState();
-  let mode='inquiry',linkIndex=0,eventChoice=null,linkChoice=null,linkPair=['',''],selectedPiece=null,side='front';
-  let eventFeedback=null,linkFeedback=null,puzzleMessage='';
-  const eventById=id=>D.lifeEpisodes.find(event=>event.id===id);
-  const visible=()=>D.lifeEpisodes.filter(event=>D.lifeVisible(event,state()));
-  const current=()=>visible().find(event=>event.id===state().lifeFocus)||visible()[0];
-  const hasPiece=id=>D.lifePieces(state()).some(event=>event.id===id);
-  const allEvents=()=>D.lifeEpisodes.every(event=>state().lifeSolved.includes(event.id));
-  const allLinks=()=>D.lifeConnections.every(link=>state().lifeLinks.includes(link.id));
-  const puzzleCorrect=()=>D.lifeEpisodes.every((event,i)=>state().profileSlots[i]===event.id);
-  function feedback(item){return item?'<p class="life-feedback '+item.kind+'" role="status">'+esc(item.note)+'</p>':'';}
-  function setMode(next){mode=next;selectedPiece=null;refresh();$('lifeWorkspace').scrollTop=0;}
-  function focusEvent(id){state().lifeFocus=id;eventChoice=null;eventFeedback=null;G.save();setMode('inquiry');}
-  function open(prefer){
-    eventChoice=null;eventFeedback=null;linkChoice=null;linkPair=['',''];linkFeedback=null;
-    mode=['inquiry','connections','portrait'].includes(prefer)?prefer:'inquiry';
-    if(mode==='inquiry'&&state().lifeSolved.includes(current().id)&&!allEvents())state().lifeFocus=visible().find(event=>!state().lifeSolved.includes(event.id))?.id||current().id;
-    G.openDialog('profileDialog');refresh();
+  let mode='research',selectedPiece=null,readingId=null,message='',previousState=null;
+  const current=()=>D.lifeEpisodes.find(item=>item.id===state().lifeFocus)||D.lifeEpisodes[0];
+  const hasPiece=id=>E.hasPiece(state(),id);
+  const received=id=>state().portraitReceived.includes(id)||state().collected.includes(id);
+  function prepare(){
+    const s=state();if(previousState!==s){selectedPiece=null;readingId=null;message='';mode='research';previousState=s;}
+    E.ensure(s);if(!D.lifeEpisodes.some(item=>item.id===s.lifeFocus))s.lifeFocus='boxes';
+    if(E.refreshRelations(s))G.save();return s;
   }
-  function refresh(){
-    if(!$('profileDialog').open)return;
-    const s=state();$('lifeProgress').innerHTML='<b>'+D.lifePieces(s).length+' CUTS</b> 已取片段<br><b>'+s.lifeSolved.length+'</b> 段深入补访<br><span>'+(s.facts.includes('profileComplete')?'已交叉核对完整侧写':s.facts.includes('profileSketch')?'已确认 '+window.Programme.adopted(s).length+' 块年代片段':'尚未确认片段日期')+'</span>';
-    $('lifeModes').querySelectorAll('[data-life-mode]').forEach(button=>{button.classList.toggle('active',button.dataset.lifeMode===mode);button.setAttribute('aria-pressed',String(button.dataset.lifeMode===mode));});
-    if(mode==='inquiry')renderInquiry();else if(mode==='connections')renderConnections();else renderPuzzle();window.Onboarding?.refresh();
+  function open(prefer){prepare();mode=['portrait','connections'].includes(prefer)?'portrait':'research';G.openDialog('profileDialog');refresh();}
+  function setMode(next){mode=next==='portrait'?'portrait':'research';message='';refresh();$('lifeWorkspace').scrollTop=0;window.Onboarding?.refresh();}
+  function focus(id){if(!D.lifeEpisodes.some(item=>item.id===id))return;state().lifeFocus=id;mode='research';message='';G.save();refresh();window.Onboarding?.refresh();}
+  function readOriginal(id){
+    if(!received(id)){G.notify('这份原件还没有交到台内。先问问相关的人。');return;}
+    G.openViewer(id);if(state().collected.includes(id)){state().portraitRead=[...new Set([...state().portraitRead,id])];G.save();refresh();}
   }
-  function renderInquiry(){
-    const s=state(),event=current(),done=s.lifeSolved.includes(event.id),primary=event.primary,doc=D.evidence[primary],read=s.collected.includes(primary),heard=s.collected.includes(event.sources[1]),adopted=hasPiece(event.id),deep=s.collected.includes(event.sources[0]);
-    $('lifeWorkspace').innerHTML='<div class="life-inquiry"><aside class="life-event-nav"><span>PRIVATE FILE / 已有索引</span>'+visible().map((item,i)=>'<button data-life-event="'+item.id+'" class="'+(item.id===event.id?'active ':'')+(hasPiece(item.id)?'solved':'')+'"><i>'+item.age+'</i><span>'+esc(item.name)+'<small>'+item.tag+'</small></span><b>'+(hasPiece(item.id)?'●':'↗')+'</b></button>').join('')+'<p>附页中的日期、寄件人与附件号，可以带你找到另一份旧档。</p></aside><section class="life-event-detail"><div class="life-event-title"><span class="eyebrow">'+event.tag+'</span><h3>'+esc(event.name)+'</h3><p>调出一份档案，再决定采用这一段，还是继续追问。</p></div><div class="life-source-pair"><button data-life-source="'+primary+'"><span>FILE / '+(read?'已读':'调取')+'</span><strong>'+esc(doc.title)+'</strong><small>阅读原件；随附材料在档案底部</small></button><button id="lifeInterview" '+(!deep?'disabled':'')+'><span>LINE / '+(heard?'回访已保存':'继续补访')+'</span><strong>'+(deep?esc(D.evidence[event.sources[1]].title):'先翻随附原件')+'</strong><small>'+(heard?'重听这段文字转录':'根据原件，提出能回答的问题')+'</small></button></div><section class="life-facet"><span class="field-label">LIFT / 保存一份档案片段</span><p>'+esc(D.lifeFacetText[event.id])+'</p><button id="liftLifeFacet" class="secondary-button" '+(!read||adopted?'disabled':'')+'>'+(adopted?'CUT SAVED / 已取片段':'保存到人物片段库 ＋')+'</button><small>保存后仍需在拼图按日期确认一次。确认记录会保留，PGM 可随时选用；更长的补访留在原档。</small></section><details class="life-deep" '+(heard?'open':'')+'><summary>继续补访 / 重建这段经历</summary><div class="life-reconstruction"><h4>'+esc(event.question)+'</h4><div class="life-event-options">'+event.options.filter(([id])=>!done||id===event.answer).map(([id,text])=>'<button data-event-choice="'+id+'" class="'+((done?event.answer:eventChoice)===id?'selected':'')+'" '+(done?'disabled':'')+'>'+esc(text)+'</button>').join('')+'</div>'+feedback(eventFeedback)+'<div class="life-submit-row"><span>'+[deep,heard].filter(Boolean).length+' / 2 来源核对</span><button id="verifyLifeEvent" class="ink-button" '+(done||!deep||!heard||!eventChoice?'disabled':'')+'>'+(done?'EVENT VERIFIED / 已核对':'VERIFY / 核对经历 ↗')+'</button></div></div></details>'+(done?'<article class="life-event-coda"><p>“'+esc(event.voice)+'”</p><button id="nextLifeEvent" class="secondary-button">另一份索引 →</button></article>':'')+'<button id="useLifePieces" class="ink-button life-to-rundown" '+(!D.lifePieces(s).length?'disabled':'')+'>ASSEMBLE / 用已有片段拼出侧写 →</button></section></div>';
-    $('lifeWorkspace').querySelectorAll('[data-life-event]').forEach(button=>button.onclick=()=>focusEvent(button.dataset.lifeEvent));
-    $('lifeWorkspace').querySelector('[data-life-source]').onclick=()=>G.openViewer(primary);
-    $('lifeInterview').onclick=()=>heard?G.openViewer(event.sources[1]):interview(event);
-    $('liftLifeFacet').onclick=()=>{if(!s.lifeFacets.includes(event.id))s.lifeFacets.push(event.id);G.save();G.sound('paper');G.render();};
-    $('useLifePieces').onclick=()=>setMode('portrait');
-    $('lifeWorkspace').querySelectorAll('[data-event-choice]').forEach(button=>button.onclick=()=>{eventChoice=button.dataset.eventChoice;eventFeedback=null;renderInquiry();});
-    $('verifyLifeEvent').onclick=()=>{const result=E.episode(event.id,eventChoice,s.collected);eventFeedback=result;window.Onboarding?.event('life-result',{episode:event.id,choice:eventChoice,kind:result.kind});s.lifeAttempts.push({type:'event',id:event.id,choice:eventChoice,result:result.kind});if(result.kind==='supported'&&!s.lifeSolved.includes(event.id)){s.lifeSolved.push(event.id);if(!s.lifeFacets.includes(event.id))s.lifeFacets.push(event.id);G.sound('fact');}else if(result.kind!=='supported')G.sound('paper');G.save();G.render();};
-    if($('nextLifeEvent'))$('nextLifeEvent').onclick=()=>{const next=visible().find(item=>!s.lifeSolved.includes(item.id));if(next)focusEvent(next.id);else setMode('connections');};
+  function investigate(){
+    const e=current(),authored=D.portraitScenes?.[e.id];
+    const fallback=e.interview.options.find(option=>option.id==='ask');
+    const lines=authored?[...(authored.intro||[]),...(authored.answer||[])]:[
+      {who:'记录',text:'小春翻出“'+D.evidence[e.sources[0]].title+'”，把它摊到话筒旁边。'},
+      {who:'主持人',text:fallback.text},...fallback.lines.map(text=>({who:'小春',text}))
+    ];
+    lines.push({who:'记录',text:authored?.delivery||'这次采访留下两份来源：“'+e.sources.map(id=>D.evidence[id].title).join('”和“')+'”。'});
+    G.playConversation(lines,{module:'portrait',label:e.age+' / '+e.name,portrait:['love','break'].includes(e.id)?'front-letter':'neutral',endText:'回到这段经历 →',after:()=>{
+      const s=state();s.portraitReceived=[...new Set([...s.portraitReceived,...e.sources])];s.portraitHeard=[...new Set([...s.portraitHeard,e.id])];
+      G.save();message='两份来源已收到。打开原件，再核对这段经历。';refresh();window.Onboarding?.refresh();
+    }});
   }
-  function interview(event){
-    const s=state();G.playConversation([{who:'主持人',text:event.interview.question}],{label:'LIFE INTERVIEW / '+event.tag,choices:()=>event.interview.options.map(option=>({text:option.text,action:()=>{
-      window.Onboarding?.event('interview-choice',{episode:event.id,choice:option.id});const wrong=option.id==='assume';s.emotion=wrong?'angry':'thoughtful';
-      G.playConversation(option.lines.map(text=>({who:'小春',text})),{label:wrong?'QUESTION THE ASSUMPTION':'A QUESTION SHE CAN ANSWER',result:wrong?'overreach':null,portrait:wrong?'open':['love','break'].includes(event.id)?'front-letter':'neutral',after:()=>{
-        if(option.id==='ask'){G.collect(event.sources[1]);eventFeedback={kind:'supported',note:'回答与补访证词已收入本段。现在可以比较两份来源，重建事件。'};G.save();}
-        refresh();
-      }});
-    }}))});
-  }
-  function renderConnections(){
-    const s=state(),available=D.lifeConnections.filter(link=>link.pair.every(id=>s.lifeSolved.includes(id)));
-    if(!available.length){$('lifeWorkspace').innerHTML='<section class="life-connections"><span class="eyebrow">PATCH BAY / 等待交叉补访</span><h3>这里把两段已经核对的经历接在一起。</h3><p>继续翻原件、完成回访，相关经历会在这里出现。也可以现在采用手边的片段，进入侧写。</p><button id="connectionsToPortrait" class="ink-button">用已有片段拼图 →</button></section>';$('connectionsToPortrait').onclick=()=>setMode('portrait');return;}
-    if(!available.includes(D.lifeConnections[linkIndex]))linkIndex=D.lifeConnections.indexOf(available[0]);
-    const link=D.lifeConnections[linkIndex],done=s.lifeLinks.includes(link.id),events=D.lifeEpisodes.filter(event=>s.lifeSolved.includes(event.id));
-    if(done){linkPair=[...link.pair];linkChoice=link.answer;}
-    const select=(index)=>'<label>事件 '+(index+1)+'<select '+(done?'disabled':'')+' id="linkEvent'+index+'" aria-label="关系中的第'+(index+1)+'段事件"><option value="">选择一段已重建的经历</option>'+events.map(event=>'<option value="'+event.id+'" '+(linkPair[index]===event.id?'selected':'')+'>'+event.age+' / '+esc(event.name)+'</option>').join('')+'</select></label>';
-    $('lifeWorkspace').innerHTML='<section class="life-connections"><nav class="life-link-nav">'+D.lifeConnections.filter(item=>available.includes(item)).map(item=>{const i=D.lifeConnections.indexOf(item);return '<button data-life-link="'+i+'" class="'+(i===linkIndex?'active':'')+'">0'+(i+1)+' / '+(s.lifeLinks.includes(item.id)?'VERIFIED ✓':'CONNECT')+'</button>';}).join('')+'</nav><span class="eyebrow">A RELATIONSHIP BETWEEN EVENTS</span><h3>'+esc(link.title)+'</h3><p class="life-link-instruction">选出与问题有关的两段已重建事件，再提出同时保留两边事实的读法。它是人物理解，不是新的定罪证据。</p>'+(events.length<2?'<p class="life-feedback incomplete">还缺可连接的事件。先到“经历核对”调查旧档与补访。</p>':'')+'<div class="life-link-selectors">'+select(0)+'<i>↔</i>'+select(1)+'</div><div class="life-event-options">'+link.options.filter(([id])=>!done||id===link.answer).map(([id,text])=>'<button data-link-choice="'+id+'" class="'+(linkChoice===id?'selected':'')+'" '+(done?'disabled':'')+'>'+esc(text)+'</button>').join('')+'</div>'+feedback(linkFeedback)+'<div class="life-submit-row"><span>'+(done?'关系已核对':'需要两段事件和一个读法')+'</span><button id="verifyLifeLink" class="ink-button" '+(done||!linkChoice||!linkPair.every(Boolean)?'disabled':'')+'>'+(done?'RELATION VERIFIED / 已核对':'CONNECT / 提交关系 ↗')+'</button></div>'+(done?'<article class="life-link-coda"><p>'+esc(link.note)+'</p><div class="life-library-row"><button id="relationToPGM" class="secondary-button">采用这条人物链到 B ＋</button><button id="relationToPortrait" class="text-button">确认相关两段的年代 →</button></div><button id="nextLifeLink" class="secondary-button">'+(allLinks()?'去拼回正反画像 →':'下一条关系 →')+'</button></article>':'')+'</section>';
-    $('lifeWorkspace').querySelectorAll('[data-life-link]').forEach(button=>button.onclick=()=>{linkIndex=Number(button.dataset.lifeLink);linkPair=['',''];linkChoice=null;linkFeedback=null;renderConnections();});
-    [0,1].forEach(index=>$('linkEvent'+index).onchange=e=>{linkPair[index]=e.target.value;linkFeedback=null;renderConnections();});
-    $('lifeWorkspace').querySelectorAll('[data-link-choice]').forEach(button=>button.onclick=()=>{linkChoice=button.dataset.linkChoice;linkFeedback=null;renderConnections();});
-    $('verifyLifeLink').onclick=()=>{
-      const result=E.connection(link.id,linkChoice,linkPair,s.lifeSolved);linkFeedback=result;window.Onboarding?.event('relation-result',{id:link.id,choice:linkChoice,kind:result.kind});s.lifeAttempts.push({type:'connection',id:link.id,choice:linkChoice,pair:[...linkPair],result:result.kind});
-      if(result.kind==='supported'&&!s.lifeLinks.includes(link.id)){s.lifeLinks.push(link.id);G.sound('fact');}G.save();G.render();
-    };
-    if($('relationToPGM'))$('relationToPGM').onclick=()=>window.Radio.useRelation(link.id);if($('relationToPortrait'))$('relationToPortrait').onclick=()=>setMode('portrait');
-    if($('nextLifeLink'))$('nextLifeLink').onclick=()=>{const next=D.lifeConnections.findIndex(item=>!s.lifeLinks.includes(item.id));if(next>=0){linkIndex=next;linkPair=['',''];linkChoice=null;linkFeedback=null;renderConnections();}else setMode('portrait');};
-  }
-  function finishIfReady(){
-    const s=state();if(!E.complete(s)||s.facts.includes('profileComplete'))return;
-    s.facts.push('profileComplete');s.emotion='thoughtful';G.save();G.sound('fact');G.notify('人生事件、关系与正反侧写已完成。她的一生不会只剩这场事故。');G.render();
-  }
-  function reading(id){
-    const event=eventById(id);if(!event||!hasPiece(id))return;
-    if(!state().lifeSolved.includes(id)){$('fragmentReading').innerHTML='<span>'+event.age+' / SELECTED FILE</span><h3>'+esc(D.lifeFacetText[id])+'</h3><p>来源：'+esc(D.evidence[event.primary].title)+'</p><small>采用的是眼前这份档案；更长的回访尚未核对。</small>';return;}
-    $('fragmentReading').innerHTML='<span>'+event.age+' / '+esc(event.tag)+'</span><h3>'+esc(side==='front'?event.front:event.back)+'</h3><p>“'+esc(event.voice)+'”</p><small>依据：'+event.sources.map(source=>esc(D.evidence[source].title)).join(' ＋ ')+'。人物侧写不直接代替案件证明。</small>';
+  function verifyCurrent(){
+    const s=state(),result=E.verifyEpisode(s,current().id);message=result.note;
+    if(result.kind==='supported'){G.sound('fact');readingId=current().id;}
+    G.save();G.render();window.Onboarding?.event('life-result',{episode:current().id,kind:result.kind});return result;
   }
   function placePiece(index,id=selectedPiece){
-    const s=state();if(!id||!hasPiece(id))return;
-    const old=s.profileSlots.indexOf(id);if(old>=0)s.profileSlots[old]=null;s.profileSlots[index]=id;selectedPiece=null;puzzleMessage='';G.save();renderPuzzle();reading(id);G.sound('paper');
+    if(!E.place(state(),index,id)){G.notify('先选一块已有的片段。');return false;}
+    readingId=id;selectedPiece=null;message='片段已放入。摆好后核对年代。';G.save();refresh();G.sound('paper');window.Onboarding?.refresh();return true;
   }
-  function renderPuzzle(){
-    const s=state(),done=s.facts.includes('profileComplete'),image=side==='front'?'execution/assets/character/shadows/stand-reaching-profile.png':'execution/assets/character/shadows/stand-bowed.png';
-    $('profileDialog').dataset.side=side;
-    $('lifeWorkspace').innerHTML='<p class="life-task-split"><b>拼图 / 核对人生经历与年代。</b><br>这里保存你的调查结果，不决定本期播什么。想采用某种人物解读，请到播出单 B 轨一次选入，相关经历会自动跟随。</p><div class="life-portrait-top"><div><span class="eyebrow">THE SAME PERSON, TWO READINGS</span><h3>把经历放回它发生的时候。</h3></div><div class="profile-sides"><button id="profileFront" class="'+(side==='front'?'active':'')+'">SIDE A<small>档案表层</small></button><button id="profileBack" class="'+(side==='back'?'active':'')+'">SIDE B<small>补访后的另一面</small></button></div></div><div class="profile-layout"><div class="puzzle-wrap"><div id="puzzleBoard" class="puzzle-board" aria-label="按日期重建人生经历">'+D.lifeEpisodes.map((expected,i)=>{const event=eventById(s.profileSlots[i]),n=event?D.lifeEpisodes.indexOf(event):-1;return '<button class="puzzle-slot '+(event?'occupied':'empty')+(done?' verified':'')+'" data-puzzle-slot="'+i+'" aria-label="'+expected.age+'岁的经历">'+(event?'<img class="piece-image" src="'+image+'" style="--c:'+n%2+';--r:'+Math.floor(n/2)+'" alt="小春的无五官剪影拼图">':'<span class="puzzle-age">'+expected.age+'</span>')+'<span class="puzzle-slot-label">'+expected.age+' / '+esc(event?event.name:'把这段经历放回来')+'</span></button>';}).join('')+'</div><p id="puzzleStatus">'+esc(puzzleMessage||(done?'经历、关系与正反侧写均已完成。':!allEvents()?'已取片段按日期放回；其余位置可以留空。':!allLinks()?'可以核对已有片段，也可以继续交叉补访。':'按年代拼好并核对。翻面可以查看补访得到的另一面。'))+'</p><p class="adopted-status">已确认 '+window.Programme.adopted(s).length+' 块片段。拼图负责确认年代；PGM 选择独立进行，重排不会删除已确认记录。</p><button id="checkProfile" class="ink-button">核对当前片段的年代 / 保存调查 ↗</button></div><section class="profile-fragments"><p class="profile-instruction">选一段经历，再点左侧位置；也可拖放。放错可以重放。已经取出的片段就可以进入拼图；空位可以保留。</p><div id="fragmentTray">'+[3,0,5,2,1,4].map(index=>{const event=D.lifeEpisodes[index],unlocked=hasPiece(event.id);return '<button class="fragment-card '+(selectedPiece===event.id?'selected ':'')+(s.profileSlots.includes(event.id)?'placed ':'')+(!unlocked?'locked':'')+'" data-fragment="'+event.id+'" draggable="'+unlocked+'" '+(!unlocked?'disabled':'')+'><span class="fragment-image">'+(unlocked?'<img class="piece-image" src="'+image+'" style="--c:'+index%2+';--r:'+Math.floor(index/2)+'" alt="">':'<b>?</b>')+'</span><strong>'+esc(unlocked?event.name:'未打开的档案')+'</strong><small>'+(unlocked?(s.lifeSolved.includes(event.id)?'已深入补访':'已取片段'):'尚无索引')+'</small></button>';}).join('')+'</div><article id="fragmentReading" class="fragment-reading"><span>HER LIFE</span><h3>这段经历，发生在什么时候？</h3><p>未放入的部分保持空白。翻面可以查看已经补访的不同读法。</p></article></section></div>';
-    $('profileFront').onclick=()=>flip('front');$('profileBack').onclick=()=>flip('back');
-    if((done||s.facts.includes('profileSketch'))&&window.Radio){const queue=document.createElement('button');queue.id='lifeToRundown';queue.className='secondary-button life-to-rundown';queue.textContent='打开 B 素材库 / 选择或更换已确认片段 →';queue.onclick=()=>{G.closeDialog('profileDialog');window.Radio.openRundown();};$('checkProfile').parentElement.append(queue);}
-    $('puzzleBoard').querySelectorAll('[data-puzzle-slot]').forEach(slot=>{slot.onclick=()=>{const i=Number(slot.dataset.puzzleSlot);if(selectedPiece)placePiece(i);else reading(s.profileSlots[i]);};slot.ondragover=e=>{e.preventDefault();slot.classList.add('drop-target');};slot.ondragleave=()=>slot.classList.remove('drop-target');slot.ondrop=e=>{e.preventDefault();placePiece(Number(slot.dataset.puzzleSlot),e.dataTransfer.getData('text/plain'));};});
-    $('fragmentTray').querySelectorAll('[data-fragment]').forEach(button=>{button.onclick=()=>{selectedPiece=button.dataset.fragment;renderPuzzle();reading(selectedPiece);};button.ondragstart=e=>e.dataTransfer.setData('text/plain',button.dataset.fragment);});
-    $('checkProfile').onclick=()=>{
-      const placed=s.profileSlots.filter(Boolean),correct=placed.length>0&&s.profileSlots.every((id,i)=>!id||id===D.lifeEpisodes[i].id);
-      if(!correct)puzzleMessage=placed.length?'比较档案日期，把已取片段放回对应年龄；其余可留空。':'先选择一块已取片段，再点对应年龄的位置。';
-      else {window.Programme.acceptPortrait(s);if(!s.profileViews.includes(side))s.profileViews.push(side);puzzleMessage='这 '+placed.length+' 块片段已确认，已加入 B 素材库。空位可保留；以后更换节目内容不必再拼或重访。';G.save();finishIfReady();G.render();}
-      renderPuzzle();
-    };
+  function confirmPortrait(){
+    const result=E.confirm(state(),state().portraitSide);message=result.note;
+    if(result.kind==='supported')G.sound('fact');G.save();G.render();window.Onboarding?.refresh();return result;
   }
-  function flip(to){side=to;const s=state();if(puzzleCorrect()&&allEvents()&&allLinks()&&s.profileViews.length){if(!s.profileViews.includes(side))s.profileViews.push(side);G.save();finishIfReady();}renderPuzzle();reading(state().profileSlots.find(Boolean));G.sound('paper');}
-  function hint(){const event=current();return ['补访 / '+event.name,['先打开“'+D.evidence[event.primary].title+'”。读完可以取出眼前片段，放到侧写中对应的年龄。','档案最下面有随附材料。点击附页，会调出更多原件或新的旧档索引。','若要深入重建，读完原件、提一个可核对的问题，再比较两个来源。一个片段只能进入摘要。相关两段经历与一条人物关系接起来，才可能支撑正式定性；其他空位可保留。']];}
-  $('lifeModes').querySelectorAll('[data-life-mode]').forEach(button=>button.onclick=()=>setMode(button.dataset.lifeMode));
-  $('viewer').addEventListener('close',refresh);
-  window.LifeUI={open,refresh,hint};
-  G.render();
+  function flip(side){E.view(state(),side);if(state().radio)state().radio.previewed='';G.save();G.render();G.sound('paper');}
+  function toolbar(){return '<nav class="portrait-mode-tabs" aria-label="人物侧写"><button data-portrait-mode="research" class="'+(mode==='research'?'active':'')+'" aria-pressed="'+(mode==='research')+'">取材与记忆</button><button data-portrait-mode="portrait" class="'+(mode==='portrait'?'active':'')+'" aria-pressed="'+(mode==='portrait')+'">人物拼图 <span>'+state().profileAdopted.length+' / 6</span></button></nav>';}
+  function research(){
+    const s=state(),e=current(),done=s.lifeSolved.includes(e.id),ready=e.sources.every(id=>s.collected.includes(id)&&s.portraitRead.includes(id));
+    return toolbar()+'<nav id="portraitTopics" class="portrait-topic-grid" aria-label="选择要追问的经历">'+D.lifeEpisodes.map(item=>'<button data-portrait-topic="'+item.id+'" class="'+(e.id===item.id?'active':'')+'" aria-pressed="'+(e.id===item.id)+'"><span>'+item.age+' 岁</span><b>'+esc(item.name)+'</b><small>'+(s.lifeSolved.includes(item.id)?'已深入核对 ✓':item.sources.some(received)?'原件已到 / 待核对':'从这件事问起 ↗')+'</small></button>').join('')+'</nav>'+
+      '<section class="portrait-research"><header><div><span class="eyebrow">'+esc(e.tag)+'</span><h3>'+esc(e.name)+'</h3><p>'+esc(e.question)+'</p></div><button id="portraitInvestigate" class="ink-button">'+(s.portraitHeard.includes(e.id)?'重听这段采访 ↺':'问问这件事 →')+'</button></header>'+
+      '<div id="portraitSources" class="portrait-sources">'+e.sources.map(id=>received(id)?'<button data-portrait-read="'+id+'" class="secondary-button"><small>'+esc(D.evidence[id].code)+' / '+(s.portraitRead.includes(id)?'已读':'这次收到')+'</small><b>'+esc(D.evidence[id].title)+'</b><span>打开原件 ↗</span></button>':'<div class="portrait-unreceived"><small>尚未取得</small><b>'+(id===e.sources[0]?'相关的旧物与日期':'另一端的回答')+'</b><span>继续采访后再核对</span></div>').join('')+'</div>'+
+      '<div class="portrait-verify-row"><p>'+(done?'这段经历已经核对，片段保存在拼图里。':e.sources.every(received)?'对照原件日期和当事人的回答。':'先听她把东西拿出来，再看这段经历发生了什么。')+'</p><button id="portraitVerify" class="ink-button" '+(!ready||done?'disabled':'')+'>'+(done?'已深入核对 ✓':'核对两份来源 / 取得片段 →')+'</button></div><p id="portraitFeedback" class="portrait-feedback" role="status">'+esc(message)+'</p>'+
+      (done?'<article class="portrait-memory"><span>已核对的经历</span><p>'+esc(e.options.find(([id])=>id===e.answer)[1])+'</p><button id="portraitToPuzzle" class="secondary-button">把这段放进人物拼图 →</button></article>':'')+'</section>';
+  }
+  function sourceIds(e){const own=e.sources.filter(received);if(own.length)return own;for(const [id,ids]of Object.entries(state().fieldProofs||{})){const link=D.lifeConnections.find(item=>item.id===id);if(link?.pair.includes(e.id))return ids.filter(key=>D.evidence[key]);}return [];}
+  function reading(){
+    const e=D.lifeEpisodes.find(item=>item.id===readingId),s=state();
+    if(!e||!hasPiece(e.id))return '<span>HER PORTRAIT</span><h3>选一块，看看你正在怎样理解她。</h3><p>同一段经历翻到另一面，会显出她舍不得的东西。空白处仍然是你还没问过的事。</p>';
+    const deep=s.lifeSolved.includes(e.id),sources=sourceIds(e);
+    return '<span>'+e.age+' / '+esc(e.name)+'</span><h3>'+esc(deep?(s.portraitSide==='front'?e.front:e.back):D.lifeFacetText[e.id])+'</h3>'+(deep?'<p>“'+esc(e.voice)+'”</p>':'<p>目前只有片段，原件与另一端的回答还没一起核对。</p>')+'<small>来源：'+esc(sources.length?sources.map(id=>D.evidence[id].title).join(' ＋ '):'旧存档中已核实的经历')+'</small><button data-return-topic="'+e.id+'" class="text-button">回到这段经历 / 查看来源 ↗</button>';
+  }
+  function relations(){
+    const s=state(),links=D.lifeConnections.filter(item=>s.lifeLinks.includes(item.id));
+    return '<section id="portraitRelations" class="portrait-relations"><h3>这些经历之间</h3>'+(links.length?links.map(link=>'<article><div><b>'+esc(link.title)+'</b><p>'+esc(link.options.find(([id])=>id===link.answer)[1])+'</p><small>'+esc(link.pair.map(id=>D.lifeEpisodes.find(e=>e.id===id).age+' 岁').join(' ＋ '))+'</small></div><button data-portrait-relation="'+link.id+'" class="secondary-button">选入 B 轨 →</button></article>').join(''):'<p>相关的两段经历核对过、年代放对后，会在这里连成侧写。</p>')+'</section>';
+  }
+  function puzzle(){
+    const s=state(),image=s.portraitSide==='front'?'execution/assets/character/shadows/stand-reaching-profile.png':'execution/assets/character/shadows/stand-bowed.png';
+    return toolbar()+'<div class="portrait-board-header"><div><span class="eyebrow">ONE PERSON / TWO READINGS</span><h3>你要用哪些经历，拼出她这个人？</h3></div><div class="profile-sides"><button id="profileFront" class="'+(s.portraitSide==='front'?'active':'')+'">SIDE A<small>她留下的情分</small></button><button id="profileBack" class="'+(s.portraitSide==='back'?'active':'')+'">SIDE B<small>她攥住的东西</small></button></div></div><div class="profile-layout"><section class="puzzle-wrap"><div id="puzzleBoard" class="puzzle-board" aria-label="把经历放回发生的年龄">'+D.lifeEpisodes.map((expected,i)=>{const e=D.lifeEpisodes.find(item=>item.id===s.profileSlots[i]),n=e?D.lifeEpisodes.indexOf(e):-1,confirmed=e&&e.id===expected.id&&s.profileAdopted.includes(e.id);return '<button class="puzzle-slot '+(e?'occupied':'empty')+(confirmed?' verified':'')+'" data-puzzle-slot="'+i+'" aria-label="'+expected.age+'岁的经历位置'+(e?'：'+esc(e.name):'，空白')+'">'+(e?'<img class="piece-image" src="'+image+'" style="--c:'+n%2+';--r:'+Math.floor(n/2)+'" alt="小春的无五官剪影拼图片段">':'<span class="puzzle-age">'+expected.age+'</span>')+'<span class="puzzle-slot-label">'+expected.age+' / '+esc(e?e.name:'等待一段经历')+'</span></button>';}).join('')+'</div><p id="puzzleStatus" role="status">'+esc(message||'选一块片段，再点相应年龄；也可拖放。摆好后核对年代，其他位置可以留空。')+'</p><button id="checkProfile" class="ink-button">核对年代 / 保存人物侧写 →</button><p class="portrait-confirmed">'+s.profileAdopted.length+' / 6 块已确认 · '+s.lifeSolved.length+' / 6 段已深入</p></section><section class="profile-fragments"><p class="profile-instruction">先选片，再放入左侧。选中后可在下方读正反两面。</p><div id="fragmentTray">'+[3,0,5,2,1,4].map(index=>{const e=D.lifeEpisodes[index],unlocked=hasPiece(e.id);return '<button class="fragment-card '+(selectedPiece===e.id?'selected ':'')+(s.profileSlots.includes(e.id)?'placed ':'')+(!unlocked?'locked':'')+'" data-fragment="'+e.id+'" draggable="'+unlocked+'" '+(!unlocked?'disabled':'')+' aria-pressed="'+(selectedPiece===e.id)+'"><span class="fragment-image">'+(unlocked?'<img class="piece-image" src="'+image+'" style="--c:'+index%2+';--r:'+Math.floor(index/2)+'" alt="">':'<b>?</b>')+'</span><strong>'+esc(e.name)+'</strong><small>'+(s.lifeSolved.includes(e.id)?'已深入核对':unlocked?'已有片段 / 可继续追问':'还未取得')+'</small></button>';}).join('')+'</div><article id="fragmentReading" class="fragment-reading">'+reading()+'</article></section></div>'+relations();
+  }
+  function refresh(){
+    if(!$('profileDialog'))return;const s=prepare(),panel=$('profileDialog');panel.dataset.lifeUi='portrait';panel.dataset.side=s.portraitSide;$('lifeModes').hidden=true;
+    const heading=panel.querySelector('.life-heading');if(heading){heading.querySelector('h2').textContent='她留下的东西';heading.querySelector('p').textContent=s.lifeSolved.length+' / 6 段已深入 · '+s.profileAdopted.length+' 块年代已确认';}
+    $('lifeWorkspace').innerHTML=mode==='portrait'?puzzle():research();
+    $('lifeWorkspace').querySelectorAll('[data-portrait-mode]').forEach(button=>button.onclick=()=>setMode(button.dataset.portraitMode));
+    $('lifeWorkspace').querySelectorAll('[data-portrait-topic]').forEach(button=>button.onclick=()=>focus(button.dataset.portraitTopic));
+    $('lifeWorkspace').querySelectorAll('[data-portrait-read]').forEach(button=>button.onclick=()=>readOriginal(button.dataset.portraitRead));
+    if(mode==='research'){
+      $('portraitInvestigate').onclick=investigate;$('portraitVerify').onclick=verifyCurrent;
+      if($('portraitToPuzzle'))$('portraitToPuzzle').onclick=()=>{readingId=current().id;selectedPiece=hasPiece(current().id)?current().id:null;setMode('portrait');};
+    }else{
+      $('profileFront').onclick=()=>flip('front');$('profileBack').onclick=()=>flip('back');$('checkProfile').onclick=confirmPortrait;
+      $('lifeWorkspace').querySelectorAll('[data-fragment]').forEach(button=>{button.onclick=()=>{selectedPiece=button.dataset.fragment;readingId=selectedPiece;refresh();window.Onboarding?.refresh();};button.ondragstart=event=>{event.dataTransfer.setData('text/plain',button.dataset.fragment);selectedPiece=button.dataset.fragment;};});
+      $('lifeWorkspace').querySelectorAll('[data-puzzle-slot]').forEach(slot=>{slot.onclick=()=>{const index=Number(slot.dataset.puzzleSlot);if(selectedPiece)placePiece(index);else{readingId=s.profileSlots[index];refresh();}};slot.ondragover=event=>{event.preventDefault();slot.classList.add('drop-target');};slot.ondragleave=()=>slot.classList.remove('drop-target');slot.ondrop=event=>{event.preventDefault();placePiece(Number(slot.dataset.puzzleSlot),event.dataTransfer.getData('text/plain'));};});
+      $('lifeWorkspace').querySelectorAll('[data-return-topic]').forEach(button=>button.onclick=()=>focus(button.dataset.returnTopic));
+      $('lifeWorkspace').querySelectorAll('[data-portrait-relation]').forEach(button=>button.onclick=()=>{G.closeDialog('profileDialog');window.Radio.useRelation(button.dataset.portraitRelation);window.Radio.openRundown();});
+    }
+  }
+  function hint(){const e=current();return mode==='portrait'?['人物拼图',['在下方点选一块已有片段，再点它发生的年龄；也可以拖过去。','按 16、19、20、21、24、26 岁核对。空位可留，摆错能重放。','核对年代后，相关的两段经历会连成侧写。翻面看你正在保留她的哪一部分，再决定播什么。']]:['取材 / '+e.name,['先点“问问这件事”。相关的人会拿出旧物、留下回答。','把这次收到的两份原件都打开，比较日期与具体经过。','核对后这段会成为拼图片段。16 岁经历也有完整路径，不需要先查别的五段。']];}
+  $('viewer').addEventListener('close',()=>{refresh();window.Onboarding?.refresh();});
+  window.LifeUI={open,refresh,hint,currentEpisode:current,currentMode:()=>mode,verifyCurrent,placePiece,confirmPortrait,investigate};G.render();
 })();
