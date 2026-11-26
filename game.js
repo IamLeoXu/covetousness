@@ -5,26 +5,30 @@
   const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const KEY = 'dead-air-chapter01-v03';
   const allClaims = D.topics.flatMap(topic=>topic.claims);
-  const fresh = () => ({version:D.version,started:false,scene:'studio',caseLayer:'keys',collected:[],facts:[],attempts:[],audio:true,ending:null,studioQuote:null,emotion:'neutral',profileSlots:[null,null,null,null,null,null],profileViews:[],lifeSolved:[],lifeFacets:[],lifeLinks:[],lifeAttempts:[],lifeFocus:'boxes',cgWatched:false,radio:D.newRadioState(),onboarding:D.newOnboarding(),builder:{topic:'keys',claim:null,selected:[],source:'evidence'}});
+  const fresh = () => ({version:D.version,started:false,scene:'studio',caseLayer:'keys',collected:[],facts:[],factProofs:{},profileAdopted:[],attempts:[],audio:true,ending:null,studioQuote:null,emotion:'neutral',profileSlots:[null,null,null,null,null,null],profileViews:[],lifeSolved:[],lifeFacets:[],lifeLinks:[],lifeAttempts:[],lifeFocus:'boxes',cgWatched:false,radio:D.newRadioState(),onboarding:D.newOnboarding(),builder:{topic:'keys',claim:null,selected:[],source:'evidence'}});
   let state = fresh(), flow = null, toastTimer, currentViewer = null, audioContext = null, lastSound = 0;
   try {
     const stored = JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('dead-air-chapter01-v02'));
-    if (stored && [D.version,'0.6.4','0.6.3','0.6.2','0.6.1','0.6','0.5','0.4','0.3','0.2'].includes(stored.version)) {
+    if (stored && [D.version,'0.8.0','0.7.0','0.6.5','0.6.4','0.6.3','0.6.2','0.6.1','0.6','0.5','0.4','0.3','0.2'].includes(stored.version)) {
       const legacy=stored.version==='0.2';
       state.started = stored.started === true;
       state.scene = D.scenes[stored.scene] ? stored.scene : 'studio';
       state.collected = [...new Set(Array.isArray(stored.collected) ? stored.collected.filter(id=>D.evidence[id]) : [])];
       state.facts = [...new Set(Array.isArray(stored.facts) ? stored.facts.filter(id=>D.facts[id]&&(!legacy||id!=='profileComplete')) : [])];
       state.attempts = Array.isArray(stored.attempts) ? stored.attempts.filter(a=>a && allClaims.some(c=>c.id===a.claim) && Array.isArray(a.materials)).slice(-100) : [];
+      state.factProofs=stored.factProofs&&typeof stored.factProofs==='object'?Object.fromEntries(Object.entries(stored.factProofs).filter(([id,items])=>D.facts[id]&&Array.isArray(items)).map(([id,items])=>[id,items.filter(key=>D.facts[key]||D.evidence[key]).slice(0,3)])):{};
       state.audio = stored.audio !== false;
       state.ending = !legacy&&['good','bad','zero','hold','release'].includes(stored.ending) ? stored.ending : null;
       state.studioQuote = typeof stored.studioQuote === 'string' ? stored.studioQuote.slice(0,160) : null;
       state.profileSlots=Array.from({length:6},(_,i)=>!legacy&&D.profiles.some(p=>p.id===stored.profileSlots?.[i])?stored.profileSlots[i]:null);
+      state.profileAdopted=Array.isArray(stored.profileAdopted)?[...new Set(stored.profileAdopted.filter(id=>D.lifeEpisodes.some(e=>e.id===id)))]:state.facts.some(id=>['profileSketch','profileComplete'].includes(id))?D.lifeEpisodes.filter((e,i)=>state.profileSlots[i]===e.id).map(e=>e.id):[];
       state.profileViews=!legacy&&Array.isArray(stored.profileViews)?stored.profileViews.filter(v=>v==='front'||v==='back'):[];
       state.lifeSolved=!legacy&&Array.isArray(stored.lifeSolved)?[...new Set(stored.lifeSolved.filter(id=>D.lifeEpisodes.some(event=>event.id===id)))]:[];
       state.lifeFacets=[...new Set([...(Array.isArray(stored.lifeFacets)?stored.lifeFacets:[]),...state.lifeSolved])].filter(id=>D.lifeEpisodes.some(event=>event.id===id));
       state.lifeLinks=!legacy&&Array.isArray(stored.lifeLinks)?[...new Set(stored.lifeLinks.filter(id=>D.lifeConnections.some(link=>link.id===id)))]:[];
       state.lifeAttempts=!legacy&&Array.isArray(stored.lifeAttempts)?stored.lifeAttempts.slice(-60):[];
+      state.dialogueLog=Array.isArray(stored.dialogueLog)?stored.dialogueLog.filter(entry=>entry&&Array.isArray(entry.lines)).slice(-30):[];
+      state.chatRead=Array.isArray(stored.chatRead)?stored.chatRead.filter(id=>typeof id==='string'):[];
       state.lifeFocus=D.lifeEpisodes.some(event=>event.id===stored.lifeFocus)?stored.lifeFocus:'boxes';
       const p=E.milestones(state.facts);
       state.caseLayer=D.caseLayers.some(layer=>layer.id===stored.caseLayer)?stored.caseLayer:!p.first?'keys':!p.warning?'notice':'rescue';
@@ -128,9 +132,11 @@
     if(item.rows) content+='<table class="record-table"><tbody>'+item.rows.map(([key,value])=>'<tr><th scope="row">'+esc(key)+'</th><td>'+esc(value)+'</td></tr>').join('')+'</tbody></table>';
     if(item.note) content+='<div class="exhibit-note">'+esc(item.note)+'</div>';
     if(item.followUps?.length)content+='<nav class="source-attachments" aria-label="随附材料"><span>FILE ATTACHMENTS / 随附材料</span>'+item.followUps.map(link=>'<button data-follow-up="'+link.id+'">'+esc(link.label)+' <b>↗</b></button>').join('')+'</nav>';
+    if(fact&&fact.proof!==false){const proof=window.Programme.proof(state,id);content+='<section class="proof-chain"><b>推论依据与用途</b><p>'+esc(D.inferenceRoles[id]||'可进入本期论证')+'</p>'+proof.map(key=>'<button data-proof-source="'+key+'">'+esc(materialTitle(key))+' ↗</button>').join('')+'<button id="proofToPGM" class="proof-use">采用这条推论到 PGM ＋</button></section>';}
     content+='</article>';
     $('viewerContent').innerHTML=content;$('viewerContent').scrollTop=0;
     $('viewerContent').querySelectorAll('[data-follow-up]').forEach(button=>button.onclick=()=>openViewer(button.dataset.followUp));
+    $('viewerContent').querySelectorAll('[data-proof-source]').forEach(button=>button.onclick=()=>openViewer(button.dataset.proofSource));if($('proofToPGM'))$('proofToPGM').onclick=()=>window.Radio.useFact(id);
     $('viewerLabel').textContent=(fact?'INFERENCE':item.lane==='life'?'LIFE SOURCE':'EVIDENCE')+' / '+item.code+' / '+item.label;
     $('viewerSaved').innerHTML='<i></i>'+(fact?'VERIFIED / YOUR INFERENCE':item.lane==='life'?'SAVED TO HER LIFE FILE':newly?'ADDED TO CASE FILE':'IN YOUR CASE FILE');
     $('companionButton').hidden=!item.companion;
@@ -148,27 +154,29 @@
   function renderBuilder() {
     const b=state.builder;
     const topic=D.topics.find(t=>t.id===b.topic)||D.topics[0],layer=D.caseLayers.find(item=>item.id===topic.id);
-    b.source=b.source==='facts'?'facts':'evidence';
+    b.source=['facts','mixed'].includes(b.source)?b.source:'evidence';
     const inLayer=id=>layer.materials.includes(id)||layer.facts.includes(id);
     b.selected=b.selected.filter(id=>known(id)&&inLayer(id)).slice(0,3);
-    const materials=owned().filter(id=>inLayer(id)&&(b.source==='facts'?!!D.facts[id]:!!D.evidence[id]));
+    const materials=owned().filter(id=>inLayer(id)&&(b.source==='mixed'?true:b.source==='facts'?!!D.facts[id]:!!D.evidence[id]));
     $('materialCount').textContent=String(materials.length).padStart(2,'0');
-    $('materialTabs').innerHTML=[['evidence','原始材料'],['facts','已核实推论']].map(([id,label])=>'<button data-source="'+id+'" aria-pressed="'+(b.source===id)+'" class="'+(b.source===id?'active':'')+'">'+label+' <small>'+owned().filter(key=>inLayer(key)&&(id==='facts'?!!D.facts[key]:!!D.evidence[key])).length+'</small></button>').join('');
+    $('materialTabs').innerHTML=[['evidence','原始材料'],['facts','已核实推论'],['mixed','全部材料']].map(([id,label])=>'<button data-source="'+id+'" aria-pressed="'+(b.source===id)+'" class="'+(b.source===id?'active':'')+'">'+label+' <small>'+owned().filter(key=>inLayer(key)&&(id==='mixed'?true:id==='facts'?!!D.facts[key]:!!D.evidence[key])).length+'</small></button>').join('');
     $('materialTabs').querySelectorAll('[data-source]').forEach(button=>button.onclick=()=>{b.source=button.dataset.source;renderBuilder();});
-    $('poolScope').textContent=layer.number+' / '+layer.title+' · 仅显示本卷';
+    $('poolScope').textContent='FILE '+String.fromCharCode(65+D.caseLayers.indexOf(layer))+' / '+layer.title+' · 仅显示本卷';
     $('evidencePool').innerHTML=materials.length?materials.map(id=>{
       const item=D.evidence[id]||D.facts[id],inference=!!D.facts[id],selected=b.selected.includes(id);
-      return '<div class="material-card '+(inference?'inference ':'')+(selected?'selected':'')+'" draggable="true" data-material="'+id+'"><button class="material-select" data-select="'+id+'" aria-pressed="'+selected+'" aria-label="'+(selected?'移除：':'放入：')+esc(item.title)+'"><span>'+(inference?'VERIFIED INFERENCE':'EVIDENCE / '+item.code)+'</span><strong>'+esc(item.short||item.title)+'</strong><small>'+esc(item.label)+'</small></button><button class="material-inspect" data-inspect="'+id+'" aria-label="重看：'+esc(item.title)+'">↗</button></div>';
+      return '<div class="material-card '+(inference?'inference ':'')+(selected?'selected':'')+'" draggable="true" data-material="'+id+'"><button class="material-select" data-select="'+id+'" aria-pressed="'+selected+'" aria-label="'+(selected?'移除：':'放入：')+esc(item.title)+'"><span>'+(inference?'VERIFIED INFERENCE':'EVIDENCE / '+item.code)+'</span><strong>'+esc(item.short||item.title)+'</strong><small>'+esc(item.label)+'</small></button><button class="material-inspect" data-inspect="'+id+'" aria-label="重看：'+esc(item.title)+'">↗</button>'+(inference?'<div class="material-pgm"><span>'+esc(D.inferenceRoles[id]||'可进入本期论证')+'</span><button data-adopt-fact="'+id+'" type="button">采用到 PGM ＋</button></div>':'')+'</div>';
     }).join(''):'<p class="pool-empty">'+(b.source==='facts'?'本卷尚无已核实推论。<br>先使用原始材料。':'本卷还没有收集材料。<br>回到场景，查看这一层的物件。')+'</p>';
     $('evidencePool').querySelectorAll('[data-select]').forEach(button=>button.onclick=()=>selectMaterial(button.dataset.select));
+    $('evidencePool').querySelectorAll('[data-adopt-fact]').forEach(button=>button.onclick=()=>window.Radio.useFact(button.dataset.adoptFact));
     $('evidencePool').querySelectorAll('[data-inspect]').forEach(button=>button.onclick=()=>openViewer(button.dataset.inspect));
     $('evidencePool').querySelectorAll('[data-material]').forEach(card=>card.ondragstart=event=>{event.dataTransfer.setData('text/plain',card.dataset.material);event.dataTransfer.effectAllowed='copy';});
     $('topicTabs').innerHTML=D.topics.map(topic=>'<button role="tab" aria-selected="'+(topic.id===b.topic)+'" class="'+(topic.id===b.topic?'active':'')+'" data-topic="'+topic.id+'" '+(window.ChapterExtension&&!window.ChapterExtension.layerUnlocked(state,topic.id)?'disabled':'')+'><span>'+topic.en+'</span>'+topic.title+'</button>').join('');
     $('topicTabs').querySelectorAll('[data-topic]').forEach(button=>button.onclick=()=>{b.topic=state.caseLayer=button.dataset.topic;b.claim=null;b.selected=[];b.source='evidence';save();render();renderBuilder();});
     if($('builderQuestion'))$('builderQuestion').textContent=topic.question;
     $('claimOptions').innerHTML=topic.claims.filter(claim=>!D.claimVisible||D.claimVisible(claim,state)).map(claim=>'<button class="claim-option '+(claim.id===b.claim?'selected':'')+'" data-claim="'+claim.id+'" aria-pressed="'+(claim.id===b.claim)+'">'+esc(claim.text)+'</button>').join('');
-    $('claimOptions').querySelectorAll('[data-claim]').forEach(button=>button.onclick=()=>{b.claim=button.dataset.claim;renderBuilder();});
-    $('evidenceSlots').innerHTML=[0,1,2].map(index=>{const id=b.selected[index];return '<button class="evidence-slot '+(id?'filled':'empty')+'" data-slot="'+index+'" aria-label="'+(id?'移除：'+esc(materialTitle(id)):'第 '+(index+1)+' 个证据位')+'">'+(id?'<span>'+String(index+1).padStart(2,'0')+' / '+(D.facts[id]?'INFERENCE':'EVIDENCE')+'</span><strong>'+esc(materialTitle(id))+'</strong>':'<span>DROP / '+String(index+1).padStart(2,'0')+'</span>')+'</button>';}).join('');
+    $('claimOptions').querySelectorAll('[data-claim]').forEach(button=>button.onclick=()=>{b.claim=button.dataset.claim;if((D.inferenceRecipes[b.claim]||[]).some(recipe=>recipe.some(id=>D.facts[id])))b.source='mixed';renderBuilder();});
+    const deep=(D.inferenceRecipes[b.claim]||[]).some(recipe=>recipe.some(id=>D.facts[id]));$('claimRole').classList.toggle('deep',deep);$('claimRole').textContent=deep?'深层推论：必须把已核实推论和新原件放在同一组。切换左侧标签不会清空已选来源。':b.claim?(D.inferenceRoles[b.claim]||'先核实当前说法，再决定是否采用。'):'';
+    $('evidenceSlots').innerHTML=[0,1,2].map(index=>{const id=b.selected[index];return '<button class="evidence-slot '+(id?'filled':'empty')+'" data-slot="'+index+'" aria-label="'+(id?'移除：'+esc(materialTitle(id)):'第 '+(index+1)+' 个证据位')+'">'+(id?'<span>'+String(index+1).padStart(2,'0')+' / '+(D.facts[id]?'INFERENCE':'EVIDENCE')+'</span><strong>'+esc(materialTitle(id))+'</strong>':'<span>来源位 '+(index+1)+' / 可留空</span>')+'</button>';}).join('');
     $('evidenceSlots').querySelectorAll('[data-slot]').forEach(slot=>{
       slot.onclick=()=>{const i=Number(slot.dataset.slot);if(b.selected[i]){b.selected.splice(i,1);renderBuilder();}else notify('从左侧选一份材料，或将它拖进来。');};
       slot.ondragover=event=>{event.preventDefault();slot.classList.add('drop-target');};
@@ -195,6 +203,7 @@
     const newFact=result.fact&&!state.facts.includes(result.fact),before=progress();
     state.attempts.push({claim:b.claim,topic:b.topic,materials:[...b.selected],result:result.kind,note:result.note,fact:result.fact});
     if(newFact) state.facts.push(result.fact);
+    if(result.fact)state.factProofs[result.fact]=[...b.selected];
     state.studioQuote=result.lines[0];state.scene='studio';
     if(newFact&&!before.first&&progress().first) state.builder={topic:'notice',claim:null,selected:[]};
     window.ChapterExtension?.onResult(state,result);
@@ -202,7 +211,7 @@
     save();render();closeDialog('builder');sceneFlash();
     const lines=[{who:'主持人',text:claim.text},...result.lines.map(text=>({who:'小春',text})),{who:'调查笔记',text:result.note}];
     if(newFact) lines.push({who:'调查笔记',text:'已记下：'+D.facts[result.fact].title+'。这项推论可以继续参与组合。'});
-    playConversation(lines,{label:labels[result.kind],result:result.kind,portrait:result.kind==='supported'?'keys':'open',choices:()=>{
+    playConversation(lines,{label:labels[result.kind],result:result.kind,portrait:result.kind==='supported'?(result.fact==='oldKeys'?'front-keys':'neutral'):'open',choices:()=>{
       if(progress().ready&&!state.ending&&!window.Onboarding?.coreActive())return [{text:'把事实与人物侧写带入最后的公开评价。',action:()=>{finishConversation();openEnding();}},{text:'继续核查其他材料。',action:finishConversation}];
       return null;
     }});
@@ -210,21 +219,37 @@
   }
 
   function playConversation(lines,options={}) {
-    flow={lines,index:0,...options};$('conversation').dataset.result=options.result||'';
-    $('conversationPortrait').src=window.ChapterExtension?.portrait(state,options)||'execution/assets/character/details/held-letter.png';
+    const parent=options.parent||null;
+    flow={lines,index:0,...options,parent};$('conversation').dataset.result=options.result||'';
+    $('conversation').dataset.module=options.module||'';
     renderConversation();openDialog('conversation');window.Radio?.onConversation(true);
   }
   function renderConversation() {
     if(!flow) return;
     const line=flow.lines[flow.index];$('conversationLabel').textContent=flow.label||'INTERVIEW / OFF AIR';$('conversationSpeaker').textContent=line.who;$('conversationText').textContent=line.text;
+    $('conversationPortrait').src=window.ChapterExtension?.portrait(state,{...flow,portrait:line.portrait||flow.portrait})||'execution/assets/character/details/calm-empty-hands.png';
+    $('conversationPortrait').dataset.framing=/\/(?:calm-empty-hands|clasped-keys|front-clasped-keys|front-held-letter)\.png/.test($('conversationPortrait').src)?'waist':'';
+    const tape=line.visual==='tape';$('conversation').classList.toggle('is-tape',tape);
+    $('conversationTape').hidden=!tape;$('conversationPortrait').hidden=tape;
+    if(tape&&!$('conversationTape').firstElementChild)new window.CharacterCassette($('conversationTape'),'handoff',{decal:'execution/assets/ui/koharu-tape-decal.png'}).update(.35);
     $('conversationCounter').textContent=String(flow.index+1).padStart(2,'0')+' / '+String(flow.lines.length).padStart(2,'0');
+    $('conversationPrev').disabled=flow.index===0&&!flow.parent;
     $('conversationChoices').innerHTML='';$('conversationNext').hidden=false;
     const atEnd=flow.index===flow.lines.length-1,choices=atEnd&&flow.choices?flow.choices():null;
-    if(choices&&choices.length){$('conversationNext').hidden=true;choices.forEach(choice=>{const button=document.createElement('button');button.textContent=choice.text;button.onclick=choice.action;$('conversationChoices').append(button);});}
-    $('conversationNext').textContent=atEnd?'BACK TO THE CASE →':'NEXT →';window.Onboarding?.refresh();
+    if(choices&&choices.length){$('conversationNext').hidden=true;choices.forEach(choice=>{const button=document.createElement('button');button.textContent=choice.text;button.onclick=()=>{const previous=flow;choice.action();if(flow&&flow!==previous&&!flow.parent&&!flow.review){flow.parent=previous;renderConversation();}};$('conversationChoices').append(button);});}
+    $('conversationNext').textContent=atEnd?(flow.endText||'返回调查 →'):'下一页 →';window.Onboarding?.refresh();
   }
+  function previousConversation(){if(!flow)return;if(flow.index>0)flow.index--;else if(flow.parent)flow=flow.parent;renderConversation();}
+  function rememberConversation(){
+    if(!flow||flow.review||flow.choices&&flow.lines.length===1)return;
+    const entry={label:flow.label||'INTERVIEW / OFF AIR',portrait:flow.portrait||'neutral',lines:flow.lines.map(({who,text,visual,portrait})=>({who,text,visual,portrait}))};
+    state.dialogueLog=Array.isArray(state.dialogueLog)?state.dialogueLog:[];
+    if(JSON.stringify(state.dialogueLog.at(-1))!==JSON.stringify(entry))state.dialogueLog.push(entry);
+    state.dialogueLog=state.dialogueLog.slice(-30);save();
+  }
+  function reviewLastConversation(){const entry=state.dialogueLog?.at(-1);if(!entry){notify('还没有读完的对话。');return;}closeDialog('helpDialog');playConversation(entry.lines,{label:'回看 / '+entry.label,portrait:entry.portrait,review:true,endText:'结束回看 →'});}
   function advanceConversation() {if(!flow)return;if(flow.index<flow.lines.length-1){flow.index++;renderConversation();}else finishConversation();}
-  function finishConversation() {const after=flow?.after;flow=null;closeDialog('conversation');window.Radio?.onConversation(false);window.ChapterExtension?.onConversationEnd(state);render();after?.();}
+  function finishConversation() {const after=flow?.after;rememberConversation();flow=null;closeDialog('conversation');window.Radio?.onConversation(false);window.ChapterExtension?.onConversationEnd(state);render();after?.();}
   function talkToHer() {
     if(window.ChapterExtension?.talkToHer){window.ChapterExtension.talkToHer();return;}
     playConversation([{who:'小春',text:'你想先问哪件？'}],{portrait:'keys',choices:()=>[
@@ -297,7 +322,7 @@
   document.querySelectorAll('[data-ending]').forEach(button=>button.addEventListener('click',()=>chooseEnding(button.dataset.ending)));
   document.addEventListener('click',event=>{if(event.target.closest('button'))sound();},true);
   $('buildButton').onclick=openBuilder;$('notebookButton').onclick=openNotebook;$('talkPerson').onclick=talkToHer;
-  $('clearSlots').onclick=()=>{state.builder.selected=[];renderBuilder();};$('submitArgument').onclick=submitArgument;$('conversationNext').onclick=advanceConversation;
+  $('clearSlots').onclick=()=>{state.builder.selected=[];renderBuilder();};$('submitArgument').onclick=submitArgument;$('conversationNext').onclick=advanceConversation;$('conversationPrev').onclick=previousConversation;
   $('helpButton').onclick=()=>openDialog('helpDialog');$('brandHome').onclick=event=>{event.preventDefault();openDialog('helpDialog');};
   $('restartButton').onclick=requestRestart;$('cancelRestart').onclick=()=>{$('restartConfirm').hidden=true;};$('confirmRestart').onclick=restart;
   $('audioToggle').onclick=()=>{state.audio=!state.audio;save();render();if(state.audio)sound();};
@@ -311,12 +336,12 @@
     if(event.ctrlKey||event.altKey||event.metaKey||/INPUT|TEXTAREA|SELECT/.test(event.target.tagName))return;
     if(!$('titleScreen').hidden)return;
     if($('cgScreen')&&!$('cgScreen').hidden)return;
-    if($('conversation').open){if((event.key==='Enter'||event.key===' ')&&event.target===$('conversationNext'))return;if((event.key==='Enter'||event.key===' ')&&!$('conversationNext').hidden){event.preventDefault();advanceConversation();}return;}
+    if($('conversation').open){if((event.key==='Enter'||event.key===' ')&&event.target.closest('button'))return;if(event.key==='ArrowLeft'){event.preventDefault();previousConversation();}else if((event.key==='Enter'||event.key===' ')&&!$('conversationNext').hidden){event.preventDefault();advanceConversation();}return;}
     if(document.querySelector('dialog[open]'))return;
     if(event.key.toLowerCase()==='b'){event.preventDefault();openBuilder();}
     if(event.key.toLowerCase()==='n'){event.preventDefault();openNotebook();}
     if(['1','2','3'].includes(event.key)){event.preventDefault();switchScene(['studio','lobby','archive'][Number(event.key)-1]);}
   });
-  window.ChapterGame={getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,openEnding,openViewer,collect,progress,sound,openBuilder,renderBuilder,viewerId:()=>currentViewer};
+  window.ChapterGame={getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,reviewLastConversation,openEnding,openViewer,collect,progress,sound,openBuilder,renderBuilder,viewerId:()=>currentViewer};
   render();$('startButton').focus();
 })();

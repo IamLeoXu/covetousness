@@ -1,6 +1,6 @@
-/* DEAD AIR v0.27: intact glass and restrained mechanical micro-scratches. */
+/* DEAD AIR v0.28.1: corrected waist crop; scene and lyric timing preserved. */
 window.TIMELINE = {
-  "version": "0.27",
+  "version": "0.28.1",
   "duration": 213.68,
   "music": "assets/bgm.mp3",
   "art": {
@@ -25,7 +25,7 @@ window.TIMELINE = {
     "sobClose": "assets/character/details/covered-face.png",
     "letterClose": "assets/character/details/gripped-envelope.png",
     "reachClose": "assets/character/details/reach-dark.png",
-    "keysClose": "assets/character/details/clasped-keys.png",
+    "keysClose": "assets/character/details/clasped-keys.png?v=0.8.1",
     "absenceClose": "assets/character/details/open-hands.png",
     "roomKeys": "assets/props/kept/room-keys.png",
     "repairLedger": "assets/props/kept/repair-ledger.png",
@@ -50,7 +50,115 @@ window.TIMELINE = {
     "pressedFlower": "assets/props/pressed-flower.webp",
     "memoryTrace": "assets/props/print/memory-trace.webp",
     "vacantDoor": "assets/props/kept/vacant-door.png",
-    "archiveSleeve": "assets/props/kept/archive-sleeve.png"
+    "archiveSleeve": "assets/props/kept/archive-sleeve.png",
+    "memoryStitches": {
+      "src": "assets/props/memories/memory-a.png",
+      "cell": [
+        0,
+        0,
+        3,
+        2
+      ]
+    },
+    "memoryCups": {
+      "src": "assets/props/memories/memory-a.png",
+      "cell": [
+        1,
+        0,
+        3,
+        2
+      ]
+    },
+    "memoryWindow": {
+      "src": "assets/props/memories/memory-a.png",
+      "cell": [
+        2,
+        0,
+        3,
+        2
+      ]
+    },
+    "memoryRepair": {
+      "src": "assets/props/memories/memory-a.png",
+      "cell": [
+        0,
+        1,
+        3,
+        2
+      ]
+    },
+    "memoryTickets": {
+      "src": "assets/props/memories/memory-a.png",
+      "cell": [
+        1,
+        1,
+        3,
+        2
+      ]
+    },
+    "memoryDoor": {
+      "src": "assets/props/memories/memory-a.png",
+      "cell": [
+        2,
+        1,
+        3,
+        2
+      ]
+    },
+    "memoryFaces": {
+      "src": "assets/props/memories/memory-b.png",
+      "cell": [
+        0,
+        0,
+        3,
+        2
+      ]
+    },
+    "memoryUmbrella": {
+      "src": "assets/props/memories/memory-b.png",
+      "cell": [
+        1,
+        0,
+        3,
+        2
+      ]
+    },
+    "memoryTable": {
+      "src": "assets/props/memories/memory-b.png",
+      "cell": [
+        2,
+        0,
+        3,
+        2
+      ]
+    },
+    "memoryParcel": {
+      "src": "assets/props/memories/memory-b.png",
+      "cell": [
+        0,
+        1,
+        3,
+        2
+      ]
+    },
+    "memoryTelephone": {
+      "src": "assets/props/memories/memory-b.png",
+      "cell": [
+        1,
+        1,
+        3,
+        2
+      ]
+    },
+    "memoryEnvelope": {
+      "src": "assets/props/memories/memory-b.png",
+      "cell": [
+        2,
+        1,
+        3,
+        2
+      ]
+    }
   },
   "portraits": {
     "standShadow": "assets/character/shadows/stand-bowed.png",
@@ -983,7 +1091,7 @@ window.TIMELINE = {
       "id": "solo-memory-flashback",
       "stage": "flashback",
       "pose": null,
-      "action": "112–135.5 秒纯物件硬切记忆，约每秒 3.4 张，不出现 Koharu 或她的身体局部。",
+      "action": "112–135.5 秒物件记忆硬切，保留原有 80 个踩点；新增十二幅绘制记忆，以双联、斜切、三联和局部构图接镜，不出现 Koharu 身体。",
       "x": 75,
       "y": 8,
       "scale": 0.68,
@@ -1004,97 +1112,86 @@ window.TIMELINE = {
         {
           "t": 112,
           "id": "memory-cut-001",
-          "background": "city",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 67,
-              "y": 65,
-              "height": 22.32,
-              "rotation": 0,
-              "opacity": 1
+              "asset": "memoryStitches",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "rentReceipt",
-              "x": 47,
-              "y": 54,
-              "height": 27.9,
-              "rotation": 11,
-              "opacity": 1
+              "asset": "memoryWindow",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.8,
-            "fromX": -18,
-            "fromY": -2
-          },
-          "weather": "rain",
-          "rainIntensity": 0.8
+          ]
         },
         {
           "t": 112.29375,
           "id": "memory-cut-002",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 29,
-              "y": 43,
-              "height": 76.25999999999999,
-              "rotation": -6,
-              "opacity": 1,
-              "content": "faceB"
+              "asset": "memoryRepair",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "frame",
-              "x": 68,
-              "y": 41,
-              "height": 90.21,
-              "rotation": 5,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryDoor",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryRepair",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 112.5875,
           "id": "memory-cut-003",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 35,
-              "y": 43,
-              "height": 76.25999999999999,
-              "rotation": -5,
-              "opacity": 1,
-              "content": "faceEmpty"
+              "asset": "memoryParcel",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "archiveSleeve",
-              "x": 71,
-              "y": 46,
-              "height": 71.61,
-              "rotation": 7,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 112.88125,
@@ -1129,83 +1226,86 @@ window.TIMELINE = {
         {
           "t": 113.175,
           "id": "memory-cut-005",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
+          "layout": "cut",
           "splice": 0,
-          "cells": [
-            "envelope",
-            "roomTag",
-            "emptyCup",
-            "pressedNote",
-            "looseKeys",
-            "archiveSleeve"
-          ],
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          "printLayout": "diagonal",
+          "printSplit": 0.5,
+          "printPanels": [
+            {
+              "asset": "memoryWindow",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryCups",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
+            }
+          ]
         },
         {
           "t": 113.46875,
           "id": "memory-cut-006",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "envelope",
-              "x": 66,
-              "y": 44,
-              "height": 67.89,
-              "rotation": -7,
-              "opacity": 1
+              "asset": "memoryDoor",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "roomTag",
-              "x": 34,
-              "y": 63,
-              "height": 23.25,
-              "rotation": 8,
-              "opacity": 1
+              "asset": "memoryUmbrella",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTickets",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 113.7625,
           "id": "memory-cut-007",
-          "background": "paperVault",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "vacantDoor",
-              "x": 61,
-              "y": 48,
-              "height": 84.63,
-              "rotation": 0,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "roomKeys",
-              "x": 32,
-              "y": 63,
-              "height": 29.759999999999998,
-              "rotation": 13,
-              "opacity": 1
+              "asset": "memoryTickets",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 114.05625,
@@ -1232,86 +1332,86 @@ window.TIMELINE = {
         {
           "t": 114.35,
           "id": "memory-cut-009",
-          "background": "voidCut",
-          "layout": "strips",
-          "layers": [
-            {
-              "asset": "looseKeys",
-              "x": 58,
-              "y": 47,
-              "height": 84.63,
-              "rotation": -11,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          "printLayout": "triptych",
+          "printSplit": 0.61,
+          "printPanels": [
+            {
+              "asset": "memoryTable",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
+            }
+          ]
         },
         {
           "t": 114.64375,
           "id": "memory-cut-010",
-          "background": "morningVault",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "rentReceipt",
-              "x": 60,
-              "y": 48,
-              "height": 80.91,
-              "rotation": 7,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "bluePen",
-              "x": 31,
-              "y": 66,
-              "height": 21.389999999999997,
-              "rotation": -15,
-              "opacity": 1
+              "asset": "memoryRepair",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryFaces",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 114.9375,
           "id": "memory-cut-011",
-          "background": "emptyWindows",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 32,
-              "y": 42,
-              "height": 80.91,
-              "rotation": -7,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryUmbrella",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "frame",
-              "x": 70,
-              "y": 45,
-              "height": 68.82,
-              "rotation": 7,
-              "opacity": 1,
-              "content": "faceC"
+              "asset": "memoryParcel",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 115.23125,
@@ -1346,84 +1446,86 @@ window.TIMELINE = {
         {
           "t": 115.525,
           "id": "memory-cut-013",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
-            {
-              "asset": "petalBlush",
-              "x": 62,
-              "y": 49,
-              "height": 32.55,
-              "rotation": -18,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          "printLayout": "inset",
+          "printSplit": 0.42,
+          "printPanels": [
+            {
+              "asset": "memoryTickets",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
+            }
+          ]
         },
         {
           "t": 115.81875,
           "id": "memory-cut-014",
-          "background": "archiveCut",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "memoryTrace",
-              "x": 59,
-              "y": 48,
-              "height": 80.91,
-              "rotation": 6,
-              "opacity": 1
+              "asset": "memoryTelephone",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "pressedNote",
-              "x": 26,
-              "y": 62,
-              "height": 27.9,
-              "rotation": -9,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryRepair",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 116.1125,
           "id": "memory-cut-015",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "envelope",
-              "x": 60,
-              "y": 49,
-              "height": 81.83999999999999,
-              "rotation": -5,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "pressedFlower",
-              "x": 28,
-              "y": 65,
-              "height": 26.97,
-              "rotation": 9,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 116.40625,
@@ -1449,83 +1551,86 @@ window.TIMELINE = {
         {
           "t": 116.7,
           "id": "memory-cut-017",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 61,
-              "y": 49,
-              "height": 68.82,
-              "rotation": -3,
-              "opacity": 1
+              "asset": "memoryStitches",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "bluePen",
-              "x": 33,
-              "y": 66,
-              "height": 20.459999999999997,
-              "rotation": -12,
-              "opacity": 1
+              "asset": "memoryTickets",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 0,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 116.99375,
           "id": "memory-cut-018",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
+          "layout": "cut",
           "splice": 0,
-          "cells": [
-            "rentReceipt",
-            "roomKeys",
-            "bluePen",
-            "residentNote",
-            "pressedFlower",
-            "repairLedger"
-          ],
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": -2,
-            "fromY": 0
-          }
+          "printLayout": "diptych",
+          "printSplit": 0.61,
+          "printPanels": [
+            {
+              "asset": "memoryRepair",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTickets",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.36
+            }
+          ]
         },
         {
           "t": 117.2875,
           "id": "memory-cut-019",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 64,
-              "y": 53,
-              "height": 74,
-              "rotation": -1,
-              "opacity": 1
+              "asset": "memoryParcel",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "bluePen",
-              "x": 36,
-              "y": 70,
-              "height": 22,
-              "rotation": -10,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 117.58125,
@@ -1562,95 +1667,86 @@ window.TIMELINE = {
         {
           "t": 117.875,
           "id": "memory-cut-021",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 32,
-              "y": 47,
-              "height": 82,
-              "rotation": -4,
-              "opacity": 1,
-              "content": "faceB"
+              "asset": "memoryWindow",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "frame",
-              "x": 71,
-              "y": 45,
-              "height": 97,
-              "rotation": 7,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryRepair",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 118.16875,
           "id": "memory-cut-022",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 32,
-              "y": 47,
-              "height": 82,
-              "rotation": -7,
-              "opacity": 1,
-              "content": "faceEmpty"
+              "asset": "memoryDoor",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "archiveSleeve",
-              "x": 68,
-              "y": 50,
-              "height": 77,
-              "rotation": 5,
-              "opacity": 1
+              "asset": "memoryWindow",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryFaces",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": -2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 118.4625,
           "id": "memory-cut-023",
-          "background": "morningVault",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "vacantDoor",
-              "x": 69,
-              "y": 52,
-              "height": 86,
-              "rotation": 0,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "roomTag",
-              "x": 37,
-              "y": 67,
-              "height": 29,
-              "rotation": 11,
-              "opacity": 1
+              "asset": "memoryDoor",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 118.75625,
@@ -1676,84 +1772,86 @@ window.TIMELINE = {
         {
           "t": 119.05,
           "id": "memory-cut-025",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "envelope",
-              "x": 69,
-              "y": 48,
-              "height": 73,
-              "rotation": -5,
-              "opacity": 1
+              "asset": "memoryTable",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "roomTag",
-              "x": 37,
-              "y": 67,
-              "height": 25,
-              "rotation": 10,
-              "opacity": 1
+              "asset": "memoryTable",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 119.34375,
           "id": "memory-cut-026",
-          "background": "paperVault",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "vacantDoor",
-              "x": 58,
-              "y": 52,
-              "height": 91,
-              "rotation": -2,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "roomKeys",
-              "x": 29,
-              "y": 67,
-              "height": 32,
-              "rotation": 11,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryRepair",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": -2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 119.6375,
           "id": "memory-cut-027",
-          "background": "blackStrings",
-          "layout": "split",
-          "layers": [
-            {
-              "asset": "roomKeys",
-              "x": 65,
-              "y": 55,
-              "height": 57,
-              "rotation": -7,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          "printLayout": "inset",
+          "printSplit": 0.61,
+          "printPanels": [
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.36
+            }
+          ]
         },
         {
           "t": 119.93125,
@@ -1780,94 +1878,86 @@ window.TIMELINE = {
         {
           "t": 120.225,
           "id": "memory-cut-029",
-          "background": "morningVault",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "rentReceipt",
-              "x": 63,
-              "y": 52,
-              "height": 87,
-              "rotation": 9,
-              "opacity": 1
+              "asset": "memoryTickets",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "bluePen",
-              "x": 34,
-              "y": 70,
-              "height": 23,
-              "rotation": -13,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 120.51875,
           "id": "memory-cut-030",
-          "background": "emptyWindows",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 29,
-              "y": 46,
-              "height": 87,
-              "rotation": -9,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryTelephone",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "frame",
-              "x": 67,
-              "y": 49,
-              "height": 74,
-              "rotation": 5,
-              "opacity": 1,
-              "content": "faceC"
+              "asset": "memoryStitches",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTickets",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": -2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 120.8125,
           "id": "memory-cut-031",
-          "background": "petalRoad",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "pressedFlower",
-              "x": 66,
-              "y": 51,
-              "height": 69,
-              "rotation": -6,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "residentNote",
-              "x": 34,
-              "y": 61,
-              "height": 32,
-              "rotation": 10,
-              "opacity": 1
+              "asset": "memoryRepair",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 121.10625,
@@ -1894,92 +1984,86 @@ window.TIMELINE = {
         {
           "t": 121.4,
           "id": "memory-cut-033",
-          "background": "archiveCut",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "memoryTrace",
-              "x": 62,
-              "y": 52,
-              "height": 87,
-              "rotation": 8,
-              "opacity": 1
+              "asset": "memoryStitches",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "pressedNote",
-              "x": 29,
-              "y": 66,
-              "height": 30,
-              "rotation": -7,
-              "opacity": 1
+              "asset": "memoryWindow",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 121.69375,
           "id": "memory-cut-034",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "envelope",
-              "x": 57,
-              "y": 53,
-              "height": 88,
-              "rotation": -7,
-              "opacity": 1
+              "asset": "memoryRepair",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "pressedFlower",
-              "x": 25,
-              "y": 69,
-              "height": 29,
-              "rotation": 7,
-              "opacity": 1
+              "asset": "memoryDoor",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryFaces",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": -2,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 121.9875,
           "id": "memory-cut-035",
-          "background": "archiveCut",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "memoryTrace",
-              "x": 65,
-              "y": 56,
-              "height": 93.09,
-              "rotation": 10,
-              "opacity": 1
+              "asset": "memoryParcel",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "pressedNote",
-              "x": 32,
-              "y": 70,
-              "height": 32.1,
-              "rotation": -5,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          ]
         },
         {
           "t": 122.28125,
@@ -2014,85 +2098,86 @@ window.TIMELINE = {
         {
           "t": 122.575,
           "id": "memory-cut-037",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
+          "layout": "cut",
           "splice": 0,
-          "cells": [
-            "roomKeys",
-            "bluePen",
-            "residentNote",
-            "pressedFlower",
-            "repairLedger",
-            "rentReceipt"
-          ],
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          "printLayout": "full",
+          "printSplit": 0.42,
+          "printPanels": [
+            {
+              "asset": "memoryWindow",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.53
+            }
+          ]
         },
         {
           "t": 122.86875,
           "id": "memory-cut-038",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 55,
-              "y": 57,
-              "height": 79.18,
-              "rotation": -7,
-              "opacity": 1
+              "asset": "memoryDoor",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "bluePen",
-              "x": 27,
-              "y": 74,
-              "height": 23.540000000000003,
-              "rotation": -16,
-              "opacity": 1
+              "asset": "memoryTickets",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryRepair",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": -4,
-            "fromY": 2
-          }
+          ]
         },
         {
           "t": 123.1625,
           "id": "memory-cut-039",
-          "background": "city",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 73,
-              "y": 73,
-              "height": 25.68,
-              "rotation": 4,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "rentReceipt",
-              "x": 53,
-              "y": 62,
-              "height": 32.1,
-              "rotation": 15,
-              "opacity": 1
+              "asset": "memoryTelephone",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.96,
-            "fromX": -14,
-            "fromY": 2
-          },
-          "weather": "rain",
-          "rainIntensity": 0.8
+          ]
         },
         {
           "t": 123.45625,
@@ -2129,84 +2214,86 @@ window.TIMELINE = {
         {
           "t": 123.75,
           "id": "memory-cut-041",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 41,
-              "y": 51,
-              "height": 87.74000000000001,
-              "rotation": -1,
-              "opacity": 1,
-              "content": "faceEmpty"
+              "asset": "memoryTable",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "archiveSleeve",
-              "x": 77,
-              "y": 54,
-              "height": 82.39,
-              "rotation": 11,
-              "opacity": 1
+              "asset": "memoryStitches",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          ]
         },
         {
           "t": 124.04375,
           "id": "memory-cut-042",
-          "background": "morningVault",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "vacantDoor",
-              "x": 60,
-              "y": 56,
-              "height": 92.02000000000001,
-              "rotation": -6,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "roomTag",
-              "x": 28,
-              "y": 71,
-              "height": 31.03,
-              "rotation": 5,
-              "opacity": 1
+              "asset": "memoryRepair",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTickets",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": -4,
-            "fromY": 2
-          }
+          ]
         },
         {
           "t": 124.3375,
           "id": "memory-cut-043",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
+          "layout": "cut",
           "splice": 0,
-          "cells": [
-            "emptyCup",
-            "pressedNote",
-            "looseKeys",
-            "archiveSleeve",
-            "envelope",
-            "roomTag"
-          ],
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          "printLayout": "triptych",
+          "printSplit": 0.42,
+          "printPanels": [
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryWindow",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.53
+            }
+          ]
         },
         {
           "t": 124.63125,
@@ -2241,76 +2328,86 @@ window.TIMELINE = {
         {
           "t": 124.925,
           "id": "memory-cut-045",
-          "background": "paperVault",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "vacantDoor",
-              "x": 67,
-              "y": 56,
-              "height": 97.37,
-              "rotation": 4,
-              "opacity": 1
+              "asset": "memoryTickets",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "roomKeys",
-              "x": 38,
-              "y": 71,
-              "height": 34.24,
-              "rotation": 17,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          ]
         },
         {
           "t": 125.21875,
           "id": "memory-cut-046",
-          "background": "blackStrings",
-          "layout": "split",
-          "layers": [
-            {
-              "asset": "roomKeys",
-              "x": 56,
-              "y": 59,
-              "height": 60.99,
-              "rotation": -13,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": -4,
-            "fromY": 2
-          }
+          "printLayout": "triptych",
+          "printSplit": 0.42,
+          "printPanels": [
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryFaces",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.53
+            }
+          ]
         },
         {
           "t": 125.5125,
           "id": "memory-cut-047",
-          "background": "voidCut",
-          "layout": "strips",
-          "layers": [
-            {
-              "asset": "looseKeys",
-              "x": 64,
-              "y": 55,
-              "height": 97.37,
-              "rotation": -7,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          "printLayout": "inset",
+          "printSplit": 0.5,
+          "printPanels": [
+            {
+              "asset": "memoryEnvelope",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryCups",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.64
+            }
+          ]
         },
         {
           "t": 125.80625,
@@ -2345,86 +2442,86 @@ window.TIMELINE = {
         {
           "t": 126.1,
           "id": "memory-cut-049",
-          "background": "emptyWindows",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 38,
-              "y": 50,
-              "height": 93.09,
-              "rotation": -3,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryStitches",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "frame",
-              "x": 76,
-              "y": 53,
-              "height": 79.18,
-              "rotation": 11,
-              "opacity": 1,
-              "content": "faceC"
+              "asset": "memoryTickets",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          ]
         },
         {
           "t": 126.39375,
           "id": "memory-cut-050",
-          "background": "petalRoad",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "pressedFlower",
-              "x": 57,
-              "y": 55,
-              "height": 73.83,
-              "rotation": -12,
-              "opacity": 1
+              "asset": "memoryRepair",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "residentNote",
-              "x": 25,
-              "y": 65,
-              "height": 34.24,
-              "rotation": 4,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryRepair",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": -4,
-            "fromY": 2
-          }
+          ]
         },
         {
           "t": 126.6875,
           "id": "memory-cut-051",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
-            {
-              "asset": "petalBlush",
-              "x": 68,
-              "y": 57,
-              "height": 37.45,
-              "rotation": -14,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.24,
-            "fromX": 4,
-            "fromY": 2
-          }
+          "printLayout": "full",
+          "printSplit": 0.61,
+          "printPanels": [
+            {
+              "asset": "memoryParcel",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.36
+            }
+          ]
         },
         {
           "t": 126.98125,
@@ -2459,84 +2556,86 @@ window.TIMELINE = {
         {
           "t": 127.275,
           "id": "memory-cut-053",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
-            {
-              "asset": "petalBlush",
-              "x": 71,
-              "y": 49,
-              "height": 32.55,
-              "rotation": -18,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          "printLayout": "inset",
+          "printSplit": 0.5,
+          "printPanels": [
+            {
+              "asset": "memoryWindow",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.64
+            }
+          ]
         },
         {
           "t": 127.56875,
           "id": "memory-cut-054",
-          "background": "archiveCut",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "memoryTrace",
-              "x": 50,
-              "y": 48,
-              "height": 80.91,
-              "rotation": 6,
-              "opacity": 1
+              "asset": "memoryDoor",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "pressedNote",
-              "x": 17,
-              "y": 62,
-              "height": 27.9,
-              "rotation": -9,
-              "opacity": 1
+              "asset": "memoryWindow",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTickets",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": -6,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 127.8625,
           "id": "memory-cut-055",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "envelope",
-              "x": 69,
-              "y": 49,
-              "height": 81.83999999999999,
-              "rotation": -5,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "pressedFlower",
-              "x": 37,
-              "y": 65,
-              "height": 26.97,
-              "rotation": 9,
-              "opacity": 1
+              "asset": "memoryDoor",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 128.15625,
@@ -2562,96 +2661,86 @@ window.TIMELINE = {
         {
           "t": 128.45,
           "id": "memory-cut-057",
-          "background": "voidCut",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 70,
-              "y": 49,
-              "height": 68.82,
-              "rotation": -3,
-              "opacity": 1
+              "asset": "memoryTable",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "bluePen",
-              "x": 42,
-              "y": 66,
-              "height": 20.459999999999997,
-              "rotation": -12,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 128.74375,
           "id": "memory-cut-058",
-          "background": "city",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 58,
-              "y": 65,
-              "height": 22.32,
-              "rotation": 0,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "rentReceipt",
-              "x": 38,
-              "y": 54,
-              "height": 27.9,
-              "rotation": 11,
-              "opacity": 1
+              "asset": "memoryUmbrella",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryFaces",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.8,
-            "fromX": -24,
-            "fromY": -2
-          },
-          "weather": "rain",
-          "rainIntensity": 0.8
+          ]
         },
         {
           "t": 129.0375,
           "id": "memory-cut-059",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 38,
-              "y": 43,
-              "height": 76.25999999999999,
-              "rotation": -6,
-              "opacity": 1,
-              "content": "faceB"
+              "asset": "memoryUmbrella",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "frame",
-              "x": 77,
-              "y": 41,
-              "height": 90.21,
-              "rotation": 5,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryTickets",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 129.33125,
@@ -2687,83 +2776,86 @@ window.TIMELINE = {
         {
           "t": 129.625,
           "id": "memory-cut-061",
-          "background": "morningVault",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "vacantDoor",
-              "x": 75,
-              "y": 48,
-              "height": 79.97999999999999,
-              "rotation": -2,
-              "opacity": 1
+              "asset": "memoryTickets",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "roomTag",
-              "x": 43,
-              "y": 63,
-              "height": 26.97,
-              "rotation": 9,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 129.91875,
           "id": "memory-cut-062",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
+          "layout": "cut",
           "splice": 0,
-          "cells": [
-            "pressedNote",
-            "looseKeys",
-            "archiveSleeve",
-            "envelope",
-            "roomTag",
-            "emptyCup"
-          ],
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": -6,
-            "fromY": -2
-          }
+          "printLayout": "diagonal",
+          "printSplit": 0.5,
+          "printPanels": [
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.5,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryRepair",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.64
+            }
+          ]
         },
         {
           "t": 130.2125,
           "id": "memory-cut-063",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "envelope",
-              "x": 75,
-              "y": 44,
-              "height": 67.89,
-              "rotation": -7,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1.3599999999999999,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "roomTag",
-              "x": 43,
-              "y": 63,
-              "height": 23.25,
-              "rotation": 8,
-              "opacity": 1
+              "asset": "memoryRepair",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 130.50625,
@@ -2798,76 +2890,86 @@ window.TIMELINE = {
         {
           "t": 130.8,
           "id": "memory-cut-065",
-          "background": "blackStrings",
-          "layout": "split",
-          "layers": [
-            {
-              "asset": "roomKeys",
-              "x": 71,
-              "y": 51,
-              "height": 53.01,
-              "rotation": -9,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          "printLayout": "diagonal",
+          "printSplit": 0.5,
+          "printPanels": [
+            {
+              "asset": "memoryStitches",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
+            }
+          ]
         },
         {
           "t": 131.09375,
           "id": "memory-cut-066",
-          "background": "voidCut",
-          "layout": "strips",
-          "layers": [
-            {
-              "asset": "looseKeys",
-              "x": 49,
-              "y": 47,
-              "height": 84.63,
-              "rotation": -11,
-              "opacity": 1
-            }
-          ],
+          "layout": "cut",
           "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": -6,
-            "fromY": -2
-          }
+          "printLayout": "triptych",
+          "printSplit": 0.61,
+          "printPanels": [
+            {
+              "asset": "memoryRepair",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryFaces",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTickets",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
+            }
+          ]
         },
         {
           "t": 131.3875,
           "id": "memory-cut-067",
-          "background": "morningVault",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "rentReceipt",
-              "x": 69,
-              "y": 48,
-              "height": 80.91,
-              "rotation": 7,
-              "opacity": 1
+              "asset": "memoryParcel",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "bluePen",
-              "x": 40,
-              "y": 66,
-              "height": 21.389999999999997,
-              "rotation": -15,
-              "opacity": 1
+              "asset": "memoryTable",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.08,
-            "fromX": 6,
-            "fromY": -2
-          }
+          ]
         },
         {
           "t": 131.68125,
@@ -2904,94 +3006,86 @@ window.TIMELINE = {
         {
           "t": 131.975,
           "id": "memory-cut-069",
-          "background": "morningVault",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "triptych",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "rentReceipt",
-              "x": 60,
-              "y": 52,
-              "height": 87,
-              "rotation": 9,
-              "opacity": 1
+              "asset": "memoryWindow",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "bluePen",
-              "x": 31,
-              "y": 70,
-              "height": 23,
-              "rotation": -13,
-              "opacity": 1
+              "asset": "memoryUmbrella",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryStitches",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 132.26875,
           "id": "memory-cut-070",
-          "background": "emptyWindows",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 32,
-              "y": 46,
-              "height": 87,
-              "rotation": -9,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryDoor",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "frame",
-              "x": 70,
-              "y": 49,
-              "height": 74,
-              "rotation": 5,
-              "opacity": 1,
-              "content": "faceC"
+              "asset": "memoryTickets",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryFaces",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 132.5625,
           "id": "memory-cut-071",
-          "background": "petalRoad",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "pressedFlower",
-              "x": 63,
-              "y": 51,
-              "height": 69,
-              "rotation": -6,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "residentNote",
-              "x": 31,
-              "y": 61,
-              "height": 32,
-              "rotation": 10,
-              "opacity": 1
+              "asset": "memoryEnvelope",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryTelephone",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 132.85625,
@@ -3018,83 +3112,86 @@ window.TIMELINE = {
         {
           "t": 133.15,
           "id": "memory-cut-073",
-          "background": "archiveCut",
-          "layout": "split",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "inset",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "memoryTrace",
-              "x": 59,
-              "y": 52,
-              "height": 87,
-              "rotation": 8,
-              "opacity": 1
+              "asset": "memoryTable",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "pressedNote",
-              "x": 26,
-              "y": 66,
-              "height": 30,
-              "rotation": -7,
-              "opacity": 1
+              "asset": "memoryRepair",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 133.44375,
           "id": "memory-cut-074",
-          "background": "petalRoad",
-          "layout": "aperture",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "envelope",
-              "x": 60,
-              "y": 53,
-              "height": 88,
-              "rotation": -7,
-              "opacity": 1
+              "asset": "memoryCups",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "pressedFlower",
-              "x": 28,
-              "y": 69,
-              "height": 29,
-              "rotation": 7,
-              "opacity": 1
+              "asset": "memoryParcel",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryRepair",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 133.7375,
           "id": "memory-cut-075",
-          "background": "paperVault",
-          "layout": "contact",
-          "layers": [],
+          "layout": "cut",
           "splice": 0,
-          "cells": [
-            "residentNote",
-            "pressedFlower",
-            "repairLedger",
-            "rentReceipt",
-            "roomKeys",
-            "bluePen"
-          ],
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          "printLayout": "diptych",
+          "printSplit": 0.61,
+          "printPanels": [
+            {
+              "asset": "memoryUmbrella",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryWindow",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTable",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
+            }
+          ]
         },
         {
           "t": 134.03125,
@@ -3129,97 +3226,86 @@ window.TIMELINE = {
         {
           "t": 134.325,
           "id": "memory-cut-077",
-          "background": "city",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "full",
+          "printSplit": 0.5,
+          "printPanels": [
             {
-              "asset": "emptyCup",
-              "x": 67,
-              "y": 69,
-              "height": 24,
-              "rotation": 2,
-              "opacity": 1
+              "asset": "memoryTickets",
+              "zoom": 1,
+              "focusX": 0.5,
+              "focusY": 0.53
             },
             {
-              "asset": "rentReceipt",
-              "x": 47,
-              "y": 58,
-              "height": 30,
-              "rotation": 13,
-              "opacity": 1
+              "asset": "memoryFaces",
+              "zoom": 1.12,
+              "focusX": 0.66,
+              "focusY": 0.36
+            },
+            {
+              "asset": "memoryDoor",
+              "zoom": 1.24,
+              "focusX": 0.35,
+              "focusY": 0.64
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.8800000000000001,
-            "fromX": -18,
-            "fromY": 0
-          },
-          "weather": "rain",
-          "rainIntensity": 0.8
+          ]
         },
         {
           "t": 134.61875,
           "id": "memory-cut-078",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diptych",
+          "printSplit": 0.61,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 29,
-              "y": 47,
-              "height": 82,
-              "rotation": -8,
-              "opacity": 1,
-              "content": "faceB"
+              "asset": "memoryTelephone",
+              "zoom": 1,
+              "focusX": 0.66,
+              "focusY": 0.64
             },
             {
-              "asset": "frame",
-              "x": 68,
-              "y": 45,
-              "height": 97,
-              "rotation": 3,
-              "opacity": 1,
-              "content": "faceA"
+              "asset": "memoryCups",
+              "zoom": 1.12,
+              "focusX": 0.35,
+              "focusY": 0.53
+            },
+            {
+              "asset": "memoryTickets",
+              "zoom": 1.24,
+              "focusX": 0.5,
+              "focusY": 0.36
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 134.9125,
           "id": "memory-cut-079",
-          "background": "emptyWindows",
-          "layout": "strips",
-          "layers": [
+          "layout": "cut",
+          "splice": 0,
+          "printLayout": "diagonal",
+          "printSplit": 0.42,
+          "printPanels": [
             {
-              "asset": "frame",
-              "x": 35,
-              "y": 47,
-              "height": 82,
-              "rotation": -3,
-              "opacity": 1,
-              "content": "faceEmpty"
+              "asset": "memoryEnvelope",
+              "zoom": 1,
+              "focusX": 0.35,
+              "focusY": 0.36
             },
             {
-              "asset": "archiveSleeve",
-              "x": 71,
-              "y": 50,
-              "height": 77,
-              "rotation": 9,
-              "opacity": 1
+              "asset": "memoryUmbrella",
+              "zoom": 1.12,
+              "focusX": 0.5,
+              "focusY": 0.64
+            },
+            {
+              "asset": "memoryParcel",
+              "zoom": 1.24,
+              "focusX": 0.66,
+              "focusY": 0.53
             }
-          ],
-          "splice": 0,
-          "backgroundMotion": {
-            "zoom": 1.1600000000000001,
-            "fromX": 0,
-            "fromY": 0
-          }
+          ]
         },
         {
           "t": 135.20625,

@@ -11,9 +11,9 @@
     const old = has(m,'keys','ledger') || m.has('oldKeys');
     const exit = m.has('entry') || m.has('freeExit');
     const after = has(m,'call','rescue') || m.has('afterCall');
-    const knew = has(m,'report','receipt') || m.has('knowledge') || m.has('withheld');
-    const gap = has(m,'report','notice') || m.has('noticeGap') || m.has('withheld');
-    const withheld = m.has('withheld') || (knew && (m.has('notice') || gap)) || (gap && m.has('receipt'));
+    const knew = has(m,'report','receipt') || m.has('knowledge');
+    const gap = has(m,'report','notice') || m.has('noticeGap');
+    const withheld = has(m,'knowledge','notice') || has(m,'noticeGap','receipt') || has(m,'knowledge','noticeGap');
     switch (claim) {
       case 'oldKeys':
         if(old) return reply('supported',['是他们搬走以后交回的。牌子是自己写的，我就一直留着。','这串开不了现在的锁。你不能拿它说，我收走了当晚住客的钥匙。'],'实物编号与退住日期相符。这项结论只针对这串钥匙。','oldKeys');
@@ -44,6 +44,7 @@
         if(gap) return reply('supported',['告示是我写的。我写了维修，写了再等三天。','没有把停止住宿那段贴出去。'],'对照确认两份文本存在关键差异；她何时收到原件仍可继续核对。','noticeGap');
         return reply('incomplete',['你要比的是哪两份？住客看到的那张，也在前台。'],'需要同时比较原要求与实际告示。');
       case 'withheld':
+        if(!m.has('knowledge')&&!m.has('noticeGap'))return reply('incomplete',['先分清我收到过什么，或者两张告知差在哪里，再把结论接到新材料上。'],'这一条必须使用已核实推论：先做“她已收到完整要求”或“两份告知存在差异”，再与另一份原件组合。三份原始线索不能跳过这层核对。');
         if(withheld) return reply('supported',['报告我看了。我没有把整份给他们。','你要问为什么……因为他们看完就会走。','以前每次差一点，我都补过去了。这次我也想先把楼保住。'],'确认了知悉与告知之间的差异；这不等于证明她希望伤害发生。','withheld');
         if(gap) return reply('incomplete',['两张确实不一样。你问我当时收到的是哪一份？'],'告示有省略，但还需要确认她收到完整要求的事实。');
         if(knew) return reply('incomplete',['我收到过。你现在要核对，他们看见的是什么，对吧？'],'收到报告与向住客告知，是两个需要分别核实的事实。');

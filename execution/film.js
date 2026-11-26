@@ -37,15 +37,28 @@
     }
 
     loadGroup(group) {
-      return Object.fromEntries(Object.entries(group || {}).map(([key, src]) => {
-        if(this.assetCache.has(src))return [key,this.assetCache.get(src)];
-        const image = new Image();
-        const asset = { image, ready: false, src };
-        this.assetCache.set(src,asset);
-        image.onload = () => { asset.ready = true; this.needsPaint = true; };
-        image.onerror = () => { asset.failed=true; this.needsPaint=true; };
-        image.decoding = 'async'; image.src = src;
-        return [key, asset];
+      return Object.fromEntries(Object.entries(group || {}).map(([key, value]) => {
+        const config=typeof value==='string'?{src:value}:value,src=config.src;
+        let source=this.assetCache.get(src);
+        if(!source){
+          const image=new Image();source={image,ready:false,src};this.assetCache.set(src,source);
+          image.onload=()=>{source.ready=true;this.needsPaint=true;};
+          image.onerror=()=>{source.failed=true;this.needsPaint=true;};
+          image.decoding='async';image.src=src;
+        }
+        if(!config.cell)return [key,source];
+        const cellKey=src+'#'+config.cell.join(',');
+        if(this.assetCache.has(cellKey))return [key,this.assetCache.get(cellKey)];
+        const canvas=document.createElement('canvas'),asset={image:canvas,ready:false,src};
+        this.assetCache.set(cellKey,asset);
+        const crop=()=>{
+          const [x,y,columns,rows]=config.cell,sw=source.image.width/columns,sh=source.image.height/rows;
+          canvas.width=Math.round(sw);canvas.height=Math.round(sh);
+          canvas.getContext('2d').drawImage(source.image,x*sw,y*sh,sw,sh,0,0,canvas.width,canvas.height);
+          asset.ready=true;this.needsPaint=true;
+        };
+        if(source.ready)crop();else{source.image.addEventListener('load',crop,{once:true});source.image.addEventListener('error',()=>{asset.failed=true;},{once:true});}
+        return [key,asset];
       }));
     }
 
@@ -552,11 +565,36 @@
     }
 
     flashbackLayerAllowed(layer) {
-      return ![layer.asset,layer.content].some(key=>/^assets\/character\//.test(this.data.props[key]||''));
+      return ![layer.asset,layer.content].some(key=>{const value=this.data.props[key];return /^assets\/character\//.test(typeof value==='string'?value:value?.src||'');});
+    }
+
+    printedMemory(ctx,cue){
+      const w=this.width,h=this.height,panels=cue.printPanels||[],layout=cue.printLayout||'diptych',gap=Math.max(3,h*.012);
+      const draw=(index,x,y,width,height)=>{
+        const panel=panels[index%panels.length],asset=this.props[panel.asset];
+        ctx.save();ctx.beginPath();ctx.rect(x,y,width,height);ctx.clip();ctx.fillStyle='#211923';ctx.fillRect(x,y,width,height);
+        if(asset?.ready&&this.flashbackLayerAllowed(panel)){
+          const img=asset.image,zoom=panel.zoom||1,sw=Math.min(img.width,img.width/zoom),sh=Math.min(img.height,img.height/zoom);
+          const cropW=Math.min(sw,sh*width/height),cropH=cropW*height/width;
+          const px=clamp(panel.focusX??.5),py=clamp(panel.focusY??.5);
+          ctx.drawImage(img,(img.width-cropW)*px,(img.height-cropH)*py,cropW,cropH,x,y,width,height);
+        }
+        ctx.restore();
+      };
+      ctx.fillStyle='#ead8c4';ctx.fillRect(0,0,w,h);
+      if(layout==='full')draw(0,0,0,w,h);
+      else if(layout==='triptych')for(let i=0;i<3;i++)draw(i,i*(w+gap)/3,0,(w-2*gap)/3,h);
+      else if(layout==='diagonal'){
+        draw(0,0,0,w,h);ctx.save();ctx.beginPath();ctx.moveTo(w*.55,0);ctx.lineTo(w,0);ctx.lineTo(w,h);ctx.lineTo(w*.42,h);ctx.closePath();ctx.clip();draw(1,w*.25,0,w*.75,h);ctx.restore();
+        ctx.strokeStyle='#ead8c4';ctx.lineWidth=gap;ctx.beginPath();ctx.moveTo(w*.55,0);ctx.lineTo(w*.42,h);ctx.stroke();
+      }else if(layout==='inset'){
+        draw(0,0,0,w,h);const x=w*.6,y=h*.13,width=w*.31,height=h*.74;ctx.fillRect(x-gap,y-gap,width+gap*2,height+gap*2);draw(1,x,y,width,height);
+      }else{const split=w*(cue.printSplit||.5);draw(0,0,0,split-gap/2,h);draw(1,split+gap/2,0,w-split-gap/2,h);}
     }
 
     flashbackPlate(ctx, scene, cue, end, t) {
       fill(ctx,this.width,this.height,'#17131b');
+      if(cue.printPanels?.length){this.printedMemory(ctx,cue);return;}
       const source=this.data.scenes.find(s=>s.id===cue.sourceScene && !s.flashbacks);
       if (source) {
         const sourceTime=(cue.sourceTime??source.t) + (this.reducedMotion?0:Math.max(0,t-cue.t)*(cue.sourceSpeed??.15));

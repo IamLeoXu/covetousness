@@ -20,6 +20,7 @@
     }
     if(!open('builder'))return step('case-open-builder','#buildButton','下一步 / 比较原件','线索已保存。现在点击右下方“比较原件”，把两份记录放到同一张编辑台上核对。');
     if(b.topic!=='keys')return step('case-select-file','[data-topic="keys"]','先回到这一项问题','本次练习核对“别走”的语境。点“最初的指控”，其他卷宗稍后再查。');
+    if(!t().seen.includes('builder-layout'))return step('case-builder-layout','#builderMap','上方是卷宗，下方是来源位','A/B/C 用来切换调查问题；下面 1、2、3 是同一句说法的三个来源位，两组编号没有配对关系。先选说法，再选能互相支持的材料：顺序不限，不必填满。原始材料与已核实推论可以混用，切换标签不清空来源。',{ack:'开始这次组合',seen:['builder-layout']});
     if(!c.callCompared){
       if(open('viewer'))return closeViewer('case-call-read','看清两个信息：受话人是安置站值班员；通话开始于 22:19。我们没有从一句“别走”猜它是在对住客下命令。');
       return step('case-inspect-call','[data-inspect="call"]','先看内容 / 还不放进来源位','点击“原始通话”右上角的 ↗。大按钮是把材料放进组合，↗ 才是重看原件；这次先读原件。');
@@ -34,48 +35,54 @@
     if(!window.Radio.canRecord())return step('case-arm','#editArm','准备记录这一次追问','ARM 让这次采访录音待命。它本身不增加新证据；修改说法或来源后会解除待命。');
     return step('case-record','#submitArgument','现在提出追问，听她回答','点击 REC / TAKE。程序会检查组合是否支持这句话，并记录小春的回应。这才是第一次组合推论的提交。');
   }
-  function lifeLesson(){
-    const s=state(),l=t().life,viewer=G.viewerId();
-    if(l.puzzleDone)return lifeWrap();
-    if(!l.opened)return step('life-talk','#talkPerson','下一种操作 / 和她聊聊','刚才核对了公开指控，但这不等于认识了她。点击“和小春谈谈”，从一份具体的旧档开始问。');
-    if(!open('profileDialog'))return step('life-reopen','#profileButton','人物档案在这里','点击“人物侧写”继续。案件来源和人生来源分别保存，人物片段不能直接当作新的定罪证据。');
-    if(s.lifeFocus!=='break')return step('life-choose-episode','[data-life-event="break"]','一次只追一段经历','先选择 21 岁的这一项。我们练习从一份行程追到原信，再向她提出一个能回答的问题。');
-    if(!l.letterRead){
-      if(open('viewer')){
-        if(viewer==='lifeLetter')return closeViewer('life-read-letter','原信明确写了“结束”；后来的行程没有获得对方确认。两份记录可以比较，不能只凭她还留着行程，就替另一方补上承诺。');
-        if(viewer==='lifeVisit')return step('life-open-attachment','[data-follow-up="lifeLetter"]','新的操作 / 原件还有随附材料','看见装订线索了吗？点击这一张附页，读完整原信。以后遇到附件号、回单或签收页，也可以这样继续追。');
-        return closeViewer('life-other-source','读完这页，先回到当前经历。附页会留在档案中，不会因为返回而丢失。');
-      }
-      return step('life-open-file','[data-life-source="lifeVisit"]','先调原件，再提问','打开“没有得到确认的探望行程”。留意日期、对方确认栏，以及下面还能点开的装订原信。');
+  function lifeModule(){
+    const s=state(),seen=t().seen,tab=document.querySelector('[data-life-mode].active')?.dataset.lifeMode;
+    if(tab==='connections')return contextual();
+    if(tab==='portrait'){
+      if(seen.includes('module-life-portrait'))return null;
+      if(window.Programme.adopted(s).length)return step('portrait-done','#checkProfile','年代核对会保留','拼图记录你已经知道的经历，不决定本期采用什么。要播一条人物解读，到播出单 B 轨选择，依据会一起带入。',{ack:'继续看档案',seen:['module-life-portrait']});
+      const pieces=window.InquiryData.lifePieces(s);
+      if(!pieces.length)return step('portrait-no-pieces','[data-life-mode="inquiry"]','拼图需要有来源的经历','先在“经历核对”打开一份旧档并保存片段。这里可以保留空白，不要求你完整了解她才允许下结论。',{ack:'知道了',seen:['module-life-portrait']});
+      const selected=document.querySelector('[data-fragment].selected')?.dataset.fragment;
+      if(!selected){if(s.profileSlots.some(Boolean))return step('portrait-check','#checkProfile','核对你放入的年代','确认的日期会永久保存。以后在 B 轨换人物解读，不需要再拼一次。');return step('portrait-pick',document.querySelector('[data-fragment]:not(:disabled)'),'先选一段已有经历','点一块已取得的片段。再按它的日期放进左侧的位置；也可以拖放。');}
+      const index=D.lifeEpisodes.findIndex(e=>e.id===selected);
+      if(s.profileSlots[index]!==selected)return step('portrait-place','[data-puzzle-slot="'+index+'"]','把经历放回相应的年龄','看原档日期，把这一段放在 '+D.lifeEpisodes[index].age+' 岁。没有取得的其他经历可以留空。');
+      return step('portrait-check','#checkProfile','核对年代，保存这次调查','这里确认的是发生顺序，不是选择播出内容。确认后这段经历会在素材库保留。');
     }
-    if(!s.lifeSolved.includes('break')){
-      if(open('conversation')){
-        const choices=[...document.querySelectorAll('#conversationChoices button')],ask=D.lifeEpisodes.find(item=>item.id==='break').interview.options.find(item=>item.id==='ask');
-        if(choices.length)return step('life-ask-question',choices.find(node=>node.textContent===ask.text),'问一个记录能回答的问题','先问探望是否双方约好。预先替她定性，会让她回应你的假设，而不是补上我们缺少的事实。');
-        return step('life-read-answer','#conversationNext','把回答读完','这是一次补访。读到最后，相关转录会保存在这段经历里，再与原信互证。');
-      }
-      if(!s.collected.includes('lifeBreakVoice'))return step('life-interview','#lifeInterview','现在和她谈这件具体的事','原件读过了。点击“继续补访”，由你选择问题，再听她确认那份行程是谁安排的。');
-      if(!document.querySelector('.life-deep')?.open)return step('life-expand-reconstruction','.life-deep>summary','把两个来源重建成一件事','展开这里。原信和补访都在手边，现在才判断这一段究竟发生了什么。');
-      const chosen=document.querySelector('[data-event-choice].selected')?.dataset.eventChoice;
-      if(!chosen||chosen===l.lastWrong)return step('life-choose-reading','.life-event-options','请从两份来源推到事件','原信已明确结束；行程没有双方确认。选出同时保留这两个事实的读法，再提交核对。');
-      return step('life-verify','#verifyLifeEvent','核对这段经历','点击 VERIFY。若解释超出了材料，会得到具体反馈，可以修改；读过文件与真正重建出事件是两回事。');
+    if(seen.includes('module-life-inquiry'))return null;
+    const e=D.lifeEpisodes.find(e=>e.id===s.lifeFocus)||D.lifeEpisodes[0],read=s.collected.includes(e.primary),deep=s.collected.includes(e.sources[0]),heard=s.collected.includes(e.sources[1]);
+    if(open('viewer')){
+      const attachment=document.querySelector('#viewer [data-follow-up="'+e.sources[0]+'"]');
+      if(!deep&&shown(attachment))return step('life-open-attachment',attachment,'原档还装订着另一份材料','点击这份附页。先比较两个来源，再判断它们能支持什么；不是所有重要内容都在第一次打开的页面里。');
+      return closeViewer('life-read-file','读完这份原件，点击这里回到当前经历。原件与附页会保留，不必重新寻找。');
     }
-    if(!(s.facts.includes('profileSketch')||s.facts.includes('profileComplete'))||s.profileSlots[3]!=='break'){
-      if(!$('puzzleBoard'))return step('life-to-puzzle',$('useLifePieces')||document.querySelector('[data-life-mode="portrait"]'),'把已核对的事件放进侧写','这一段经历已经核对。现在去拼图，按日期把它放回去；其他没有调查的部分可以留空。');
-      if(s.profileSlots[3]==='break')return step('life-adopt','#checkProfile','采用这个有来源的片段','确认当前侧写。它记录的是已掌握的部分，还不能凭这一片就给整个人定性。');
-      if(!document.querySelector('[data-fragment="break"].selected'))return step('life-select-piece','[data-fragment="break"]','先选这块已取得的经历','点击“没有读的最后一句”这块碎片。没有调查的片段仍然是空白，不会自动替你补完。');
-      return step('life-place-piece','[data-puzzle-slot="3"]','对照日期 / 放回 21 岁','把这一段放到 21 岁的位置。它与将来取得的另一段经历，还可以连成更完整的人物推断。');
+    if(s.lifeSolved.includes(e.id))return step('life-inquiry-done','.life-event-coda','这段经历已经重建','旧档、附页与补访共同支持了这一件事。其他经历由你决定是否继续追；“关系连接”和“拼图”会在你自己打开时分别说明。',{ack:'继续调查',seen:['module-life-inquiry']});
+    if(open('conversation')){
+      const choices=[...document.querySelectorAll('#conversationChoices button')],ask=e.interview.options.find(item=>item.id==='ask');
+      if(choices.length)return step('life-ask-question',choices.find(node=>node.textContent===ask.text)||choices[0],'这是补访，不是台内闲聊','根据原档缺少的信息提出问题。补访回答会留在这段经历的来源里；不能凭一段闲谈跳过核实。');
+      return step('life-read-answer','#conversationNext','读完她对这件事的回答','可以点“上一页”回看。翻页不会重复获得线索，也不会撤销调查结果。');
     }
-    l.puzzleDone=true;
-    return lifeWrap();
+    if(!read)return step('life-open-file','[data-life-source="'+e.primary+'"]','先看你选中的这一份旧档','人生档案的任务是调查具体经历。打开原件，留意日期、旁证和随附材料；其他索引暂时不用一起处理。');
+    if(!deep)return step('life-deep-source','[data-life-source="'+e.primary+'"]','回原档查看附页','这段经历还缺一份独立材料。原档下方的装订线索可以继续点开，不要急着采用表层印象。');
+    if(!heard)return step('life-interview','#lifeInterview','向她核实这件具体的事','点击补访，由你选择问题。和工作台上的“谈谈”不同，这里有明确原件和需要核实的事实。');
+    if(!document.querySelector('.life-deep')?.open)return step('life-expand-reconstruction','.life-deep>summary','用两份来源重建事件','展开选项。现在才判断这一段发生了什么；读完材料与得出有依据的结论是两回事。');
+    const choice=document.querySelector('[data-event-choice].selected')?.dataset.eventChoice;
+    if(!choice||choice===t().life.lastWrong)return step('life-choose-reading','.life-event-options','选一个没有超出材料的解释','把原件与回答放在一起看。选项不是给她打好坏分，而是判断这一件事；错误可以修改。');
+    return step('life-verify','#verifyLifeEvent','提交这段经历的重建','点击核对。通过后保存这段事件，尚未调查的部分仍然保持空白。');
   }
-  function lifeWrap(){
-    if(open('profileDialog'))return step('life-close',footerClose('profileDialog'),'回到取材桌','一次人物补访和拼图已经走完。正式定性仍要相关两段经历与一条关系；不需要填满六段。先返回取材桌。');
-    if(!t().seen.includes('notebook')){
-      if(open('notebook'))return step('notebook-read',footerClose('notebook'),'你的取材笔记','这里分别保留案件推论和人物记录，也保留尚未核查的问题。读完返回，调查进度会自动保存。');
-      return step('notebook-open','#notebookButton','最后认识一个入口 / 取材笔记','点击 CASE NOTES。以后忘了哪些已经核实、哪些还只是猜测，可以随时回到这里。');
-    }
-    return step('lesson-finish','[data-layer="notice"]','第一次值班练习完成','你已经亲自完成：调原件、比较时间、组合追问、采访、追附页、重建经历和放置拼图。接下来继续查“危险与告知”；新的关系连接与播出操作，第一次用到时我还会带你。',{ack:'继续值班',finish:true});
+  function currentModule(){
+    if(open('rundownDialog')||open('radioScript')&&!open('builder'))return 'rundown';
+    if(open('ending'))return 'ending';
+    if(open('profileDialog'))return 'life-'+(document.querySelector('[data-life-mode].active')?.dataset.lifeMode||'inquiry');
+    if(open('conversation')&&$('conversation').dataset.module==='talk')return 'talk';
+    if(open('notebook'))return 'notebook';
+    return 'case';
+  }
+  function skipModule(){
+    const module=currentModule();
+    const keys={rundown:['pgm-library','rundown'],ending:['ending-review'],talk:['module-talk'],notebook:['notebook'],'life-inquiry':['module-life-inquiry'],'life-connections':['relations'],'life-portrait':['module-life-portrait']};
+    if(module==='case'){t().core.done=true;t().complete=true;}else for(const key of keys[module]||[])mark(key);
+    persist();lastStep='';refresh();
   }
   function contextual(){
     const s=state(),viewer=G.viewerId(),seen=t().seen;
@@ -84,34 +91,38 @@
     if(open('profileDialog')&&document.querySelector('.life-connections')&&!seen.includes('relations')){
       const active=document.querySelector('[data-life-link].active');if(!active)return null;
       const link=D.lifeConnections[Number(active.dataset.lifeLink)];
-      if(s.lifeLinks.includes(link.id)){mark('relations');persist();return step('relation-done','.life-link-coda','关系核对完成','这条关系把两段有来源的经历接起来。采用对应两块侧写后，它能进入人物链；不需要先查完其他四段。',{ack:'继续取材'});}
+      if(s.lifeLinks.includes(link.id)){mark('relations');persist();return step('relation-done','.life-link-coda','关系核对完成','这条关系把两段有来源的经历接起来。拼图核对相关两段的年代后，播出单 B 轨可以一次采用它和两份依据；不需要先查完其他四段。',{ack:'继续取材'});}
       if($('linkEvent0')?.value!==link.pair[0])return step('relation-first','#linkEvent0','新的操作 / 连接两段经历','左边选择“'+D.lifeEpisodes.find(item=>item.id===link.pair[0]).name+'”。先摆事实，关系不是再给她贴一个空标签。');
       if($('linkEvent1')?.value!==link.pair[1])return step('relation-second','#linkEvent1','放入另一段经历','右边选择“'+D.lifeEpisodes.find(item=>item.id===link.pair[1]).name+'”。接下来找能同时保留两段事实的解释。');
       const choice=document.querySelector('[data-link-choice].selected')?.dataset.linkChoice;
       if(!choice||choice===t().lastRelationWrong)return step('relation-reading','.life-connections .life-event-options','这两件事之间，能推出什么？','选择一个同时容纳两段事实的读法。不能用后来的遗憾倒改先后，也不能用一次善意抹去另一项过错。');
       return step('relation-verify','#verifyLifeLink','提交你连接出的关系','核对通过后，它会作为人物推断保留。若选错仍可以调整，原件不会丢失。');
     }
+    if(open('builder')&&['withheld','rescueContext','causationLimit'].includes(s.builder.claim)&&!seen.includes('inference-bridge'))return step('inference-bridge','#claimRole','深层推论必须站在上一层结果上','这一类不能只靠原始材料跳过去。左侧切换“已核实推论”或“全部材料”，把已核实结果和新原件放入同一组；第三个来源位是否需要，取决于你要证明什么。核实过的推论也可直接送 PGM，不需要重做。',{ack:'继续组合',seen:['inference-bridge','reuse-facts']});
     if(open('builder')&&!seen.includes('reuse-facts')&&[...document.querySelectorAll('[data-source="facts"]')].some(node=>!node.textContent.trim().endsWith('0')))return step('facts-tab','[data-source="facts"]','新的操作 / 推论也可以继续组合','点击“已核实推论”。之前做出的有依据的结论可以与别的来源继续组合；但一条结论不能拿来证明它自己。');
+    if(open('rundownDialog')&&!open('radioScript')&&!seen.includes('pgm-library'))return step('rundown-library','#programmeGuide','先分清素材库和 PGM','素材库保留已经核实的推论、经历和人物关系。展开某轨勾选，再接入 PGM；换内容只需要重新 CUE，不用重新推理或补访。人物关系可以连同相关两段一起换入 B。',{ack:'选择本期采用的素材',seen:['pgm-library']});
     if(open('rundownDialog')&&!seen.includes('rundown')){
       if(open('radioScript'))return step('rundown-confirm','#radioScriptConfirm','这是实际将采用的版本','没有接入的轨道不会自动播出。确认这份稿件，再回播出单检查本期是否已经构成完整论证。');
+      if(!s.radio.queued.length&&!Object.values(s.radio.cuts||{}).some(keys=>keys.length)){const picker=document.querySelector('.rundown-card.available [data-cut-picker]');if(picker&&!picker.open)return step('rundown-open-library',picker.querySelector('summary'),'先展开已有素材','这里存放的是已核实结果，不是再做一遍推理。展开后可以挑本期要保留的内容。');const first=picker?.querySelector('input[data-pgm-cut]:not(:disabled)');if(first)return step('rundown-select-cut',first.closest('label'),'勾选本期采用的一条内容','勾选只决定这期采用什么，不会增加新推论，也不会删除没选的结果。人物推断还可以连同相关两段经历一起替换到 B。');}
       if(!s.radio.queued.length){const button=[...document.querySelectorAll('[data-queue]')].find(node=>node.closest('.available'));return step('rundown-patch',button,'新的操作 / 接入待播轨','点击“接入 PGM”。取得材料、录好 TAKE 与决定把它播出去，是三个不同操作；本期可以不采用某些录音。');}
-      if(!window.Radio.ready())return step('rundown-preview','#rundownRead','先读本期完整稿件','CUE 会显示当前接入的版本。正式定性需要行为链和人物链；只采用零散摘要会走第 0 结局，不开放磁带。');
+      if(!window.Radio.ready())return step('rundown-preview','#rundownRead','先读本期完整稿件','CUE 会显示本期实际勾选的内容。只有选入的推论与人物链进入定性；只采用零散摘要会走第 0 结局，不开放磁带。');
       return step('rundown-review','#rundownArm','去最后的论证检查','点击这里。下一页会显示哪些链已接上、哪些仍缺来源，你可以继续取材，不用强行作结。');
     }
-    if(open('ending')&&!s.ending&&!seen.includes('ending-review'))return step('ending-review','#verdictChains','新的操作 / 用逻辑链支撑定性','行为、相关两段人生及其关系，要一起进入节目。链条完整才能选择正面或负面定性；只播摘要是第 0 结局，不解锁 CG。',{ack:'我明白了',seen:['ending-review','rundown']});
+    if(open('ending')&&!s.ending&&!seen.includes('ending-review'))return step('ending-review','#verdictChains','新的操作 / 用逻辑链支撑定性','上面的事实和人物推断来自本期 PGM。已知但未采用的内容不会自动进入本次审判。链条完整才能选择正面或负面定性；只播摘要是第 0 结局，不解锁 CG。',{ack:'我明白了',seen:['ending-review','rundown']});
     if(s.radio.phase==='on-air'&&!seen.includes('broadcast'))return step('broadcast-next','#radioStoryNext','现在才是对外播出的版本','这一次 ON AIR 按你接入的内容逐段播出，最后一句由你署名。原稿会封存，后来的发现不会倒写进去。');
     return null;
   }
   function choose(){
     const s=state();if(!t()?.enabled||!$('titleScreen').hidden||!$('cgScreen').hidden)return null;
     if(!$('radioScene').hidden&&s.radio.phase!=='on-air')return null;
-    if(s.radio.phase==='on-air'||open('ending'))return contextual();
-    if(!t().complete){
-      if(!t().core.done){
-        if(t().core.submitted){if(open('conversation'))return step('case-read-result','#conversationNext','读完你的第一条推论','追问已有来源，回答也会保存。读到最后，注意它纠正了什么，以及它还没有证明什么。');t().core.done=true;persist();}
-        else {if(open('conversation'))return null;return caseLesson();}
-      }
-      return lifeLesson();
+    if(s.radio.phase==='on-air'||open('ending')||open('rundownDialog')||open('radioScript')&&!open('builder'))return contextual();
+    if(open('conversation')&&$('conversation').dataset.module==='talk')return t().seen.includes('module-talk')?null:step('talk-intro','#conversationText','谈谈 / 值班间隙的交流','这里认识她怎么说话、做事和与别人相处，不会自动生成定性依据。要调查具体经历，另开“人生档案”；补访、关系和拼图各有自己的操作引导。',{ack:'开始聊聊',seen:['module-talk']});
+    if(open('profileDialog'))return lifeModule();
+    if(open('notebook'))return t().seen.includes('notebook')?null:step('notebook-intro','#notebookContent','取材笔记 / 查看已知结果','这里查看已经核实的推论和未解决的问题。它与播出单不同：笔记记录你知道什么，播出单决定你说什么。',{ack:'继续查看',seen:['notebook']});
+    if(open('helpDialog')||open('recordDialog'))return null;
+    if(!t().complete&&!t().core.done){
+      if(t().core.submitted){if(open('conversation'))return step('case-read-result','#conversationNext','读完你的第一条推论','追问已有来源，回答也会保存。读到最后，注意它纠正了什么，以及它还没有证明什么。');t().core.done=true;t().complete=true;persist();}
+      else {if(open('conversation'))return null;return caseLesson();}
     }
     return contextual();
   }
@@ -121,7 +132,8 @@
     root.innerHTML='<div class="guide-shade top"></div><div class="guide-shade left"></div><div class="guide-shade right"></div><div class="guide-shade bottom"></div><div class="guide-focus" aria-hidden="true"></div><svg class="guide-arrow" aria-hidden="true"><path></path><polygon></polygon></svg><aside class="producer-card" aria-label="导播内线引导"><header><span class="producer-icon">AH</span><div><span>PRODUCER / INTERNAL LINE</span><b id="producerTitle"></b><span id="producerDragHint" class="producer-drag-caption">按住标题栏可拖动提示框</span></div><button id="producerPause" aria-label="收起引导">−</button></header><p id="producerCopy" aria-live="polite"></p><div id="producerQuiz"></div><p id="producerFeedback" role="status"></p><footer><span id="producerAction">请点击高亮位置</span><button id="producerAck" hidden></button><button id="producerSkip" class="guide-skip">关闭本次引导</button></footer></aside>';
     card=root.querySelector('.producer-card');bindDrag();
     root.querySelector('#producerPause').onclick=()=>{t().paused=!t().paused;persist();refresh();};
-    root.querySelector('#producerSkip').onclick=skip;
+    const moduleSkip=document.createElement('button');moduleSkip.id='producerSkipModule';moduleSkip.className='guide-skip';moduleSkip.textContent='跳过当前模块';moduleSkip.onclick=skipModule;root.querySelector('#producerSkip').before(moduleSkip);
+    root.querySelector('#producerSkip').textContent='关闭全部引导';root.querySelector('#producerSkip').onclick=skip;
     root.querySelector('#producerAck').onclick=()=>{if(current?.finish)t().complete=true;for(const id of current?.seen||[])mark(id);if(current?.id==='relation-done')mark('relations');lastStep='';persist();refresh();};
     document.body.append(root);
   }

@@ -13,6 +13,8 @@
     const context=(m.has('dispatch')&&m.has('falling'))||m.has('rescueContext');
     const limit=(m.has('expert')&&m.has('handoff'))||m.has('causationLimit');
     if(claim==='rescueAct')return act?answer('supported',['她还在上面。我回去了，奈央在外面接。','那时候我没有想钥匙，也没有想账本。'],'记录确认返身与抱出；救人是事实，方法与后果仍须另行核实。','rescueAct'):answer('incomplete',['你问我回没回去，楼梯口的记录能看到。'],'报警或接应指示，不能独立证明她之后实际做了什么。');
+    if(claim==='rescueContext'&&!m.has('rescueAct'))return answer('incomplete',['先把我到底有没有返回这件事核实。然后再问，我返回时面对什么。'],'必须先得到“她确实返回救人”，再与接应指示、随后掉落声组合。');
+    if(claim==='causationLimit'&&!m.has('rescueAct')&&!m.has('rescueContext'))return answer('incomplete',['先确认你问的是哪一次搬动，再说后来的检查能证明什么。'],'必须把已核实的“返身救人”或“救援处境”推论，与首次接手记录、因果复核意见组合；原件不能跳过行动核对。');
     if(claim==='rescueContext')return context?answer('supported',['我说过等。我真的站在门外等了一会儿。','后来又响了。我不知道还能不能等到他们上去。你现在说那不一定是要塌……那时候我不知道。'],'确认她面对的两种信息。新增掉落声能解释紧迫感，但不证明她的处理必然正确。','rescueContext'):answer('incomplete',[m.has('dispatch')?'你给我的是先前的指示。后来那一声，你也问问奈央。':'那一声发生以前，救援那边也跟我说过话。'],'需要同时核对原有接应指示和随后新增的现场信息。');
     if(claim==='causationLimit')return limit?answer('supported',['我把她抱出来了。可是你问是不是我抱坏的，我不知道。','她现在走路还是疼。你别拿“不能确定”告诉我，她就没有受伤。'],'首次专业检查在搬动后，意见明确保留真实的两种可能。不能确认新增损害，不等于确认无害；此前过错独立保留。','causationLimit'):answer('incomplete',[m.has('expert')?'意见里说缺少搬动前的检查。你能确认，第一次接手是什么时候吗？':'人是在我抱出来以后被检查的。可这能说清每一处伤是什么时候有的吗？'],'需要把首次检查的时点，与复核意见的证明范围放在一起。');
     if(claim==='rescueHarmed')return answer(limit?'contradicted':'overreach',['你给我的记录是后来查出来的伤。','我没法说抱的时候一定没错。可“有可能”，也不是“已经证明全是这样”。'],'后发生的检查不能自行完成因果证明；缺少前后对照时，不能把全部新增损害认定为已证实。');

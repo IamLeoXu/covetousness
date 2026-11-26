@@ -18,6 +18,6 @@
       if(choice!==link.answer)return result('overreach','这条读法抹去了一边已核实的事实。保留她的真心、遗憾，以及别人自行决定的权利。');
       return result('supported',link.note);
     },
-    complete(state){return D.lifeEpisodes.every(event=>state.lifeSolved.includes(event.id))&&D.lifeConnections.every(link=>state.lifeLinks.includes(link.id))&&D.lifeEpisodes.every((event,i)=>state.profileSlots[i]===event.id)&&['front','back'].every(side=>state.profileViews.includes(side));}
+    complete(state){return D.lifeEpisodes.every(event=>state.lifeSolved.includes(event.id))&&D.lifeConnections.every(link=>state.lifeLinks.includes(link.id))&&D.lifeEpisodes.every(event=>window.Programme.adopted(state).includes(event.id))&&['front','back'].every(side=>state.profileViews.includes(side));}
   };
 })();

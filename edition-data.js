@@ -1,6 +1,6 @@
 /* A programme can close before its reporter has opened every envelope. */
 (function(){
-  'use strict';const D=window.InquiryData;D.version='0.6.5';
+  'use strict';const D=window.InquiryData;D.version='0.8.1';
   D.initialLife=['boxes','choice','break','phone'];
   D.lifeVisible=(event,s)=>D.initialLife.includes(event.id)||s.collected.includes(event.sources[0])||s.lifeSolved.includes(event.id);
   D.lifePieces=s=>D.lifeEpisodes.filter(event=>s.lifeSolved.includes(event.id)||(s.lifeFacets||[]).includes(event.id));
@@ -29,13 +29,16 @@
   D.scenes.archive.items=D.scenes.archive.items.filter(item=>item.id!=='returnVideo');
   D.lifeEpisodes.forEach(event=>{event.primary={choice:'lifeWork',break:'lifeVisit',phone:'lifeCallLog'}[event.id]||event.sources[0];});
   D.lifeEpisodes.find(event=>event.id==='love').name='两张不相邻的票';
-  D.radioSegments=[{id:'rumor',code:'A1',title:'来稿核实',need:'核实一项来稿指控即可录成一条 TAKE。'},{id:'warning',code:'A2',title:'经营记录',need:'核对报告、告示或安置款中的一项说法。'},{id:'rescue',code:'A3',title:'事故之后',need:'核对交接记录、现场指示或行动附件。'},{id:'life',code:'B',title:'人物摘录',need:'从补访中采用一块人物片段；可继续翻附页。'}];
+  D.radioSegments=[{id:'rumor',code:'A1',title:'来稿核实',need:'核实一项来稿指控即可录成一条 TAKE。'},{id:'warning',code:'A2',title:'经营记录',need:'核对报告、告示或安置款中的一项说法。'},{id:'rescue',code:'A3',title:'事故之后',need:'核对交接记录、现场指示或行动附件。'},{id:'life',code:'B',title:'人物解读',need:'核对两段经历及其关系，可选入整条解读；零散经历只能作摘要。'}];
   D.radioColdOpen[2].body[0]='楼内公共平台坠落，住客澪受伤。来稿附着小春的告示：维修期间“再等三天”；安置款到账后，房租先付了。还有一张钥匙照片和九秒钟的“别走”。';
   D.radioColdOpen[3].body[1]='你可以核实来稿、补访她的过去，也可以在已有材料上收尾。播出单只采用你实际选进去的内容。值班倒计时不会替你决定何时结束。';
   D.intro=[{who:'主持人',text:'安置的钱，为什么先交了房租？'},{who:'小春',text:'那两笔一直在催。修了多少地方，账上都记着。'},{who:'主持人',text:'住客知道报告里要求停用吗？'},{who:'小春',text:'……你先把东西看完，别只拿那九秒钟来问我。'},{who:'导播内线',text:'先试一条可核实的追问。原通话是 22:19，去调首次报警记录，再回编辑台。两个时间都摆上来，我带你录第一条。'}];
+  D.inferenceRecipes={oldKeys:[['keys','ledger']],freeExit:[['entry']],afterCall:[['call','rescue']],knowledge:[['report','receipt']],noticeGap:[['report','notice']],withheld:[['knowledge','notice'],['noticeGap','receipt'],['knowledge','noticeGap']],misuse:[['grant','spending']],rescueAct:[['returnVideo']],rescueContext:[['rescueAct','dispatch','falling']],causationLimit:[['rescueAct','handoff','expert'],['rescueContext','handoff','expert']]};
+  D.inferenceRoles={oldKeys:'A1 来稿核实 / 可进入审判',freeExit:'A1 来稿核实 / 可进入审判',afterCall:'A1 来稿核实 / 可进入审判',knowledge:'继续推导未完整告知 / A2 可采用',noticeGap:'继续推导未完整告知 / A2 可采用',withheld:'正负两条审判行为链 / A2',misuse:'负面定性的款项依据 / A2',rescueAct:'继续推导救援处境与因果边界 / A3',rescueContext:'可继续核对因果边界 / 正面处境依据 / A3',causationLimit:'正面定性的归责边界 / A3'};
+  D.topics.forEach((topic,i)=>{topic.en='FILE '+String.fromCharCode(65+i)+' / '+topic.title;const deep=topic.claims.find(c=>c.id==='withheld');if(deep)deep.check='必须用已核实推论与原件继续组合，不能只堆原始材料。';});
   const baseNew=D.newRadioState,baseRestore=D.restoreRadioState;
   D.newOnboarding=()=>({enabled:true,core:{},life:{},seen:[],quiz:{},paused:false,complete:false,panelPosition:null});
   D.restoreOnboarding=(value,started)=>value&&typeof value==='object'?{...D.newOnboarding(),...value,core:value.core||{},life:value.life||{},seen:Array.isArray(value.seen)?value.seen:[],quiz:value.quiz||{}}:{...D.newOnboarding(),complete:started===true,enabled:started!==true};
-  D.newRadioState=()=>({...baseNew(),scope:'conduct',lessonDismissed:false,editorialSnapshot:null});
-  D.restoreRadioState=(value,ending)=>{const r={...baseRestore(value,ending),scope:value?.scope==='person'?'person':'conduct',lessonDismissed:value?.lessonDismissed===true,editorialSnapshot:value?.editorialSnapshot||null};if(D.lifeEpisodes.some(event=>event.id===value?.lifeQuote))r.lifeQuote=value.lifeQuote;if(Array.isArray(value?.airScript)&&value.airScript.length>=3&&value.airScript.length<=6&&value.airScript.every(item=>item&&['id','title','body'].every(key=>typeof item[key]==='string')))r.airScript=value.airScript.map(item=>({id:item.id.slice(0,30),title:item.title.slice(0,100),body:item.body.slice(0,3000)}));return r;};
+  D.newRadioState=()=>({...baseNew(),scope:'conduct',lessonDismissed:false,editorialSnapshot:null,cuts:{},history:[]});
+  D.restoreRadioState=(value,ending)=>{const r={...baseRestore(value,ending),scope:value?.scope==='person'?'person':'conduct',lessonDismissed:value?.lessonDismissed===true,editorialSnapshot:value?.editorialSnapshot||null,cuts:value?.cuts&&typeof value.cuts==='object'?Object.fromEntries(Object.entries(value.cuts).filter(([id,items])=>['rumor','warning','rescue','life'].includes(id)&&Array.isArray(items)).map(([id,items])=>[id,items.filter(key=>typeof key==='string').slice(0,30)])):{},history:Array.isArray(value?.history)?value.history.filter(item=>item&&['good','bad','zero'].includes(item.choice)&&item.snapshot&&typeof item.snapshot==='object').slice(-20):[]};if(D.lifeEpisodes.some(event=>event.id===value?.lifeQuote))r.lifeQuote=value.lifeQuote;if(Array.isArray(value?.airScript)&&value.airScript.length>=3&&value.airScript.length<=6&&value.airScript.every(item=>item&&['id','title','body'].every(key=>typeof item[key]==='string')))r.airScript=value.airScript.map(item=>({id:item.id.slice(0,30),title:item.title.slice(0,100),body:item.body.slice(0,3000)}));return r;};
 })();

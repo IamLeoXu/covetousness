@@ -1,21 +1,20 @@
-/* A true ending needs an argued account, not a collection percentage. */
+/* A verdict concerns the material actually selected for this programme. */
 (function(){
-  'use strict';const E=window.InquiryEngine,D=window.InquiryData;
-  E.verdictStatus=function(s,queued=s.radio?.queued||[]){
-    const facts=new Set(s.facts||[]),solved=new Set(s.lifeSolved||[]),links=new Set(s.lifeLinks||[]),slots=s.profileSlots||[],pgm=new Set(queued);
+  'use strict';const E=window.InquiryEngine,D=window.InquiryData,P=window.Programme;
+  E.verdictStatus=function(s,queued=s.radio?.queued||s.queued||[]){
+    const known=new Set(s.facts||[]),facts=new Set(P.usedFacts(s,queued)),solved=new Set(s.lifeSolved||[]),links=new Set(P.usedLinks(s,queued)),events=new Set(P.usedEvents(s,queued)),accepted=new Set(P.adopted(s)),pgm=new Set(P.active(s,queued));
     const first=['afterCall','oldKeys','freeExit'].some(id=>facts.has(id));
-    const adopted=facts.has('profileSketch')||facts.has('profileComplete');
-    const pair=(id)=>{const link=D.lifeConnections.find(item=>item.id===id);return adopted&&links.has(id)&&link.pair.every(event=>solved.has(event)&&slots[D.lifeEpisodes.findIndex(item=>item.id===event)]===event);};
-    const badCase=first&&facts.has('withheld')&&facts.has('misuse'),badLife=pair('own-cost'),badProgramme=['rumor','warning','life'].every(id=>pgm.has(id));
-    const goodCase=first&&['withheld','rescueAct','rescueContext','causationLimit'].every(id=>facts.has(id)),goodLife=pair('not-fate')||pair('not-erased'),goodProgramme=['rumor','warning','rescue','life'].every(id=>pgm.has(id));
+    const pair=id=>{const link=D.lifeConnections.find(l=>l.id===id);return links.has(id)&&(s.lifeLinks||[]).includes(id)&&link.pair.every(event=>solved.has(event)&&accepted.has(event)&&events.has(event));};
+    const badCase=first&&['withheld','misuse'].every(id=>facts.has(id)),goodCase=first&&['withheld','rescueAct','rescueContext','causationLimit'].every(id=>facts.has(id));
+    const badLife=pair('own-cost'),goodLife=pair('not-fate')||pair('not-erased'),badPGM=['rumor','warning','life'].every(id=>pgm.has(id)),goodPGM=['rumor','warning','rescue','life'].every(id=>pgm.has(id));
+    function caseText(ids){const missingResearch=ids.filter(id=>!known.has(id)),notSelected=ids.filter(id=>known.has(id)&&!facts.has(id));return (missingResearch.length?'仍需核实：'+missingResearch.map(id=>D.facts[id].short).join('、')+'。':'')+(notSelected.length?'已核实但未采用：'+notSelected.map(id=>D.facts[id].short).join('、')+'。在播出单素材库勾选即可，不必重推。':'')+(!first?'还需在 A1 采用一项来稿核实推论。':'')||'本期已采用这条行为链的推论；原始线索没有直接代替它们。';}
+    function lifeText(ids){const usable=ids.filter(id=>(s.lifeLinks||[]).includes(id));return usable.length?'已核对的人物推断可从 B 素材库直接选择：'+usable.map(id=>D.lifeConnections.find(l=>l.id===id).title).join(' / ')+'。需同时采用相关两段已确认经历；换内容无需重新补访。':'还需重建相关两段经历并核对关系，再在拼图确认日期。已核对的记录会一直保留。';}
     return {
-      bad:{ready:badCase&&badLife&&badProgramme,steps:[{ok:badCase,title:'行为链',text:'还原来稿，核实她已知的停用要求、未完整传达与安置款用途。'},{ok:badLife,title:'人物链',text:'核对自主选择与分手后的安排，连接“没走的路，能向谁索还”，采用这两块侧写。'},{ok:badProgramme,title:'采用范围',text:'把来稿核实、经营记录与上述人物链一同放入本期。'}]},
-      good:{ready:goodCase&&goodLife&&goodProgramme,steps:[{ok:goodCase,title:'行为链',text:'承认事前告知的过错，核对事后的实际行动、当时处境与因果边界。'},{ok:goodLife,title:'人物链',text:'继续补访，连接一段真实关系及其变化；采用相关两段经历与已核对的关系。'},{ok:goodProgramme,title:'采用范围',text:'把来稿、经营、事后记录与上述人物链一同放入本期。'}]}
+      bad:{ready:badCase&&badLife&&badPGM,steps:[{ok:badCase,title:'本期行为链',text:caseText(['withheld','misuse'])},{ok:badLife,title:'本期人物链',text:badLife?'本期采用自主选择、分手后的安排及“没走的路，能向谁索还”的人物推断。':lifeText(['own-cost'])},{ok:badPGM,title:'PGM 采用范围',text:'A1 来稿核实、A2 经营记录与 B 人物链都需要接入；只知道、没有采用的内容不进入本次定性。'}]},
+      good:{ready:goodCase&&goodLife&&goodPGM,steps:[{ok:goodCase,title:'本期行为链',text:caseText(['withheld','rescueAct','rescueContext','causationLimit'])},{ok:goodLife,title:'本期人物链',text:goodLife?'本期采用一段真实关系及其变化，同时保留当事人的责任与他人的选择。':lifeText(['not-fate','not-erased'])},{ok:goodPGM,title:'PGM 采用范围',text:'A1、A2、A3 与 B 的相关推论需要一起接入；得出过的其他内容仍在素材库，可随时换用。'}]}
     };
   };
   E.canChooseVerdict=(choice,s,queued)=>choice==='zero'||['good','bad'].includes(choice)&&E.verdictStatus(s,queued)[choice].ready;
-  E.cgUnlocked=function(s){
-    const snapshot=s.radio?.editorialSnapshot;
-    return s.radio?.phase==='archived'&&['good','bad'].includes(s.ending)&&snapshot?.choice===s.ending&&E.verdictStatus(snapshot,snapshot.queued)[s.ending].ready;
-  };
+  function valid(snapshot,choice){return snapshot&&snapshot.choice===choice&&['good','bad'].includes(choice)&&E.verdictStatus(snapshot,snapshot.queued)[choice].ready;}
+  E.cgUnlocked=function(s){return s.radio?.phase==='archived'&&valid(s.radio.editorialSnapshot,s.ending)||(s.radio?.history||[]).some(record=>valid(record.snapshot,record.choice));};
 })();
