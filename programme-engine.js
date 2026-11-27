@@ -30,47 +30,82 @@
   }
   function selected(s,track){const keep=keys(s,track);return library(s,track).filter(item=>keep.includes(item.key)&&item.eligible);}
   function choices(s,track){return library(s,track).filter(item=>item.eligible);}
-  function setKeys(s,track,next){const valid=choices(s,track).map(item=>item.key);s.radio.cuts||={};s.radio.cuts[track]=unique(next).filter(key=>valid.includes(key));s.radio.previewed='';}
+  function setKeys(s,track,next){const valid=choices(s,track).map(item=>item.key);s.radio.cuts||={};s.radio.cuts[track]=unique(next).filter(key=>valid.includes(key));s.radio.previewed='';if(s.radio.portraitSelection==='all'&&!allAdopted(s))s.radio.portraitSelection=null;}
   function toggle(s,track,key,on){
     const item=library(s,track).find(item=>item.key===key);if(!item?.eligible)return false;
     let next=keys(s,track);if(on){next.push(key);if(item.kind==='link')next.push(...item.pair.map(id=>'event:'+id));}
     else{next=next.filter(id=>id!==key);if(item.kind==='event')next=next.filter(id=>!library(s,track).some(l=>l.key===id&&l.kind==='link'&&l.pair.includes(item.id)));}
+    if(on&&track==='life'&&item.kind==='event')next.push(...library(s,track).filter(link=>link.kind==='link'&&link.eligible&&link.pair.every(id=>next.includes('event:'+id))).map(link=>link.key));
     setKeys(s,track,next);return true;
   }
   function connect(s,track){
     const r=s.radio;if(!choices(s,track).length)return false;
     if(!Object.prototype.hasOwnProperty.call(r.cuts||{},track))setKeys(s,track,choices(s,track).map(item=>item.key));
     if(!(r.queued||[]).includes(track)&&!keys(s,track).length)return false;
-    r.queued=r.queued.includes(track)?r.queued.filter(id=>id!==track):[...r.queued,track];r.previewed='';return true;
+    r.queued=r.queued.includes(track)?r.queued.filter(id=>id!==track):[...r.queued,track];r.previewed='';if(r.portraitSelection==='all'&&!allAdopted(s))r.portraitSelection=null;return true;
   }
   function useRelation(s,id){
     const link=library(s,'life').find(item=>item.kind==='link'&&item.id===id);if(!link?.eligible)return false;
-    setKeys(s,'life',[...link.pair.map(id=>'event:'+id),link.key]);if(!s.radio.queued.includes('life'))s.radio.queued.push('life');s.radio.lifeQuote=link.pair.at(-1);return true;
+    setKeys(s,'life',[...keys(s,'life'),...link.pair.map(id=>'event:'+id),link.key]);if(!s.radio.queued.includes('life'))s.radio.queued.push('life');s.radio.lifeQuote=link.pair.at(-1);return true;
   }
   function allCuts(s){return Object.fromEntries(tracks.map(id=>[id,keys(s,id)]));}
   function active(s,queued){return (queued||radio(s).queued||[]).filter(id=>tracks.includes(id)&&selected(s,id).length);}
   function usedFacts(s,queued){return unique(active(s,queued).flatMap(track=>selected(s,track).filter(item=>item.kind==='fact').map(item=>item.id)));}
   function usedEvents(s,queued){return active(s,queued).includes('life')?selected(s,'life').filter(item=>item.kind==='event').map(item=>item.id):[];}
   function usedLinks(s,queued){return active(s,queued).includes('life')?selected(s,'life').filter(item=>item.kind==='link').map(item=>item.id):[];}
-  function body(s,track){
+  function allAdopted(s){
+    if(radio(s).portraitSelection!=='all')return false;
+    let available=false;
+    for(const track of tracks){const items=choices(s,track),keep=keys(s,track);if(items.length){available=true;if(!radio(s).queued.includes(track)||items.length!==keep.length||!items.every(item=>keep.includes(item.key)))return false;}}
+    return available;
+  }
+  function portraitSide(s){return s.schema==='selected-cuts-v5'&&s.portraitPresentation==='both'||allAdopted(s)?'both':s.portraitSide==='back'?'back':'front';}
+  function reading(s,id){
+    // Per-event readings only belong to an already frozen v4 programme.
+    if(s.schema==='selected-cuts-v4'){
+      const explicit=s.lifeReadings?.[id]||s.radio?.lifeReadings?.[id];
+      return ['front','back','both'].includes(explicit)?explicit:portraitSide(s);
+    }
+    return s.schema==='selected-cuts-v5'&&s.portraitPresentation==='both'?'both':portraitSide(s);
+  }
+  function allReadings(s){return Object.fromEntries(D.lifeEpisodes.map(event=>[event.id,reading(s,event.id)]));}
+  function setPortraitSide(s,value){
+    if(!['front','back'].includes(value))return false;
+    s.portraitSide=value;if(s.radio){s.radio.portraitSelection=null;s.radio.previewed='';}return true;
+  }
+  function setReading(s,id,value){
+    // Legacy callers may still pass an event ID, but a new draft has one B reading.
+    return D.lifeEpisodes.some(event=>event.id===id)&&setPortraitSide(s,value);
+  }
+  function adoptComplete(s){
+    if(!s.radio)return false;let available=false;
+    for(const track of tracks){const items=choices(s,track);setKeys(s,track,items.map(item=>item.key));if(items.length)available=true;}
+    s.radio.queued=tracks.filter(track=>keys(s,track).length);
+    s.radio.portraitSelection=available?'all':null;s.radio.previewed='';return available;
+  }
+  function body(s,track,options={}){
     const items=selected(s,track);let text=items.map(item=>(item.kind==='link'?'人物推断：':item.title+'。')+item.body).join(' ');
     if(track==='life'){
-      const side=s.portraitSide||'front',events=items.filter(item=>item.kind==='event');
-      text=(side==='front'?'正面侧写。':'反面侧写。')+events.map(item=>{const event=D.lifeEpisodes.find(e=>e.id===item.id);return event.age+'岁，'+event.name+'：'+(side==='front'?event.front:event.back);}).join(' ')+items.filter(item=>item.kind==='link').map(item=>' '+item.body).join('');
+      const events=items.filter(item=>item.kind==='event');
+      text=events.map(item=>{const event=D.lifeEpisodes.find(e=>e.id===item.id),mode=options.both?'both':reading(s,item.id);return event.age+'岁，'+event.name+'：'+(mode==='front'?event.front:mode==='back'?event.back:event.front+' '+event.back);}).join(' ')+items.filter(item=>item.kind==='link').map(item=>' '+item.body).join('');
     }
     return text;
   }
+  function bodyBoth(s){return body(s,'life',{both:true});}
   function acceptPortrait(s){
     const placed=(s.profileSlots||[]).filter(Boolean);if(!placed.length||s.profileSlots.some((id,i)=>id&&id!==D.lifeEpisodes[i].id))return false;
     s.profileAdopted=unique([...adopted(s),...placed]);if(!s.facts.includes('profileSketch'))s.facts.push('profileSketch');return true;
   }
   function freeze(s,choice,script){
-    return {schema:'selected-cuts-v3',version:D.version,portraitSide:s.portraitSide||'front',portraitRead:[...(s.portraitRead||[])],portraitHeard:[...(s.portraitHeard||[])],portraitReceived:[...(s.portraitReceived||[])],inquiry:JSON.parse(JSON.stringify(s.inquiry||{done:[],received:{}})),recordId:Date.now().toString(36)+'-'+(s.radio.history||[]).length,facts:[...s.facts],collected:[...s.collected],factProofs:JSON.parse(JSON.stringify(s.factProofs||{})),lifeSolved:[...s.lifeSolved],lifeLinks:[...s.lifeLinks],lifeFacets:[...s.lifeFacets],profileSlots:[...s.profileSlots],profileAdopted:[...adopted(s)],fieldProofs:JSON.parse(JSON.stringify(s.fieldProofs||{})),fieldSeen:[...(s.fieldSeen||[])],journey:JSON.parse(JSON.stringify(s.journey||{seen:[],choices:{},voiceCuts:[]})),queued:active(s),cuts:allCuts(s),scope:s.radio.scope,choice,script:script.map(item=>({...item}))};
+    return {schema:'selected-cuts-v5',version:D.version,characterId:D.characterId||'koharu',order:s.radio.order,portraitPresentation:choice==='objective'?'both':portraitSide(s),judgment:{category:choice==='objective'?'objective':choice==='zero'?'incomplete':'definition',validated:window.InquiryEngine.canChooseVerdict(choice,s),completeCollection:choice==='objective'&&window.InquiryEngine.verdictStatus(s).objective.ready},portraitSide:portraitSide(s),portraitRead:[...(s.portraitRead||[])],portraitHeard:[...(s.portraitHeard||[])],portraitReceived:[...(s.portraitReceived||[])],inquiry:JSON.parse(JSON.stringify(s.inquiry||{done:[],received:{}})),recordId:Date.now().toString(36)+'-'+(s.radio.history||[]).length,facts:[...s.facts],collected:[...s.collected],factProofs:JSON.parse(JSON.stringify(s.factProofs||{})),lifeSolved:[...s.lifeSolved],lifeLinks:[...s.lifeLinks],lifeFacets:[...s.lifeFacets],profileSlots:[...s.profileSlots],profileAdopted:[...adopted(s)],fieldProofs:JSON.parse(JSON.stringify(s.fieldProofs||{})),fieldSeen:[...(s.fieldSeen||[])],journey:JSON.parse(JSON.stringify(s.journey||{seen:[],choices:{},voiceCuts:[]})),queued:active(s),cuts:allCuts(s),scope:s.radio.scope,choice,script:script.map(item=>({...item}))};
   }
   function archive(s){
-    const r=s.radio,snapshot=r.editorialSnapshot;if(!snapshot||!['good','bad','zero'].includes(snapshot.choice))return;
+    const r=s.radio,snapshot=r.editorialSnapshot;if(!snapshot||!['good','bad','objective','zero'].includes(snapshot.choice))return;
     const id=snapshot.recordId||(snapshot.recordId='legacy-'+Date.now().toString(36));r.history||=[];
-    if(!r.history.some(item=>item.id===id))r.history.push({id,choice:snapshot.choice,snapshot:JSON.parse(JSON.stringify(snapshot)),script:(r.airScript||snapshot.script||[]).map(item=>({...item}))});
+    const record={id,characterId:snapshot.characterId||'koharu',choice:snapshot.choice,judgment:{category:snapshot.choice==='zero'?'incomplete':snapshot.choice==='objective'?'objective':'definition',validated:snapshot.choice==='zero'||window.InquiryEngine.cgRecordValid(snapshot,snapshot.choice),completeCollection:snapshot.choice==='objective'&&window.InquiryEngine.cgRecordValid(snapshot,snapshot.choice)},snapshot:JSON.parse(JSON.stringify(snapshot)),script:(r.airScript||snapshot.script||[]).map(item=>({...item}))};
+    if(!r.history.some(item=>item.id===id))r.history.push(record);
+    r.characterJudgments||={};r.characterJudgments[record.characterId]=JSON.parse(JSON.stringify(record));
+    if(window.InquiryEngine.cgRecordValid?.(snapshot,snapshot.choice)){r.cgRecords||={};r.cgRecords[record.characterId]=JSON.parse(JSON.stringify(record));}
     r.history=r.history.slice(-20);
   }
   function newDraft(s){
@@ -79,5 +114,5 @@
     if(!Object.keys(r.cuts||{}).length&&previous)r.cuts=allCuts(previous);
     s.ending=null;s.emotion='thoughtful';r.phase='off-air';r.airedEnding=null;r.editorialSnapshot=null;r.airScript=null;r.transmitIndex=0;r.previewed='';return true;
   }
-  window.Programme={tracks,sets,title,proof,adopted,library,choices,keys,selected,setKeys,toggle,connect,useRelation,allCuts,active,usedFacts,usedEvents,usedLinks,body,acceptPortrait,freeze,archive,newDraft};
+  window.Programme={tracks,sets,title,proof,adopted,library,choices,keys,selected,setKeys,toggle,connect,useRelation,allCuts,active,usedFacts,usedEvents,usedLinks,allAdopted,portraitSide,setPortraitSide,reading,allReadings,setReading,adoptComplete,body,bodyBoth,acceptPortrait,freeze,archive,newDraft};
 })();

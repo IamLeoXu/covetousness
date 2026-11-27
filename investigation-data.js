@@ -13,22 +13,28 @@
   D.intro=[L('主持人','电话是 22:19。出事是在这之前，还是之后？'),L('小春','我那时到处找床位，没看钟。奈央报的警，你问她。'),L('记录','小春拨通奈央，把手机留在桌子中间。')];
 
   D.inquirySteps=[
-    {id:'alarm',title:'问奈央：那晚几点报的警？',question:'给原通话找一个能对照的时间。',requires:{read:['call']},gives:['rescue'],place:'archive',lines:[
+    {id:'alarm',title:'问奈央：那晚几点报的警？',question:'给原通话找一个能对照的时间。',requires:{read:['call']},gives:['rescue'],place:'archive',givenBy:'奈央 / 电话中发送',deliverySummary:'追问报警时间后，奈央发来她手机里保存的通话页和受理短信。',lines:[
       L('主持人','奈央，小春说是你报的警。还记得几点吗？'),
       L('奈央','我看下手机。……22:13。这里还有受理短信，我发过去。'),
       L('小春','后面电话给我了。那会儿我还在跟她说澪在楼上。'),
       L('奈央','嗯，那通我录下来了，一直没删。先给你时间这一页？'),
       L('记录','奈央发来当晚的报警通话页和受理短信。两个时间都是 22:13。')
     ]},
-    {id:'keys',title:'查照片里的钥匙',question:'它们究竟是谁的？',requires:{read:['photo']},gives:['keys','ledger','entry'],place:'lobby',lines:[
+    {id:'keys',title:'查照片里的钥匙',question:'它们究竟是谁的？',requires:{read:['photo']},gives:['keys','ledger'],place:'lobby',givenBy:'小春 / 当面拿出',deliverySummary:'问到照片里的钥匙后，小春拿出旧钥匙和退住簿，让你核对编号与归还日期。',lines:[
       L('主持人','这张照片里的四把，都是住客现在用的？'),
       L('小春','不是。等下，我带了。'),
       L('记录','她从袋里拿出一串旧钥匙，翻过磨花的牌子，又摊开一本退住簿。'),
       L('小春','编号在背面。搬走的时候谁还的，都签了名。'),
-      L('奈央','我那晚拿自己的钥匙出去过。我找房东要了门口那段，本来就是想让他看看这个。'),
-      L('记录','奈央把房东留存的入口录像摘录发来。旧钥匙、退住簿和门口记录放到了同一页。')
+      L('记录','旧钥匙摆在退住簿旁边。纸牌背面的四个编号，都能在归还栏里找到。')
     ]},
-    {id:'notice',title:'听奈央说那张告示',question:'门能开，住客为什么没有搬？',requires:{anyFacts:['afterCall','oldKeys','freeExit']},gives:['notice'],place:'lobby',lines:[
+    {id:'exit',title:'问奈央：你那晚怎么出去的？',question:'旧钥匙已经对上，现住客手里还有自己的钥匙吗？',requires:{facts:['oldKeys']},gives:['entry'],place:'archive',givenBy:'奈央 / 电话中发送',deliverySummary:'核实旧钥匙后，你追问当晚的实际出入。奈央发来此前向房东取得的入口录像摘录。',lines:[
+      L('主持人','照片里是旧钥匙。那你当晚出去，用的是什么？'),
+      L('奈央','我自己的，一直放在包里。是我自己开的门。'),
+      L('主持人','门口有没有留下记录？'),
+      L('奈央','有。房东的监控。我前两天找他要过那一段，现在发你。'),
+      L('记录','奈央传来 11月16日 22:07 的入口录像摘录：她从包里取出钥匙，打开前门，独自离开。')
+    ]},
+    {id:'notice',title:'听奈央说那张告示',question:'门能开，住客为什么没有搬？',requires:{anyFacts:['afterCall','oldKeys','freeExit']},gives:['notice'],place:'lobby',givenBy:'奈央 / 电话中发送',deliverySummary:'最初的指控得到核实后，奈央提起自己贴过的告示，发来当时拍的前台照片。',lines:[
       L('奈央','那几句传错的，是该改。可我们没说过那张告示是假的。'),
       L('主持人','什么告示？'),
       L('奈央','“轻步，再等三天”。我还帮她把翘起来的角贴平了。照片在这。'),
@@ -36,7 +42,7 @@
       L('奈央','小春，你当时就是这么跟我们说的。'),
       L('记录','奈央发来 11月14日拍的前台照片。纸上有小春的署名。')
     ]},
-    {id:'report',title:'问小春：维修判断从哪来？',question:'把她收到的要求和告示对照。',requires:{steps:['notice']},gives:['report','receipt'],place:'archive',lines:[
+    {id:'report',title:'问小春：维修判断从哪来？',question:'把她收到的要求和告示对照。',requires:{steps:['notice']},gives:['report','receipt'],place:'archive',givenBy:'小春 / 当面交出',deliverySummary:'追问维修判断的根据后，小春从文件袋取出评估报告，签收页还订在后面。',lines:[
       L('主持人','你说等维修。有人来检查过？'),
       L('小春','来过。那份我也带了。'),
       L('记录','她在文件袋里摸了一会儿，抽出评估报告。签收回执还订在后面。'),
@@ -45,7 +51,7 @@
       L('主持人','那为什么写成再等三天？'),
       L('小春','安置的钱刚下来，房东又在催。我想先把两头压住，三天后就能转开。')
     ]},
-    {id:'money',title:'追问安置款去了哪里',question:'她说周转不开，账上发生了什么？',requires:{facts:['withheld']},gives:['grant','spending'],place:'studio',lines:[
+    {id:'money',title:'追问安置款去了哪里',question:'她说周转不开，账上发生了什么？',requires:{facts:['withheld']},gives:['grant','spending'],place:'studio',givenBy:'小春 / 手机中出示并传送',deliverySummary:'问到拨款金额和余额后，小春打开手机银行，将拨款单与两笔转账交给你。',lines:[
       L('主持人','安置款下来了多少？'),
       L('小春','一万八。'),
       L('主持人','现在剩多少？'),
@@ -54,7 +60,7 @@
       L('小春','我手上还有一批活，做完就能补上。房子一停，单子也没了。'),
       L('记录','她打开银行记录，把拨款单和两笔转账一起传给你。')
     ]},
-    {id:'return',title:'问奈央：她后来去了哪里？',question:'还有一段当晚的经过没有讲。',requires:{facts:['withheld']},gives:['returnVideo','falling'],place:'archive',lines:[
+    {id:'return',title:'问奈央：她后来去了哪里？',question:'还有一段当晚的经过没有讲。',requires:{facts:['withheld']},gives:['returnVideo','falling'],place:'archive',givenBy:'奈央 / 电话中发送',deliverySummary:'追问返身经过时，奈央发来门口声音记录，并找出小春进入和抱人出来的录像时段。',lines:[
       L('奈央','告示的事要讲。她回去那段，也得讲。'),
       L('主持人','你看着她进去的？'),
       L('奈央','我在门口。上面又响了一下，灰落下来。她就往里走，我喊她，她没停。'),
@@ -62,14 +68,14 @@
       L('奈央','所以你把我按门口接人。我记得，不用你提醒。'),
       L('记录','奈央发来她当晚留下的声音记录，又从房东给的录像里找出小春进入和抱人出来的时段。')
     ]},
-    {id:'dispatch',title:'追问返身前的那通电话',question:'她为什么没有继续等救援？',requires:{facts:['rescueAct']},gives:['dispatch'],place:'archive',lines:[
+    {id:'dispatch',title:'追问返身前的那通电话',question:'她为什么没有继续等救援？',requires:{facts:['rescueAct']},gives:['dispatch'],place:'archive',givenBy:'奈央 / 电话中补发',deliverySummary:'确认返身行动后，你追问电话里的指示，奈央补发同一通报警录音的后段。',lines:[
       L('主持人','你往回走以前，电话那头让你做什么？'),
       L('小春','在门外等，接应他们。我说了好。'),
       L('奈央','就在刚才那通里。我把后面也发给你。'),
       L('小春','我站了一会儿。后来那一声……我不知道还来不来得及。'),
       L('记录','奈央发来同一通报警录音的后段，保留了接线员的指示和小春的回答。')
     ]},
-    {id:'medical',title:'问清第一次检查的时间',question:'关于澪的伤，还有哪一步能查？',requires:{facts:['rescueContext']},gives:['handoff','expert'],place:'archive',lines:[
+    {id:'medical',title:'问清第一次检查的时间',question:'关于澪的伤，还有哪一步能查？',requires:{facts:['rescueContext']},gives:['handoff','expert'],place:'archive',givenBy:'澪保存 / 奈央转交',deliverySummary:'问到伤情与首次检查时间后，奈央转交澪保存的救援交接页和 11月19日随访说明。',lines:[
       L('主持人','她被抱出来时，伤就已经是后来查到的那样了吗？'),
       L('奈央','澪昨天复诊也问了。她留着交接那页，还有医生写的说明。我刚问过她了，可以给你。'),
       L('小春','我抱她的时候，她一直说腿疼。'),

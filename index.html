@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#111019">
-  <title>DEAD AIR · 再等三天 / 第一章 0.10.0</title>
+  <title>DEAD AIR · 余声 / 第一章 0.12.1</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath fill='%23d2f850' d='M0 0h40v40H0z'/%3E%3Cpath fill='%23111019' d='M9 6h9q16 0 16 14T18 34H9zm8 7v14h2q8 0 8-7t-8-7z'/%3E%3C/svg%3E">
   <link rel="preload" as="image" href="execution/assets/character/details/calm-empty-hands.png?v=0.8.1">
   <link rel="preload" as="image" href="assets/city.webp">
@@ -17,37 +17,43 @@
   <script defer src="life-data.js"></script>
   <script defer src="radio-data.js?v=0.8.1"></script>
   <script defer src="edition-data.js?v=0.8.1"></script>
-  <script defer src="journey-data.js?v=0.10.0"></script>
-  <script defer src="investigation-data.js?v=0.10.0"></script>
-  <script defer src="inquiry-engine.js?v=0.10.0"></script>
+  <script defer src="journey-data.js?v=0.12.1"></script>
+  <script defer src="investigation-data.js?v=0.12.1"></script>
+  <script defer src="revision-v0110.js?v=0.12.1"></script>
+  <script defer src="judgment-data.js?v=0.12.1"></script>
+  <script defer src="presentation-v0120.js?v=0.12.1"></script>
+  <script defer src="revision-v0120.js?v=0.12.1"></script>
+  <script defer src="inquiry-engine.js?v=0.12.1"></script>
   <script defer src="case-engine.js?v=0.8.1"></script>
   <script defer src="chapter-engine.js?v=0.8.1"></script>
-  <script defer src="programme-engine.js?v=0.10.0"></script>
-  <script defer src="verdict-engine.js?v=0.10.0"></script>
-  <script defer src="life-engine.js"></script>
+  <script defer src="programme-engine.js?v=0.12.1"></script>
+  <script defer src="verdict-engine.js?v=0.12.1"></script>
+  <script defer src="life-engine.js?v=0.12.1"></script>
   <script defer src="execution/cassette.js?v=0.8.1"></script>
-  <script defer src="portrait-engine.js?v=0.10.0"></script>
-  <script defer src="debug.js?v=0.10.0"></script>
-  <script defer src="game.js?v=0.10.0"></script>
-  <script defer src="chapter.js?v=0.10.0"></script>
-  <script defer src="life.js?v=0.10.0"></script>
-  <script defer src="radio.js?v=0.10.0"></script>
+  <script defer src="portrait-engine.js?v=0.12.1"></script>
+  <script defer src="debug.js?v=0.12.1"></script>
+  <script defer src="game.js?v=0.12.1"></script>
+  <script defer src="chapter.js?v=0.12.1"></script>
+  <script defer src="life.js?v=0.12.1"></script>
+  <script defer src="radio.js?v=0.12.1"></script>
   <link rel="stylesheet" href="edition.css?v=0.8.1">
   <link rel="stylesheet" href="onboarding.css?v=0.8.1">
   <link rel="stylesheet" href="programme.css?v=0.8.1">
   <link rel="stylesheet" href="revision.css?v=0.8.1">
-  <link rel="stylesheet" href="journey.css?v=0.10.0">
-  <link rel="stylesheet" href="inquiry.css?v=0.10.0">
-  <link rel="stylesheet" href="portrait.css?v=0.10.0">
-  <script defer src="inquiry.js?v=0.10.0"></script>
-  <script defer src="social.js?v=0.10.0"></script>
-  <script defer src="onboarding.js?v=0.10.0"></script>
+  <link rel="stylesheet" href="journey.css?v=0.12.1">
+  <link rel="stylesheet" href="inquiry.css?v=0.12.1">
+  <link rel="stylesheet" href="portrait.css?v=0.12.1">
+  <script defer src="inquiry.js?v=0.12.1"></script>
+  <script defer src="social.js?v=0.12.1"></script>
+  <script defer src="onboarding.js?v=0.12.1"></script>
+  <link rel="stylesheet" href="revision-v0110.css?v=0.12.1">
+  <link rel="stylesheet" href="revision-v0120.css?v=0.12.1">
 </head>
 <body>
   <div id="app" class="app" data-scene="studio" data-phase="first">
     <header class="masthead">
       <a class="brand" href="#" id="brandHome" aria-label="打开游戏菜单">DEAD<span class="brand-dot"></span>AIR<small>AFTER HOURS / FM 107.9</small></a>
-      <div class="case-id"><span>FILE / 001</span><b>THREE MORE DAYS</b></div>
+      <div class="case-id"><span>FILE / 001</span><b>WHAT REMAINS</b></div>
       <div class="header-actions">
         <span class="off-air"><i></i>OFF AIR</span>
         <button class="utility" id="audioToggle" aria-label="开关音效" aria-pressed="true">SOUND ON</button>
@@ -67,6 +73,7 @@
 
       <nav id="caseLayerTabs" class="case-layer-tabs" aria-label="案件卷宗分层"></nav>
       <section id="inquiryDesk" class="inquiry-desk" aria-label="当前可追问的问题"></section>
+      <section id="receivedSources" class="received-sources" aria-label="收到的原件与提供来源" hidden></section>
 
       <section class="stage" id="stage" aria-label="调查场景">
         <div class="stage-backdrop" aria-hidden="true"></div>
@@ -103,7 +110,7 @@
   <section class="title-screen" id="titleScreen" aria-label="游戏开始画面">
     <div class="title-backdrop" aria-hidden="true"></div><div class="title-slash" aria-hidden="true"></div>
     <div class="title-mast">DEAD AIR<span>AFTER HOURS / CASE 001</span></div>
-    <div class="title-copy"><span class="pilot-label">CHAPTER 01 / GREED</span><p class="title-kicker">THE MONEY ARRIVED.<br>THEY WERE TOLD TO WAIT.</p><h2>再等<br><em>三天。</em></h2><p class="title-description">她来澄清一句“别走”。你查到了更多。<br>事实摆在这里，她究竟是个怎样的人？</p><div class="title-buttons"><button id="startButton">BEGIN INQUIRY <span>↗</span></button><button id="resumeButton" hidden>CONTINUE <span>→</span></button></div><p class="title-control-hint">电台来访 · 共同采访 · 推理核实 · 决定播什么</p><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">WALKTHROUGH / 攻略与全部组合 ↗</a></div>
+    <div class="title-copy"><span class="pilot-label">CHAPTER 01 / GREED</span><p class="title-kicker">THE MONEY ARRIVED.<br>THEY WERE TOLD TO WAIT.</p><h2><em>余声</em></h2><p class="title-description">她来澄清一句“别走”。你查到了更多。<br>事实摆在这里，她究竟是个怎样的人？</p><div class="title-buttons"><button id="startButton">BEGIN INQUIRY <span>↗</span></button><button id="resumeButton" hidden>CONTINUE <span>→</span></button></div><p class="title-control-hint">电台来访 · 共同采访 · 推理核实 · 决定播什么</p><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">WALKTHROUGH / 攻略与全部组合 ↗</a></div>
     <img class="title-person" src="execution/assets/character/shadows/stand-reaching-profile.png" alt="小春的常态站姿" draggable="false">
     <div class="title-record"><img src="assets/tape-decal.png" alt="蝴蝶结、心形钥匙与信封图案"><span>AMANE KOHARU / SIDE A</span></div>
     <div class="title-bottom"><span>AN AFTER HOURS RECORD</span><span>CHAPTER BUILD / 0.7.0</span></div>
@@ -123,7 +130,7 @@
       <section class="evidence-drawer" aria-label="当前卷宗材料"><header><span>THIS FILE ONLY</span><span id="materialCount">00</span></header><p id="poolScope" class="pool-scope"></p><div id="materialTabs" class="material-tabs"></div><div id="evidencePool" class="evidence-pool"></div></section>
       <section class="argument-area" aria-label="组合与说法">
         <div id="builderMap" class="builder-map"><b>上方 A/B/C 是卷宗，不是来源编号。</b><br>先选一句说法，再用下方最多三份材料共同支持它。来源顺序不限，可以留空；切换材料标签不会清空已选来源。</div><div id="topicTabs" class="topic-tabs" role="tablist" aria-label="正在讨论的问题"></div>
-        <div class="claim-block"><span class="field-label">CLAIM / 选择一句说法</span><p id="builderQuestion" class="builder-question"></p><div id="claimOptions" class="claim-options"></div><p id="claimRole" class="claim-role"></p></div>
+        <div class="claim-block"><span class="field-label">CLAIM / 选择一句说法</span><p id="builderQuestion" class="builder-question"></p><div id="claimOptions" class="claim-options"></div><p id="claimRole" class="claim-role"></p><div id="claimRecipes" class="claim-recipes" hidden></div></div>
         <div class="support-block"><div class="support-heading"><span class="field-label">SOURCES / 支持它的材料</span><button id="clearSlots" class="text-button">CLEAR</button></div><div id="evidenceSlots" class="evidence-slots" aria-label="放入最多三份材料"></div><p class="slot-tip">三个来源位共同支撑当前说法，顺序不影响结果，也不必填满。点材料放入；↗ 只用于阅读。</p></div>
         <button id="debugInference" class="debug-inference" type="button">TEST / 一键推理</button><section id="debugInferencePanel" class="debug-inference-panel" hidden></section><div class="edit-transport"><span class="edit-bus-label">SOURCE → CUE → RECORD BUS</span><button id="editCue" class="deck-key">CUE<small>预听来源</small></button><button id="editArm" class="deck-key record-key">ARM<small>录音待命</small></button><span id="editTakeState" class="edit-take-state">SAFE</span></div><div class="argument-footer"><p id="submitHint">先选择一个明确的说法。</p><button id="submitArgument" class="submit-argument" disabled>REC / ASK <span>↗</span></button></div>
       </section>
@@ -153,7 +160,7 @@
 
   <dialog id="ending" class="ending-dialog">
     <header class="dialog-bar"><span>END OF THE PILOT / RECORD 001</span><button data-close="ending" class="close-button" aria-label="继续查看材料">×</button></header>
-    <div class="ending-layout"><div class="ending-art"><span>WHAT<br>REMAINS.</span><img src="execution/assets/character/details/held-letter.png" alt="小春握着信封的剪影"></div><section class="ending-copy"><span class="eyebrow">THE NEXT QUESTION</span><h2>门没锁。<br>他们知道多少？</h2><div id="endingFacts"></div><p class="ending-context">你确认了危险信息没有完整传达。事故的因果、款项与其他人的责任，还需要下一段调查。</p><div id="verdictChains" class="verdict-chains"></div><div id="endingOptions" class="ending-options"><button data-ending="good"><b>GOOD / 我认定她是个好人</b><span>采用事实与正面侧写，给她的整个人作出判断。</span></button><button data-ending="bad"><b>BAD / 我认定她是个坏人</b><span>采用事实与反面侧写，给她的整个人作出判断。</span></button><button data-ending="zero"><b>CLOSE / 就用这份摘要收尾</b><span>尚未形成完整论证，结束本次值班。</span></button></div><div id="endingResult" class="ending-result" hidden></div><div class="ending-actions"><button id="saveRecord" class="secondary-button">YOUR RECORD ↗</button><button data-close="ending" class="ink-button">RETURN TO MATERIALS →</button></div></section></div>
+    <div class="ending-layout"><div class="ending-art"><span>WHAT<br>REMAINS.</span><img src="execution/assets/character/details/held-letter.png" alt="小春握着信封的剪影"></div><section class="ending-copy"><span class="eyebrow">THE NEXT QUESTION</span><h2>门没锁。<br>他们知道多少？</h2><div id="endingFacts"></div><p class="ending-context">你确认了危险信息没有完整传达。事故的因果、款项与其他人的责任，还需要下一段调查。</p><p id="endingDecisionNotice" class="ending-decision-notice">还想继续核实？点击下方 RETURN TO MATERIALS 返回材料。只有准备播出本期时，才选择下面的收尾方式。</p><div id="verdictAssessment" class="judgment-assessment"></div><div id="verdictChains" class="verdict-chains"></div><div id="endingOptions" class="ending-options"><button data-ending="good"><b>GOOD / 我认定她是个好人</b><span>采用事实与正面侧写，给她的整个人作出判断。</span></button><button data-ending="bad"><b>BAD / 我认定她是个坏人</b><span>采用事实与反面侧写，给她的整个人作出判断。</span></button><button data-ending="objective"><b>完整客观播报 / 不给她定好坏</b><span>须完成全部调查，并把必要案件与人物材料完整选入本期；该结尾自动呈现整体侧写的两面。</span></button><button data-ending="zero"><b>材料不足 / 只播现有摘要，结束本期</b><span>调查未完成，不是完整客观结局。选此项会直接播出并结束本期。</span></button></div><div id="endingResult" class="ending-result" hidden></div><div class="ending-actions"><button id="saveRecord" class="secondary-button">YOUR RECORD ↗</button><button id="returnToMaterials" data-close="ending" class="ink-button">RETURN TO MATERIALS / 继续核实 →</button></div></section></div>
   </dialog>
 
   <dialog id="recordDialog" class="record-dialog">
@@ -179,7 +186,7 @@
 
   <section id="radioScene" class="radio-scene" hidden aria-label="电台开场与播出"><div class="radio-scene-backdrop" aria-hidden="true"></div><header class="radio-scene-header"><span>AFTER HOURS / FM 107.9</span><b id="radioSceneStatus">BEFORE THE RED LIGHT</b><button id="radioSceneSkip">熟悉操作 / 跳过教学</button></header><div class="radio-scene-layout"><article class="radio-story"><span id="radioStoryTime" class="radio-story-time">00:52</span><span id="radioStoryTag" class="eyebrow"></span><h1 id="radioStoryTitle"></h1><div id="radioStoryBody"></div><div id="radioStoryActions"></div><p id="radioStoryFeedback" role="status"></p><footer><span id="radioStoryCount">01 / 05</span><button id="radioStoryNext" class="ink-button">接入值班线路 →</button></footer></article><aside id="radioStoryArt" class="radio-story-art" aria-label="值班台"></aside></div></section>
 
-  <dialog id="rundownDialog" class="rundown-dialog"><header class="dialog-bar"><span>AFTER HOURS / TONIGHT'S RUNDOWN</span><button data-close="rundownDialog" class="close-button" aria-label="关闭播出单">×</button></header><div class="rundown-heading"><span class="eyebrow">YOU SIGN THE LAST SENTENCE</span><h2>今晚，这座城会听见哪一段她。</h2><p>核实与补访先留在预听。选入你要采用的 TAKE，送入 CUE 预听，再署名收尾。没有选入的材料留在台内。</p></div><div class="rundown-scroll"><div id="programmeGuide" class="programme-guide"><b>播出单就是 RUNDOWN；这里决定本期采用什么。</b><br>A 轨选案件推论；B 轨选人物解读，相关经历自动带入。人物拼图确认经历与年代，正反侧写决定你怎样解释这些经历。更换采用内容后重新 CUE 即可，已经完成的调查不用重做。</div><div id="rundownSegments" class="rundown-segments"></div><section class="rundown-edit"><h3>怎样开场</h3><p class="editorial-scope">正式定性需要把行为与人物链一同放进本期；下一页检查论证，不必查完她的六段人生。</p><div id="rundownOrder" class="rundown-order"><button data-radio-order="facts-first"><b>A → B</b><span>事实录音先行，再接选中的人物片段。</span></button><button data-radio-order="life-first"><b>B → A</b><span>人物解读先行，再接选中的事实录音。</span></button></div></section></div><footer class="rundown-footer"><p id="rundownReadyNote"></p><div><button id="rundownNewDraft" class="secondary-button" hidden>用现有素材重新编排一版 ↗</button><button id="rundownRead" class="secondary-button">CUE / 文字预听</button><button id="rundownArm" class="ink-button">进入播出 / 最后一句 ↗</button></div></footer></dialog>
+  <dialog id="rundownDialog" class="rundown-dialog"><header class="dialog-bar"><span>AFTER HOURS / TONIGHT'S RUNDOWN</span><button data-close="rundownDialog" class="close-button" aria-label="关闭播出单">×</button></header><div class="rundown-heading"><span class="eyebrow">YOU SIGN THE LAST SENTENCE</span><h2>今晚，这座城会听见哪一段她。</h2><p>核实与补访先留在预听。选入你要采用的 TAKE，送入 CUE 预听，再署名收尾。没有选入的材料留在台内。</p></div><div class="rundown-scroll"><div id="programmeGuide" class="programme-guide"><b>播出单就是 RUNDOWN；这里决定本期采用什么。</b><br>A 轨选案件推论；B 轨选人物解读，相关经历自动带入。人物拼图确认经历与年代；A 轨选用的案件材料与 B 轨整体侧写共同形成依据。更换采用内容后重新 CUE 即可，已经完成的调查不用重做。</div><div id="rundownSegments" class="rundown-segments"></div><section class="rundown-edit"><h3>先认识事，还是先认识人？</h3><p class="rundown-order-note">两种编排会改变开场、段落衔接和听众留言的切入点；采用材料不变，结局资格不变。</p><p class="editorial-scope">正式定性需要把行为与人物链一同放进本期；下一页检查论证，不必查完她的六段人生。</p><div id="rundownOrder" class="rundown-order"><button data-radio-order="facts-first"><b>A → B</b><span>先让听众听见发生了什么，再认识当事人。</span></button><button data-radio-order="life-first"><b>B → A</b><span>先让听众认识她，再回到那晚的行为。</span></button></div></section></div><footer class="rundown-footer"><p id="rundownReadyNote"></p><div><button id="rundownNewDraft" class="secondary-button" hidden>用现有素材重新编排一版 ↗</button><button id="rundownRead" class="secondary-button">CUE / 文字预听</button><button id="rundownArm" class="ink-button">进入播出 / 最后一句 ↗</button></div></footer></dialog>
 
   <dialog id="radioScript" class="radio-script-dialog"><header class="dialog-bar"><span>CUE / SCRIPT PREVIEW</span><button data-close="radioScript" class="close-button" aria-label="返回播出单">×</button></header><div class="radio-script-heading"><span class="eyebrow">LOCAL MONITOR / NOT ON AIR</span><h2>先让你自己听清楚。</h2><p>本期的文字预听稿；原录音、录像与补访仍以授权转录呈现。</p></div><div id="radioScriptBody" class="radio-script-body"></div><footer><button id="radioScriptConfirm" class="ink-button">确认这份编排 / 返回播出单 →</button></footer></dialog>
 </body>

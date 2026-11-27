@@ -54,11 +54,11 @@
     if(seen.includes('module-portrait-puzzle'))return null;
     const pieces=D.lifePieces(s),selected=document.querySelector('[data-fragment].selected')?.dataset.fragment;
     if(!pieces.length)return step('portrait-need-piece','[data-portrait-mode="research"]','先从一段经历取得片段','回到取材。听采访、读来源并核对后，这段才可用于拼图。');
-    if(s.profileAdopted.length)return step('portrait-two-readings','#fragmentReading','拼图决定你采用怎样的她','正反面是对同一批经历的两种理解。你采用的那一面会写进 B 轨，并影响最终审判；不是把她的一生都查完的证明。',{ack:'继续整理侧写',seen:['module-portrait-puzzle']});
+    if(s.profileAdopted.length)return step('portrait-two-readings','#fragmentReading','拼图决定你采用怎样的她','正反面是对同一批经历的两种理解。你采用的那一面会写进 B 轨，并影响最终定性；不是把她的一生都查完的证明。',{ack:'继续整理侧写',seen:['module-portrait-puzzle']});
     const wrong=s.profileSlots.find((id,i)=>id&&id!==D.lifeEpisodes[i].id);
     if(wrong){const index=D.lifeEpisodes.findIndex(event=>event.id===wrong);if(selected!==wrong)return step('portrait-reselect-wrong','[data-fragment="'+wrong+'"]','重新选中放错的片段','先在托盘重新选这一块，再放回正确的年龄。');return step('portrait-correct-age','[data-puzzle-slot="'+index+'"]','把这段移回它发生的时候','原件日期对应 '+D.lifeEpisodes[index].age+' 岁。点这个位置即可移动。');}
     if(selected){const index=D.lifeEpisodes.findIndex(event=>event.id===selected);if(s.profileSlots[index]!==selected)return step('portrait-place','[data-puzzle-slot="'+index+'"]','把这段放在发生的时候','把选中的经历放到 '+D.lifeEpisodes[index].age+' 岁。可以点位置，也可以拖过去。');}
-    if(s.profileSlots.some(Boolean))return step('portrait-confirm','#checkProfile','确认你拼出的经历','放对的年代会保存，空位可以留着。不要求六片全齐才审判。');
+    if(s.profileSlots.some(Boolean))return step('portrait-confirm','#checkProfile','确认你拼出的经历','放对的年代会保存，空位可以留着。不要求六片全齐才定性。');
     return step('portrait-select','[data-fragment]:not(:disabled)','选一块已取得的片段','先选片，再点对应年龄的位置。下方可以读这段经历的正反两面。');
   }
   function currentModule(){
@@ -71,12 +71,14 @@
   }
   function skipModule(){
     const module=currentModule();
-    const keys={rundown:['pgm-library','rundown'],ending:['ending-review'],'portrait-research':['module-portrait-research'],'portrait-puzzle':['module-portrait-puzzle'],talk:['module-talk'],notebook:['notebook'],'life-inquiry':['module-life-inquiry'],'life-connections':['relations'],'life-portrait':['module-life-portrait']};
+    const keys={rundown:['pgm-library','rundown'],ending:['ending-review','ending-returned','ending-return-explained','rundown'],'portrait-research':['module-portrait-research'],'portrait-puzzle':['module-portrait-puzzle'],talk:['module-talk'],notebook:['notebook'],'life-inquiry':['module-life-inquiry'],'life-connections':['relations'],'life-portrait':['module-life-portrait']};
     if(module==='case'){t().core.done=true;t().complete=true;}else for(const key of keys[module]||[])mark(key);
     persist();lastStep='';refresh();
   }
   function contextual(){
     const s=state(),viewer=G.viewerId(),seen=t().seen;
+    if(open('ending')&&!s.ending&&!seen.includes('ending-returned'))return step('ending-first-return','#returnToMaterials','先返回材料，继续核实','这里已经能收尾，但不代表调查完成。现在请点 RETURN TO MATERIALS 回去；等素材整理好、想正式播出时，再回来选择结论。');
+    if(!document.querySelector('dialog[open]')&&seen.includes('ending-returned')&&!seen.includes('ending-return-explained'))return step('ending-return-explained','#rundownButton','继续查，准备播出时再收尾','你可以继续询问、读原件和拼图。整理完成后再进 R、CUE 检查稿件，最后选择播出。材料不足的摘要会结束本期，不是完整客观结局。',{ack:'继续核实',seen:['ending-return-explained','rundown']});
     if(open('viewer')&&viewer==='report'&&!seen.includes('signed-page'))return step('source-signed-page','#companionButton','第一次遇到 / 签收附页','报告写了什么，与她何时拿到这个版本，需要两份来源。点 TURN PAGE，查看对应版本的签收页。');
     if(open('viewer')&&viewer==='receipt'&&!seen.includes('signed-page'))return step('source-receipt-close',footerClose('viewer'),'核对版本与签收人','这里证明的是她收到了什么，不是住客已经知道什么。读完后返回，再与住客实际看到的告示比较。');
     if(open('profileDialog')&&document.querySelector('.life-connections')&&!seen.includes('relations')){
@@ -96,10 +98,10 @@
       if(open('radioScript'))return step('rundown-confirm','#radioScriptConfirm','这是实际将采用的版本','没有接入的轨道不会自动播出。确认这份稿件，再回播出单检查本期是否已经构成完整论证。');
       if(!s.radio.queued.length&&!Object.values(s.radio.cuts||{}).some(keys=>keys.length)){const picker=document.querySelector('.rundown-card.available [data-cut-picker]');if(picker&&!picker.open)return step('rundown-open-library',picker.querySelector('summary'),'先展开已有素材','这里存放的是已核实结果，不是再做一遍推理。展开后可以挑本期要保留的内容。');const first=picker?.querySelector('input[data-pgm-cut]:not(:disabled)');if(first)return step('rundown-select-cut',first.closest('label'),'勾选本期采用的一条内容','勾选只决定这期采用什么，不会增加新推论，也不会删除没选的结果。人物推断还可以连同相关两段经历一起替换到 B。');}
       if(!s.radio.queued.length){const button=[...document.querySelectorAll('[data-queue]')].find(node=>node.closest('.available'));return step('rundown-patch',button,'新的操作 / 接入待播轨','点击“接入 PGM”。取得材料、录好 TAKE 与决定把它播出去，是三个不同操作；本期可以不采用某些录音。');}
-      if(!window.Radio.ready())return step('rundown-preview','#rundownRead','先读本期完整稿件','CUE 会显示本期实际勾选的内容。只有选入的推论与人物侧写进入审判；只采用零散摘要会走第 0 结局，不开放磁带。');
+      if(!window.Radio.ready())return step('rundown-preview','#rundownRead','先读本期完整稿件','CUE 会显示本期实际勾选的内容。只有选入的推论与人物侧写进入定性；只采用零散摘要会走第 0 结局，不开放磁带。');
       return step('rundown-review','#rundownArm','去最后的论证检查','点击这里。下一页会显示哪些链已接上、哪些仍缺来源，你可以继续取材，不用强行作结。');
     }
-    if(open('ending')&&!s.ending&&!seen.includes('ending-review'))return step('ending-review','#verdictChains','新的操作 / 用逻辑链支撑定性','上面的事实和人物推断来自本期 PGM。已知但未采用的内容不会自动进入本次审判。链条与所采用的侧写齐备，才能给她作好坏审判；只播摘要是第 0 结局，不解锁 CG。',{ack:'我明白了',seen:['ending-review','rundown']});
+    if(open('ending')&&!s.ending&&!seen.includes('ending-review'))return step('ending-review','#verdictChains','新的操作 / 用逻辑链支撑定性','上面的事实和人物推断来自本期 PGM。已知但未采用的内容不会自动进入本次定性。案件与人物材料综合决定好坏选项；双方都有充分依据时两项都能选。全收集并完整采用才开放客观播报，材料不足只播摘要。',{ack:'我明白了',seen:['ending-review','rundown']});
     if(s.radio.phase==='on-air'&&!seen.includes('broadcast'))return step('broadcast-next','#radioStoryNext','现在才是对外播出的版本','这一次 ON AIR 按你接入的内容逐段播出，最后一句由你署名。原稿会封存，后来的发现不会倒写进去。');
     return null;
   }
@@ -230,6 +232,7 @@
     if(!t().enabled){refresh();return;}
     if(name==='viewer-open'){if(data.id==='rescue')t().core.alarmOpened=true;if(data.id==='lifeLetter')t().life.letterOpened=true;}
     if(name==='viewer-close'){if(data.id==='rescue'&&t().core.alarmOpened)t().core.alarmClosed=true;if(data.id==='call'&&t().core.builderOpened)t().core.callCompared=true;if(data.id==='lifeLetter'&&t().life.letterOpened)t().life.letterRead=true;if(data.id==='receipt')mark('signed-page');}
+    if(name==='ending-return-click'&&!state().ending){mark('ending-returned');mark('ending-review');}
     if(name==='builder-open')t().core.builderOpened=true;
     if(name==='case-result'&&data.claim==='afterCall'&&data.kind==='supported')t().core.submitted=true;
     if(name==='dialog-open'&&data.id==='profileDialog')t().life.opened=true;
@@ -241,8 +244,8 @@
   function skip(){t().enabled=false;t().complete=true;persist();if(root)root.hidden=true;document.querySelectorAll('[data-producer-focus]').forEach(node=>node.removeAttribute('data-producer-focus'));G.render();}
   function replay(){finishDrag();const panelPosition=t().panelPosition;state().onboarding=D.newOnboarding();state().onboarding.panelPosition=panelPosition;G.closeDialog('helpDialog');lastStep='';persist();G.render();refresh();}
   const replayButton=document.createElement('button');replayButton.id='replayTutorial';replayButton.className='secondary-button';replayButton.textContent='PRODUCER / 补看操作引导';replayButton.onclick=replay;document.querySelector('.chapter-help-links').append(replayButton);
-  document.addEventListener('click',event=>{if(event.target.closest('#producerGuide'))return;if(event.target.closest('[data-source="facts"]'))mark('reuse-facts');if(event.target.closest('#radioStoryNext')&&state().radio.phase==='on-air')mark('broadcast');refresh();});
+  document.addEventListener('click',event=>{if(event.target.closest('#producerGuide'))return;if(event.target.closest('#returnToMaterials'))window.Onboarding.event('ending-return-click');if(event.target.closest('[data-source="facts"]'))mark('reuse-facts');if(event.target.closest('#radioStoryNext')&&state().radio.phase==='on-air')mark('broadcast');refresh();});
   window.visualViewport?.addEventListener('resize',refresh);window.visualViewport?.addEventListener('scroll',refresh);document.addEventListener('change',refresh);document.addEventListener('keydown',()=>refresh());addEventListener('resize',refresh);document.addEventListener('scroll',refresh,true);
   document.addEventListener('close',e=>{if(e.target.tagName==='DIALOG')event('dialog-close',{id:e.target.id});},true);
-  window.Onboarding={refresh,event,coreActive,skip,replay};refresh();
+  window.Onboarding={refresh,event,coreActive,skip,replay,mustReturnBeforeEnding:()=>t().enabled&&!t().seen.includes('ending-returned')};refresh();
 })();

@@ -40,6 +40,6 @@
     s.portraitSide=side==='back'?'back':'front';s.profileViews=unique([...s.profileViews,s.portraitSide]);refreshRelations(s);
     return {kind:'supported',note:'年代已确认。'+(s.lifeLinks.length>links?'相关经历也连成了一条人物关系。':'这些片段可以在播出单 B 轨采用。'),newPieces:s.profileAdopted.length-count,newLinks:s.lifeLinks.length-links};
   }
-  function view(s,side){ensure(s);s.portraitSide=side==='back'?'back':'front';if(s.profileAdopted.length)s.profileViews=unique([...s.profileViews,s.portraitSide]);refreshRelations(s);return s.portraitSide;}
+  function view(s,side){ensure(s);window.Programme.setPortraitSide(s,side==='back'?'back':'front');if(s.profileAdopted.length)s.profileViews=unique([...s.profileViews,s.portraitSide]);refreshRelations(s);return s.portraitSide;}
   window.PortraitEngine={ensure,hasPiece,verifyEpisode,place,confirm,refreshRelations,view};
 })();

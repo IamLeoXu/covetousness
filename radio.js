@@ -17,10 +17,26 @@
   }
   function segmentFacts(id){return P.selected(state(),id).filter(item=>item.kind==='fact').map(item=>item.id);}
   function segmentReady(id){return P.choices(state(),id).length>0;}
-  function segmentText(id){return P.body(state(),id);}
+  function segmentText(id,choice){const s=state();if(id==='life')return choice==='objective'?P.bodyBoth(s):P.body(s,id);return P.selected(s,id).map(item=>D.broadcastFacts?.[item.id]||item.body).join(' ');}
   function ordered(){return rs().order==='life-first'?['life','rumor','warning','rescue']:['rumor','warning','rescue','life'];}
-  function segments(){return ordered().filter(id=>P.active(state()).includes(id)).map(id=>({id,title:D.radioSegments.find(item=>item.id===id).title,body:segmentText(id)}));}
-  function fingerprint(){return JSON.stringify([rs().scope,rs().order,rs().lifeQuote,rs().queued,P.allCuts(state()),segments()]);}
+  function segments(choice){
+    const ids=ordered().filter(id=>P.active(state()).includes(id)),hasLife=ids.includes('life'),hasCase=ids.some(id=>id!=='life');
+    return ids.map((id,index)=>{let body=segmentText(id,choice);
+      const presentation=D.broadcastPresentation||{},lead=presentation.lead?.[id]||'';
+      if(hasLife&&hasCase){
+        if(rs().order==='life-first'&&id!=='life'&&ids.slice(0,index).every(key=>key==='life'))body='刚才说的是她此前的生活。接下来，我们回到引起争议的那一晚。'+body;
+        else if(rs().order!=='life-first'&&id==='life')body='这些记录之外，还有一部分是她此前的生活。'+body;
+      }
+      body=lead+(lead?' ':'')+body;
+      return {id,title:D.radioSegments.find(item=>item.id===id).title,body};
+    });
+  }
+  function makeIdent(){
+    const presentation=D.broadcastPresentation||{},ids=P.active(state()),both=ids.includes('life')&&ids.some(id=>id!=='life');
+    const opening=both?(presentation.orderOpening?.[rs().order]||''):'今晚，我们按已经核实的内容，整理这份来访记录。';
+    return {id:'ident',title:'01:00 / AFTER HOURS',body:[presentation.welcome,presentation.context,opening].filter(Boolean).join(' ')};
+  }
+  function fingerprint(){return JSON.stringify([rs().scope,rs().order,rs().lifeQuote,rs().queued,P.allCuts(state()),P.portraitSide(state()),segments(),window.InquiryEngine.verdictStatus(state()).objective.ready?P.bodyBoth(state()):'']);}
   function hasSelected(){return segments().length>0;}
   function ready(){return !!(state().ending&&rs().phase==='archived')||hasSelected()&&rs().previewed===fingerprint();}
   function goal(){
@@ -32,7 +48,7 @@
     if(r.tutorial==='argument'&&!r.lessonDismissed)return ['导播内线 / 录第一条 TAKE','进入编辑台后可自行选说法与来源；需要详细步骤时可打开 H 提示。','argument'];
     const nextQuestion=window.InvestigationEngine?.availableSteps(state())[0];if(nextQuestion)return ['继续采访 / '+nextQuestion.title,nextQuestion.question,'inquiry'];
     if(!G.progress().ready)return ['EDIT DESK / 来稿还在手边','沿采访桌的问题继续追问，或者打开人物侧写。','argument'];
-    return [ready()?'CUE CONFIRMED / 可以准备收尾':'TAKE READY / 已有可用录音','R 可以整理本期；只有行为与人物链接起来，才能签发正式定性。零散稿件可作为摘要收尾。','rundown'];
+    return [ready()?'CUE CONFIRMED / 可以准备播出':'TAKE READY / 已有可用录音','R 可以整理本期。给她定好坏之前，需要把案件与人物材料一起放进节目；也可以先播出已有的摘要。','rundown'];
   }
   function render(){
     const r=rs(),onAir=r.phase==='on-air',label=onAir?'ON AIR':recording&&r.phase!=='archived'?'REC':r.phase==='archived'?'ARCHIVED':'OFF AIR';
@@ -105,7 +121,7 @@
     let content;
     if(segment.id==='life'){
       const links=library.filter(item=>item.kind==='link'),events=library.filter(item=>item.kind==='event');
-      content='<p class="life-task-split"><b>这里选播哪一种人物解读。</b><br>拼图确认过的经历可以反复选用。勾选一条解读，相关两段一起成为依据。</p>'+links.map(item=>'<div class="cut-row relation-cut '+(!item.eligible?'needs-portrait':'')+'"><label><input type="checkbox" data-pgm-cut="'+item.key+'" data-pgm-track="life" '+(keep.includes(item.key)?'checked ':'')+(locked||!item.eligible?'disabled':'')+'><span><b>'+esc(item.title.replace('人物推断 / ',''))+'</b><small>'+esc(item.body)+'</small></span></label><div class="chain-evidence">'+item.pair.map(id=>'<span>↳ '+esc(library.find(e=>e.key==='event:'+id)?.title||id)+'</span>').join('')+'</div>'+(item.eligible?'<button class="text-button" data-use-chain="'+item.id+'" '+(locked?'disabled':'')+'>本期采用这条侧写 →</button>':'<small>在人物拼图放好这两段，确认年代。</small>')+'</div>').join('')+(!links.length?'<p class="empty-note">尚未核实人物关系。可以继续人物取材与拼图，也可以只播已有片段。</p>':'')+'<details class="cut-fragments"><summary>只播散段摘要 / 不构成人物解读 ↓</summary><p class="life-task-split">单独勾选经历只作为摘要。取消一条解读会保留它的两段经历，可在此取消；调查结果始终保留。</p>'+events.map(row).join('')+'</details>';
+      content='<p class="life-task-split"><b>这里选播哪一种人物解读。</b><br>拼图确认过的经历可以反复选用。勾选一条解读，相关两段一起成为依据。</p>'+links.map(item=>'<div class="cut-row relation-cut '+(!item.eligible?'needs-portrait':'')+'"><label><input type="checkbox" data-pgm-cut="'+item.key+'" data-pgm-track="life" '+(keep.includes(item.key)?'checked ':'')+(locked||!item.eligible?'disabled':'')+'><span><b>'+esc(item.title.replace('人物推断 / ',''))+'</b><small>'+esc(item.body)+'</small></span></label><div class="chain-evidence">'+item.pair.map(id=>'<span>↳ '+esc(library.find(e=>e.key==='event:'+id)?.title||id)+'</span>').join('')+'</div>'+(item.eligible?'<button class="text-button" data-use-chain="'+item.id+'" '+(locked?'disabled':'')+'>本期采用这条侧写 →</button>':'<small>在人物拼图放好这两段，确认年代。</small>')+'</div>').join('')+(!links.length?'<p class="empty-note">尚未核实人物关系。可以继续人物取材与拼图，也可以只播已有片段。</p>':'')+'<details class="cut-fragments"><summary>按经历选择本期内容 ↓</summary><p class="life-task-split">勾选经历后，已经核实的相关关系会随两段依据一起采用。取消某段经历，也会取下依赖它的关系；调查记录始终保留。</p>'+events.map(row).join('')+'</details>';
     }else content=library.map(row).join('');
     return '<details class="cut-library" data-cut-picker="'+segment.id+'" '+(expanded?'open':'')+'><summary>素材库 · '+(segment.id==='life'?'人物解读与散段摘要':library.length+' 条已核实推论')+' · 已选 '+keep.length+' 项 <span>展开更换 ↓</span></summary><div class="cut-library-items">'+content+'</div>'+(!locked&&library.some(item=>!item.eligible)?'<button class="secondary-button" data-confirm-portrait>人物拼图 / 确认相应片段 →</button>':'')+'</details>';
   }
@@ -126,20 +142,27 @@
     $('rundownSegments').querySelectorAll('[data-pgm-cut]').forEach(input=>input.onchange=()=>{P.toggle(s,input.dataset.pgmTrack,input.dataset.pgmCut,input.checked);if(input.checked&&!r.queued.includes(input.dataset.pgmTrack))r.queued.push(input.dataset.pgmTrack);if(!P.keys(s,input.dataset.pgmTrack).length)r.queued=r.queued.filter(id=>id!==input.dataset.pgmTrack);G.save();renderRundown();});
     $('rundownSegments').querySelectorAll('[data-use-chain]').forEach(button=>button.onclick=()=>{if(P.useRelation(s,button.dataset.useChain)){G.save();G.sound('paper');renderRundown();}});
     $('rundownSegments').querySelectorAll('[data-confirm-portrait]').forEach(button=>button.onclick=()=>{G.closeDialog('rundownDialog');window.LifeUI.open('portrait');});
-    $('rundownOrder').querySelectorAll('[data-radio-order]').forEach(button=>{button.classList.toggle('active',button.dataset.radioOrder===r.order);button.disabled=locked;button.onclick=()=>{r.order=button.dataset.radioOrder;r.previewed='';G.save();renderRundown();};});
+    const orderedSource=P.active(source),hasBoth=orderedSource.includes('life')&&orderedSource.some(id=>id!=='life');const orderNote=document.querySelector('.rundown-order-note');if(orderNote)orderNote.textContent=hasBoth?'先后会改变开场、衔接和留言的切入点，综合判断仍使用同一批材料。':'采用案件和人物两类内容后，可以选择先事后人或先人后事。';
+    $('rundownOrder').querySelectorAll('[data-radio-order]').forEach(button=>{button.classList.toggle('active',button.dataset.radioOrder===r.order);button.disabled=locked||!hasBoth;button.onclick=()=>{r.order=button.dataset.radioOrder;r.previewed='';G.save();renderRundown();};});
     document.querySelectorAll('[name="scope"]').forEach(input=>{input.checked=input.value===r.scope;input.disabled=locked;input.onchange=()=>{r.scope=input.value;r.previewed='';G.save();renderRundown();};});
     const pieces=P.selected(source,'life').filter(item=>item.kind==='event'&&(source.lifeSolved||[]).includes(item.id));
     if(pieces.length&&!pieces.some(item=>item.id===r.lifeQuote))r.lifeQuote=pieces[0].id;
-    $('rundownRead').disabled=locked?!r.airScript?.length:!hasSelected();$('rundownArm').disabled=!ready();$('rundownArm').textContent=locked?'回到本期结尾 →':'检查本期论证 / 最后一句 ↗';
+    $('rundownRead').disabled=locked?!r.airScript?.length:!hasSelected();$('rundownArm').disabled=!ready();$('rundownArm').textContent=locked?'回到本期结尾 →':'检查材料与结论 / 还未播出 ↗';
     $('rundownNewDraft').hidden=!locked;$('rundownNewDraft').onclick=newDraft;
-    $('rundownReadyNote').textContent=locked?'这一版已封存。可以用同一素材库另编一版；之前的记录和磁带解锁会保留。':!hasSelected()?'选择已有素材，再接入至少一轨。推论、补访和人物关系都会保留，不需要重做。':r.previewed!==fingerprint()?'本期采用 '+segments().length+' 轨。更换内容后重新 CUE 核对；不需要重录已核实的内容。':'CUE 已确认。本次审判只使用本期真正选入的推论与人物链。';
+    $('rundownReadyNote').textContent=locked?'这一版已封存。可以用同一素材库另编一版；之前的记录和磁带解锁会保留。':!hasSelected()?'选择已有素材，再接入至少一轨。推论、补访和人物关系都会保留，不需要重做。':r.previewed!==fingerprint()?'本期采用 '+segments().length+' 轨。更换内容后重新 CUE 核对；不需要重录已核实的内容。':'CUE 已确认。本次定性只使用本期真正选入的推论与人物链。';
     renderPortraitReading(source,locked);$('rundownCount').textContent=segments().length+' TRACKS';scroll.scrollTop=scrollTop;window.Onboarding?.refresh();
   }
   function renderPortraitReading(source,locked){
     let node=$('portraitJudgment');if(!node){node=document.createElement('section');node.id='portraitJudgment';node.className='portrait-reading';$('rundownSegments').after(node);}
-    const side=source.portraitSide||'front';
-    node.innerHTML='<h3>同一段人生，你采用哪一面？</h3><p>拼图保存经历。这里的读法将写进 B 轨，成为你给她下判断的依据。</p><div>'+[['front','正面 / 她曾怎样爱人'],['back','反面 / 她怎样留住别人']].map(([id,text])=>'<button data-portrait-reading="'+id+'" class="'+(side===id?'active':'')+'" '+(locked?'disabled':'')+'>'+text+'</button>').join('')+'</div>';
-    node.querySelectorAll('[data-portrait-reading]').forEach(button=>button.onclick=()=>{state().portraitSide=button.dataset.portraitReading;rs().previewed='';G.save();renderRundown();});
+    if(locked){
+      const modes=new Set(P.usedEvents(source).map(id=>P.reading(source,id)));
+      const summary=!modes.size?'本期未采用人物侧写。':source.portraitPresentation==='both'||modes.size===1&&modes.has('both')?'本期人物侧写已保留正反两面。':modes.size>1?'本期按封存时的读法播出，具体内容保留在原稿中。':'本期人物侧写采用'+(modes.has('back')?'整体反面':'整体正面')+'。';
+      node.innerHTML='<h3>B / 本期人物侧写</h3><p class="archived-portrait-reading">'+summary+'</p>';return;
+    }
+    const selection=P.allAdopted(source)?'all':P.portraitSide(source),canAdopt=P.tracks.some(track=>P.choices(source,track).length);
+    node.innerHTML='<h3>B / 整体人物侧写</h3><p>选择本期采用的整体读法。A 轨中实际选用的案件材料仍会一起形成播出依据。</p><div class="global-portrait-choice" role="group" aria-label="本期整体呈现方式">'+[['front','整体正面'],['back','整体反面']].map(([value,text])=>'<button type="button" data-portrait-reading="'+value+'" class="'+(selection===value?'active':'')+'" aria-pressed="'+(selection===value)+'">'+text+'</button>').join('')+'<button id="adoptCompleteProgramme" type="button" class="adopt-all-option '+(selection==='all'?'active':'')+'" aria-pressed="'+(selection==='all')+'" '+(!canAdopt?'disabled':'')+'>采用全部已核实材料<small>选入全部可用材料，人物侧写两面都说</small></button></div><p class="complete-adoption-note">完成全部调查并完整选入后，可直接选择完整客观播报。</p>';
+    node.querySelectorAll('[data-portrait-reading]').forEach(button=>button.onclick=()=>{P.setPortraitSide(state(),button.dataset.portraitReading);G.save();renderRundown();});
+    $('adoptCompleteProgramme').onclick=()=>{if(!P.adoptComplete(state()))return;G.save();renderRundown();G.notify('已选择采用全部已核实材料，人物侧写保留两面。');};
   }
   function newDraft(){if(!P.newDraft(state()))return;G.closeDialog('ending');G.save();G.render();openRundown();G.notify('已用现有素材开启新编排。上版记录与磁带权限保留，不必重推或重访。');}
   function useFact(id){
@@ -153,15 +176,15 @@
     G.save();G.render();G.notify('相关两段经历与人物推断已采用到 B，可在播出单更换。');return true;
   }
   function openScript(){
-    previewMode='rundown';previewStamp=fingerprint();const items=archived()&&rs().airScript?.length?rs().airScript:segments();
-    $('radioScriptBody').innerHTML=items.map((item,i)=>'<article><span>'+String(i+1).padStart(2,'0')+' / '+esc(item.title)+'</span><p>'+esc(item.body)+'</p></article>').join('')+(!archived()?'<p class="radio-script-last">最后一句尚未署名。下一页会检查行为与人物逻辑链，再决定是否能够定性。</p>':'');
-    $('radioScriptConfirm').textContent=archived()?'返回本期记录 →':'确认这份编排 / 返回播出单 →';G.openDialog('radioScript');sound('cue');
+    previewMode='rundown';previewStamp=fingerprint();const locked=archived(),items=locked&&rs().airScript?.length?rs().airScript:[makeIdent(),...segments()],presentation=D.broadcastPresentation||{};
+    $('radioScriptBody').innerHTML=items.map((item,i)=>'<article><span>'+String(i+1).padStart(2,'0')+' / '+esc(item.title)+'</span><p>'+esc(item.body)+'</p></article>').join('')+(!locked?'<article><span>节目收束</span><p>'+esc(presentation.closing||'')+'</p></article><p class="radio-script-last">最后一句尚未选择。检查页可以返回继续核实，也可选择定性或完整客观播报。</p>':'')+(!locked&&window.InquiryEngine.verdictStatus(state()).objective.ready?'<article class="objective-preview"><h3>完整客观播报预览 / 自动保留人物两面</h3><p>'+esc(P.bodyBoth(state()))+'</p><p>'+esc(presentation.editorial?.objective||D.judgmentEditorial.objective)+'</p><p>'+esc(presentation.outro?.objective||'')+'</p></article>':'');
+    $('radioScriptConfirm').textContent=locked?'返回本期记录 →':'确认这份编排 / 返回播出单 →';G.openDialog('radioScript');sound('cue');
   }
   function confirmScript(){if(previewMode==='edit'){if(previewStamp===editFingerprint())editPreview=previewStamp;G.closeDialog('radioScript');G.renderBuilder();return;}if(hasSelected()&&!archived()&&previewStamp===fingerprint())rs().previewed=previewStamp;G.save();G.closeDialog('radioScript');renderRundown();}
   function guardEnding(){if(ready())return true;openRundown();return false;}
   function airScript(choice){
-    const body=D.judgmentEditorial[choice];
-    return [{id:'ident',title:'01:00 / AFTER HOURS',body:'这里是 AFTER HOURS，FM 107.9。今晚的来访者是小春。以下采用本期播出单中的原件与采访文字转录。'},...segments(),{id:'editorial',title:choice==='zero'?'本期摘要 / 没有定性':'最后一句 / 你给她的定义',body}];
+    const presentation=D.broadcastPresentation||{},body=[presentation.closing,presentation.editorial?.[choice]||D.judgmentEditorial[choice],presentation.outro?.[choice]].filter(Boolean).join('\n\n');
+    return [makeIdent(),...segments(choice),{id:'editorial',title:choice==='zero'?'材料不足 / 本期摘要':choice==='objective'?'完整客观播报 / 两面都保留':'本期结论 / 由你署名',body}];
   }
   function renderTransmission(){
     const r=rs(),script=r.airScript,index=Math.min(r.transmitIndex,script.length-1),item=script[index];$('radioScene').dataset.kind='broadcast';$('radioSceneStatus').textContent='ON AIR / 本期播出转录';$('radioSceneSkip').hidden=true;
@@ -171,13 +194,13 @@
     $('radioStoryNext').focus({preventScroll:true});window.Onboarding?.refresh();
   }
   function transmit(choice,resume=false){document.querySelectorAll('dialog[open]').forEach(node=>node.close());if(!resume||!rs().airScript?.length){rs().airScript=airScript(choice);rs().transmitIndex=0;rs().editorialSnapshot=P.freeze(state(),choice,rs().airScript);}rs().phase='on-air';rs().airedEnding=choice;G.save();window.Onboarding?.event('transmit',{choice});showScene('air');renderTransmission();render();sound('air');}
-  function finishTransmission(){const choice=state().ending;rs().phase='archived';P.archive(state());G.save();hideScene();render();chapterVerdict(choice,state());}
+  function finishTransmission(){const choice=state().ending;rs().phase='archived';rs().audienceNote=rs().order==='life-first'?'导播：最先来的留言，问起她以前的工作和相处。也有人追问，那晚的事还没有说完。':'导播：最先来的留言，追问那晚的钱和告示。读到后面，也有人问起她以前的生活。';P.archive(state());G.save();hideScene();render();chapterVerdict(choice,state());}
   window.ChapterExtension.onVerdict=(choice)=>transmit(choice);
   window.ChapterExtension.prepareEnding=(s)=>{chapterEnding(s);$('ending').querySelector('.dialog-bar>span').textContent=archived()?'AFTER HOURS / ARCHIVED BROADCAST':'ON AIR / YOU SIGN THE LAST SENTENCE';if(!s.ending)$('ending').querySelector('h2').innerHTML='材料已在待播盘。<br>最后一句，怎么说？';};
   $('rundownButton').onclick=openRundown;$('rundownRead').onclick=openScript;$('radioScriptConfirm').onclick=confirmScript;$('rundownArm').onclick=()=>{G.closeDialog('rundownDialog');G.openEnding();};$('radioSceneSkip').onclick=()=>finishPrologue(true);
   const rehear=document.createElement('button');rehear.id='rehearOpening';rehear.className='radio-rehear';rehear.textContent='重听本期开场 / 电台与前情';rehear.onclick=()=>openPrologue(true);document.querySelector('.title-copy').append(rehear);
   const rehearMenu=document.createElement('button');rehearMenu.id='rehearFromMenu';rehearMenu.className='text-button';rehearMenu.textContent='重听本期开场';rehearMenu.onclick=()=>{G.closeDialog('helpDialog');openPrologue(true);};document.querySelector('.chapter-help-links').append(rehearMenu);
-  $('startButton').firstChild.nodeValue='TAKE THE NIGHT SHIFT ';document.querySelector('.title-control-hint').textContent='来访 · 追问取证 · 人物拼图 · 最后的审判';document.querySelector('.title-bottom span:last-child').textContent='CHAPTER BUILD / '+D.version+'';
+  $('startButton').firstChild.nodeValue='TAKE THE NIGHT SHIFT ';document.querySelector('.title-control-hint').textContent='来访 · 追问取证 · 人物拼图 · 最后的定性';document.querySelector('.title-bottom span:last-child').textContent='CHAPTER BUILD / '+D.version+'';
   document.addEventListener('keydown',event=>{if(!busy()||document.querySelector('dialog[open]'))return;if(event.key==='Enter'&&!event.target.closest('button')&&!$('radioStoryNext').disabled){event.preventDefault();$('radioStoryNext').click();}if(event.key==='Escape'&&review)finishPrologue(true);if(!event.target.closest('button')||!['Enter',' '].includes(event.key))event.stopImmediatePropagation();},true);
   document.addEventListener('keydown',event=>{if(event.key.toLowerCase()!=='r'||event.ctrlKey||event.altKey||event.metaKey||/INPUT|TEXTAREA|SELECT/.test(event.target.tagName)||!$('titleScreen').hidden||busy()||!$('cgScreen').hidden||document.querySelector('dialog[open]'))return;event.preventDefault();openRundown();});
   window.Radio={start,render,onCollect,onResult,onViewerClosed,onConversation,guardEnding,ready,busy,openRundown,openPrologue,hint,decorateBuilder,canRecord,newDraft,useFact,useRelation};
