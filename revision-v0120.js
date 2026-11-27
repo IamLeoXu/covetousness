@@ -1,5 +1,5 @@
 (function(){
-  'use strict';const D=window.InquiryData;D.version='0.12.1';
+  'use strict';const D=window.InquiryData;D.version='2.0.0';
   // The chapter title stays unchanged until the user chooses from the proposed names.
   const visible=text=>String(text).replaceAll('审判','定性播出').replaceAll('裁决','判断');
   for(const id of Object.keys(D.inferenceRoles))D.inferenceRoles[id]=visible(D.inferenceRoles[id]);

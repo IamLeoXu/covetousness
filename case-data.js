@@ -1,4 +1,4 @@
-/* Authored case material. This demo has no API or external dependencies. */
+/* Authored case material for the radio investigation. */
 (function (root) {
   'use strict';
   const evidence = {
@@ -31,7 +31,7 @@
       lead: '22:07:16，奈央打开了前门。',
       paragraphs: ['连续画面中，现住客奈央从自己的袋子里取出钥匙，打开前门，独自离开。小春没有出现在这个片段里。', '这份摘录仅对应画面中的人和时段，没有覆盖整晚所有出口。'],
       rows: [['日期', '11.16'], ['时间', '22:07:16 — 22:07:39'], ['复核身份', '奈央 / 当晚现住客']],
-      note: '这是文字化的录像摘录，本小样未制作人物监控视频。'
+      note: ''
     },
     snippet: {
       code: '05', title: '网上流传的九秒录音', label: 'NINE SECONDS', type: 'transcript', place: 'studio',
@@ -39,7 +39,7 @@
       lead: '“别走，等我两分钟。”',
       transcript: [['小春', '等一下。'], ['记录', '转接双音。'], ['小春', '别走，等我两分钟。我这边还没弄完。']],
       paragraphs: ['转发者配字：“事故前，她还在阻拦住客离开。”切片本身没有交代受话人和绝对时间。'],
-      note: '本 demo 以文字转录展示对白，不以合成语音冒充原始录音。'
+      note: ''
     },
     call: {
       code: '06', title: '安置站的原始通话转录', label: 'FULL CALL', type: 'transcript', place: 'studio',

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#111019">
-  <title>DEAD AIR · 余声 / 第一章 0.12.1</title>
+  <title>DEAD AIR · 余声 / 第一章 2.0.0</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath fill='%23d2f850' d='M0 0h40v40H0z'/%3E%3Cpath fill='%23111019' d='M9 6h9q16 0 16 14T18 34H9zm8 7v14h2q8 0 8-7t-8-7z'/%3E%3C/svg%3E">
   <link rel="preload" as="image" href="execution/assets/character/details/calm-empty-hands.png?v=0.8.1">
   <link rel="preload" as="image" href="assets/city.webp">
@@ -12,42 +12,43 @@
   <link rel="stylesheet" href="chapter.css">
   <link rel="stylesheet" href="life.css">
   <link rel="stylesheet" href="radio.css?v=0.8.1">
-  <script defer src="case-data.js"></script>
+  <script defer src="case-data.js?v=2.0.0"></script>
   <script defer src="chapter-data.js"></script>
   <script defer src="life-data.js"></script>
   <script defer src="radio-data.js?v=0.8.1"></script>
   <script defer src="edition-data.js?v=0.8.1"></script>
-  <script defer src="journey-data.js?v=0.12.1"></script>
-  <script defer src="investigation-data.js?v=0.12.1"></script>
-  <script defer src="revision-v0110.js?v=0.12.1"></script>
-  <script defer src="judgment-data.js?v=0.12.1"></script>
-  <script defer src="presentation-v0120.js?v=0.12.1"></script>
-  <script defer src="revision-v0120.js?v=0.12.1"></script>
-  <script defer src="inquiry-engine.js?v=0.12.1"></script>
+  <script defer src="journey-data.js?v=2.0.0"></script>
+  <script defer src="investigation-data.js?v=2.0.0"></script>
+  <script defer src="revision-v0110.js?v=2.0.0"></script>
+  <script defer src="judgment-data.js?v=2.0.0"></script>
+  <script defer src="presentation-v0120.js?v=2.0.0"></script>
+  <script defer src="revision-v0120.js?v=2.0.0"></script>
+  <script defer src="inquiry-engine.js?v=2.0.0"></script>
   <script defer src="case-engine.js?v=0.8.1"></script>
   <script defer src="chapter-engine.js?v=0.8.1"></script>
-  <script defer src="programme-engine.js?v=0.12.1"></script>
-  <script defer src="verdict-engine.js?v=0.12.1"></script>
-  <script defer src="life-engine.js?v=0.12.1"></script>
+  <script defer src="programme-engine.js?v=2.0.0"></script>
+  <script defer src="verdict-engine.js?v=2.0.0"></script>
+  <script defer src="life-engine.js?v=2.0.0"></script>
   <script defer src="execution/cassette.js?v=0.8.1"></script>
-  <script defer src="portrait-engine.js?v=0.12.1"></script>
-  <script defer src="debug.js?v=0.12.1"></script>
-  <script defer src="game.js?v=0.12.1"></script>
-  <script defer src="chapter.js?v=0.12.1"></script>
-  <script defer src="life.js?v=0.12.1"></script>
-  <script defer src="radio.js?v=0.12.1"></script>
+  <script defer src="portrait-engine.js?v=2.0.0"></script>
+  <script defer src="debug.js?v=2.0.0"></script>
+  <script defer src="game.js?v=2.0.0"></script>
+  <script defer src="chapter.js?v=2.0.0"></script>
+  <script defer src="life.js?v=2.0.0"></script>
+  <script defer src="radio.js?v=2.0.0"></script>
   <link rel="stylesheet" href="edition.css?v=0.8.1">
   <link rel="stylesheet" href="onboarding.css?v=0.8.1">
   <link rel="stylesheet" href="programme.css?v=0.8.1">
   <link rel="stylesheet" href="revision.css?v=0.8.1">
-  <link rel="stylesheet" href="journey.css?v=0.12.1">
-  <link rel="stylesheet" href="inquiry.css?v=0.12.1">
-  <link rel="stylesheet" href="portrait.css?v=0.12.1">
-  <script defer src="inquiry.js?v=0.12.1"></script>
-  <script defer src="social.js?v=0.12.1"></script>
-  <script defer src="onboarding.js?v=0.12.1"></script>
-  <link rel="stylesheet" href="revision-v0110.css?v=0.12.1">
-  <link rel="stylesheet" href="revision-v0120.css?v=0.12.1">
+  <link rel="stylesheet" href="journey.css?v=2.0.0">
+  <link rel="stylesheet" href="inquiry.css?v=2.0.0">
+  <link rel="stylesheet" href="portrait.css?v=2.0.0">
+  <script defer src="inquiry.js?v=2.0.0"></script>
+  <script defer src="social.js?v=2.0.0"></script>
+  <script defer src="onboarding.js?v=2.0.0"></script>
+  <link rel="stylesheet" href="revision-v0110.css?v=2.0.0">
+  <link rel="stylesheet" href="revision-v0120.css?v=2.0.0">
+  <link rel="stylesheet" href="release-v200.css?v=2.0.0">
 </head>
 <body>
   <div id="app" class="app" data-scene="studio" data-phase="first">
@@ -132,13 +133,13 @@
         <div id="builderMap" class="builder-map"><b>上方 A/B/C 是卷宗，不是来源编号。</b><br>先选一句说法，再用下方最多三份材料共同支持它。来源顺序不限，可以留空；切换材料标签不会清空已选来源。</div><div id="topicTabs" class="topic-tabs" role="tablist" aria-label="正在讨论的问题"></div>
         <div class="claim-block"><span class="field-label">CLAIM / 选择一句说法</span><p id="builderQuestion" class="builder-question"></p><div id="claimOptions" class="claim-options"></div><p id="claimRole" class="claim-role"></p><div id="claimRecipes" class="claim-recipes" hidden></div></div>
         <div class="support-block"><div class="support-heading"><span class="field-label">SOURCES / 支持它的材料</span><button id="clearSlots" class="text-button">CLEAR</button></div><div id="evidenceSlots" class="evidence-slots" aria-label="放入最多三份材料"></div><p class="slot-tip">三个来源位共同支撑当前说法，顺序不影响结果，也不必填满。点材料放入；↗ 只用于阅读。</p></div>
-        <button id="debugInference" class="debug-inference" type="button">TEST / 一键推理</button><section id="debugInferencePanel" class="debug-inference-panel" hidden></section><div class="edit-transport"><span class="edit-bus-label">SOURCE → CUE → RECORD BUS</span><button id="editCue" class="deck-key">CUE<small>预听来源</small></button><button id="editArm" class="deck-key record-key">ARM<small>录音待命</small></button><span id="editTakeState" class="edit-take-state">SAFE</span></div><div class="argument-footer"><p id="submitHint">先选择一个明确的说法。</p><button id="submitArgument" class="submit-argument" disabled>REC / ASK <span>↗</span></button></div>
+        <button id="debugInference" class="debug-inference" type="button">一键推理</button><section id="debugInferencePanel" class="debug-inference-panel" hidden></section><div class="edit-transport"><span class="edit-bus-label">SOURCE → CUE → RECORD BUS</span><button id="editCue" class="deck-key">CUE<small>预听来源</small></button><button id="editArm" class="deck-key record-key">ARM<small>录音待命</small></button><span id="editTakeState" class="edit-take-state">SAFE</span></div><div class="argument-footer"><p id="submitHint">先选择一个明确的说法。</p><button id="submitArgument" class="submit-argument" disabled>REC / ASK <span>↗</span></button></div>
       </section>
     </div>
   </dialog>
 
   <dialog id="conversation" class="conversation-dialog">
-    <div class="conversation-art" aria-hidden="true"><div id="conversationSession" class="conversation-session" hidden><span data-voice="koharu">小春 / 在场</span><span data-voice="nao">奈央 / 连线</span><span data-voice="saki">纱纪 / 工作室</span><span data-voice="host">你 / 主持人</span></div><img id="conversationPortrait" src="execution/assets/character/details/calm-empty-hands.png?v=0.8.1" alt=""><div id="conversationTape" class="conversation-tape" hidden></div></div>
+    <div class="conversation-art" aria-hidden="true"><div id="conversationSession" class="conversation-session" hidden><span data-voice="koharu">小春 / 在场</span><span data-voice="nao">奈央 / 连线</span><span data-voice="saki">纱纪 / 工作室</span><span data-voice="mother">母亲 / 连线</span><span data-voice="host">你 / 主持人</span></div><img id="conversationPortrait" src="execution/assets/character/details/calm-empty-hands.png?v=0.8.1" alt=""><div id="conversationTape" class="conversation-tape" hidden></div><div id="conversationSignal" class="conversation-signal" hidden><img src="assets/signal-only.svg" alt="仅音频连线的电台信号画面"><div class="signal-caption"><span id="signalRoute">LINE 02 / CONNECTED</span><strong id="signalSpeaker">奈央</strong><small>仅音频连线</small></div></div></div>
     <div class="conversation-content"><span id="conversationLabel" class="eyebrow">INTERVIEW / OFF AIR</span><span class="speaker-tag" id="conversationSpeaker">小春</span><p id="conversationText"></p><div id="conversationChoices" class="conversation-choices"></div><div class="conversation-bottom"><span id="conversationCounter"></span><div class="conversation-nav"><button class="secondary-button" id="conversationPrev" disabled>← 上一页</button><button class="ink-button" id="conversationNext">下一页 →</button></div></div></div>
   </dialog>
 
@@ -152,14 +153,14 @@
     <h2>先取材，<br>再点亮红灯。</h2>
     <ol><li><b>开播前</b><p>接收来稿，送 CUE 本地预听，调出原件。录音室的 REC 是采访准备，尚未对听众播出；前台页是你与小春共同核对的授权记录。</p></li><li><b>核实与补访</b><p>B 比较原件和推论，三卷案件分别核实。材料随询问和调查取得；P 核对经历、拼合正反侧写。推理只需选说法与来源，一次提交。模块打开时才出现对应引导。</p></li><li><b>编排与播出</b><p>R 打开播出单（RUNDOWN）。A 轨选择案件推论，B 轨选择人物解读并自动带入两段依据；不必取齐所有卷宗。文字预听后署名，ON AIR 按实际采用内容播出。</p></li></ol>
     <div class="help-keys"><span><kbd>B</kbd>追问</span><span><kbd>N</kbd>笔记</span><span><kbd>P</kbd>人生</span><span><kbd>R</kbd>播出单</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>取材区</span><span><kbd>ESC</kbd>返回</span><span><kbd>ENTER</kbd>继续</span></div>
-    <p class="help-note">游戏自动保存。P 人物档案，H 分阶段提示。可以只采用手边的片段收尾，也可继续点开原件的随附材料。旧版已有进度保留。CG 的 STOP、自动停止与退带后均为带纹理的待机黑屏；暂停保留当前画面。</p>
-    <div class="chapter-help-links"><button id="hintButton" class="secondary-button">HINT / 当前提示</button><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">完整攻略 ↗</a><a class="guide-link" href="case-notes.html" target="_blank" rel="noopener">案件与判例参照 ↗</a><button id="previewCG" class="text-button">ARCHIVE / 演出预览</button></div>
+    <p class="help-note">游戏自动保存。P 人物档案，H 分阶段提示。可以只采用手边的片段收尾，也可继续点开原件的随附材料。</p>
+    <div class="chapter-help-links"><button id="hintButton" class="secondary-button">HINT / 当前提示</button><a class="guide-link" href="walkthrough.html" target="_blank" rel="noopener">完整攻略 ↗</a><a class="guide-link" href="case-notes.html" target="_blank" rel="noopener">节目档案 ↗</a><button id="previewCG" class="text-button">ARCHIVE / 演出预览</button></div>
     <div class="help-actions"><button id="restartButton" class="text-button">RESTART THIS RECORD</button><button class="ink-button" data-close="helpDialog">BACK TO THE CASE →</button></div>
-    <div id="restartConfirm" class="restart-confirm" hidden><p>重新开始会清除这个 demo 的当前进度。</p><button id="confirmRestart" class="danger-button">确认重新开始</button><button id="cancelRestart" class="secondary-button">取消</button></div>
+    <div id="restartConfirm" class="restart-confirm" hidden><p>重新开始会清除当前调查进度。</p><button id="confirmRestart" class="danger-button">确认重新开始</button><button id="cancelRestart" class="secondary-button">取消</button></div>
   </dialog>
 
   <dialog id="ending" class="ending-dialog">
-    <header class="dialog-bar"><span>END OF THE PILOT / RECORD 001</span><button data-close="ending" class="close-button" aria-label="继续查看材料">×</button></header>
+    <header class="dialog-bar"><span>END OF THE PROGRAMME / RECORD 001</span><button data-close="ending" class="close-button" aria-label="继续查看材料">×</button></header>
     <div class="ending-layout"><div class="ending-art"><span>WHAT<br>REMAINS.</span><img src="execution/assets/character/details/held-letter.png" alt="小春握着信封的剪影"></div><section class="ending-copy"><span class="eyebrow">THE NEXT QUESTION</span><h2>门没锁。<br>他们知道多少？</h2><div id="endingFacts"></div><p class="ending-context">你确认了危险信息没有完整传达。事故的因果、款项与其他人的责任，还需要下一段调查。</p><p id="endingDecisionNotice" class="ending-decision-notice">还想继续核实？点击下方 RETURN TO MATERIALS 返回材料。只有准备播出本期时，才选择下面的收尾方式。</p><div id="verdictAssessment" class="judgment-assessment"></div><div id="verdictChains" class="verdict-chains"></div><div id="endingOptions" class="ending-options"><button data-ending="good"><b>GOOD / 我认定她是个好人</b><span>采用事实与正面侧写，给她的整个人作出判断。</span></button><button data-ending="bad"><b>BAD / 我认定她是个坏人</b><span>采用事实与反面侧写，给她的整个人作出判断。</span></button><button data-ending="objective"><b>完整客观播报 / 不给她定好坏</b><span>须完成全部调查，并把必要案件与人物材料完整选入本期；该结尾自动呈现整体侧写的两面。</span></button><button data-ending="zero"><b>材料不足 / 只播现有摘要，结束本期</b><span>调查未完成，不是完整客观结局。选此项会直接播出并结束本期。</span></button></div><div id="endingResult" class="ending-result" hidden></div><div class="ending-actions"><button id="saveRecord" class="secondary-button">YOUR RECORD ↗</button><button id="returnToMaterials" data-close="ending" class="ink-button">RETURN TO MATERIALS / 继续核实 →</button></div></section></div>
   </dialog>
 

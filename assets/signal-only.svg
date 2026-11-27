@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="760" viewBox="0 0 600 760" role="img" aria-labelledby="title desc">
+  <title id="title">SIGNAL ONLY</title><desc id="desc">深夜电台的音频连线画面，绿色波形穿过圆形示波器，没有人物影像。</desc>
+  <defs>
+    <radialGradient id="screen"><stop stop-color="#25312b"/><stop offset="1" stop-color="#10171a"/></radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#afc8a8" stroke-opacity=".08"/></pattern>
+    <pattern id="scan" width="4" height="6" patternUnits="userSpaceOnUse"><path d="M0 1H4" stroke="#030808" stroke-opacity=".22" stroke-width="2"/></pattern>
+    <filter id="glow" x="-20%" y="-100%" width="140%" height="300%"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+  <path fill="url(#screen)" d="M0 0h600v760H0z"/><path fill="url(#grid)" d="M0 0h600v760H0z"/>
+  <g fill="none" stroke="#a5b3a4" opacity=".42"><path d="M28 82V28h54m436 0h54v54M28 678v54h54m436 0h54v-54" stroke-width="2"/><path d="M48 106h504M48 654h504"/></g>
+  <g fill="#a2b5a5" font-family="monospace" font-size="13" letter-spacing="2"><text x="48" y="64">AFTER HOURS</text><text x="552" y="64" text-anchor="end">107.9 FM</text><text x="48" y="90" font-size="10" fill="#6d8277">REMOTE AUDIO / STUDIO A</text></g>
+  <g fill="none" stroke="#92a88e"><circle cx="300" cy="362" r="185" opacity=".2"/><circle cx="300" cy="362" r="161" opacity=".12" stroke-dasharray="3 11"/><path d="M94 362h412M300 156v412" opacity=".15"/><path d="M300 169v22m0 342v22M107 362h22m342 0h22" opacity=".5"/></g>
+  <g stroke="#c9e39c" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M93 392h73l13-17 16 33 20-61 20 91 21-122 21 140 23-171 24 129 21-71 19 47 16-24 15 26h112" stroke-width="9" opacity=".18" filter="url(#glow)"/>
+    <path d="M93 392h73l13-17 16 33 20-61 20 91 21-122 21 140 23-171 24 129 21-71 19 47 16-24 15 26h112" stroke-width="3"/>
+  </g>
+  <path fill="#131d1b" d="M82 260h436v64H82z"/>
+  <text x="300" y="306" text-anchor="middle" font-family="monospace" font-weight="700" font-size="40" letter-spacing="4" fill="#d6e7bd">SIGNAL ONLY</text>
+  <g fill="#9eb590" font-family="monospace" font-size="11" letter-spacing="3"><text x="300" y="502" text-anchor="middle">VOICE CHANNEL OPEN</text></g>
+  <g fill="#9cb98c"><rect x="250" y="538" width="8" height="12"/><rect x="267" y="531" width="8" height="19"/><rect x="284" y="520" width="8" height="30"/><rect x="301" y="525" width="8" height="25"/><rect x="318" y="533" width="8" height="17"/><rect x="335" y="540" width="8" height="10"/></g>
+  <path fill="url(#scan)" d="M0 0h600v760H0z"/>
+  <g fill="#779086" font-family="monospace" font-size="11" letter-spacing="2"><text x="48" y="690">AH / AUDIO LINK</text><circle cx="544" cy="686" r="4" fill="#c9e39c"/></g>
+</svg>

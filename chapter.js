@@ -59,8 +59,8 @@
     if(hintScope==='life')return window.LifeUI.hint();
     const s=state(),steps=window.InvestigationEngine.availableSteps(s),unread=Object.keys(s.inquiry.received).filter(id=>!s.collected.includes(id));
     if(unread.length)return ['收到的材料还没有读完',['先打开“'+D.evidence[unread[0]].title+'”。','材料在采访桌“刚交来的材料”中，也能在对应物件或收件夹重看。','读过以后才会出现在推理的来源库里。']];
-    if(steps.length)return ['现在可以追问',['采访桌上可以继续问：“'+steps[0].question+'”','点击“'+steps[0].title+'”。对方会在这段采访里交出相关材料。','收到后对照原件，再到 B 提出推断。测试时也可用一键推理查看当前组合。']];
-    const available=window.DebugInference?.solutions(s,s.caseLayer).filter(item=>!item.known)||[];
+    if(steps.length)return ['现在可以追问',['采访桌上可以继续问：“'+steps[0].question+'”','点击“'+steps[0].title+'”。对方会在这段采访里交出相关材料。','收到后对照原件，再到 B 提出推断。也可用一键推理查看当前可用的组合。']];
+    const available=window.InferenceAssistant?.solutions(s,s.caseLayer).filter(item=>!item.known)||[];
     if(available.length){const solution=available[0];return ['比较已有来源',['你已经有足够材料核对“'+D.facts[solution.claim].title+'”。','到 B，选择这句说法。','采用：'+solution.sources.map(id=>(D.evidence[id]||D.facts[id]).title).join(' ＋ ')+'。']];}
     return ['整理本期判断',['N 可回看已经核实的结果；P 可继续人物取材与拼图。','R 勾选本期采用的推论与人物侧写，再 CUE 读一遍稿件。','最后的定性只采用本期选入的内容。B 轨整体正反面可以切换，A 轨按实际采用的案件材料形成依据。']];
   }

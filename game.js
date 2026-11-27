@@ -9,7 +9,7 @@
   let state = fresh(), flow = null, toastTimer, currentViewer = null, audioContext = null, lastSound = 0;
   try {
     const stored = JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('dead-air-chapter01-v02'));
-    if (stored && [D.version,'0.12.0','0.11.0','0.10.0','0.9.0','0.8.1','0.8.0','0.7.0','0.6.5','0.6.4','0.6.3','0.6.2','0.6.1','0.6','0.5','0.4','0.3','0.2'].includes(stored.version)) {
+    if (stored && [D.version,'0.12.1','0.12.0','0.11.0','0.10.0','0.9.0','0.8.1','0.8.0','0.7.0','0.6.5','0.6.4','0.6.3','0.6.2','0.6.1','0.6','0.5','0.4','0.3','0.2'].includes(stored.version)) {
       const legacy=stored.version==='0.2';
       state.started = stored.started === true;
       state.scene = D.scenes[stored.scene] ? stored.scene : 'studio';
@@ -209,7 +209,7 @@
     $('submitArgument').disabled=!b.claim||!b.selected.length;
     const chosen=topic.claims.find(c=>c.id===b.claim);
     $('submitHint').textContent=!chosen?'先选择一个明确、可以核实的说法。':(chosen.check||'放入能支持这句话的材料。')+' 已选 '+b.selected.length+' 份。';
-    window.Radio?.decorateBuilder();window.DebugInference?.render();window.Onboarding?.refresh();
+    window.Radio?.decorateBuilder();window.InferenceAssistant?.render();window.Onboarding?.refresh();
   }
   function selectMaterial(id) {
     if(!known(id)) return;
@@ -256,8 +256,8 @@
     window.InquiryUI?.speaker(line,flow);
     $('conversationPortrait').src=window.ChapterExtension?.portrait(state,{...flow,portrait:line.portrait||flow.portrait})||'execution/assets/character/details/calm-empty-hands.png';
     $('conversationPortrait').dataset.framing=/\/(?:calm-empty-hands|clasped-keys|front-clasped-keys|front-held-letter)\.png/.test($('conversationPortrait').src)?'waist':'';
-    const tape=line.visual==='tape';$('conversation').classList.toggle('is-tape',tape);
-    $('conversationTape').hidden=!tape;$('conversationPortrait').hidden=tape;
+    const tape=line.visual==='tape',remote=['nao','saki','mother'].includes($('conversation').dataset.speaker);$('conversation').classList.toggle('is-tape',tape);$('conversation').classList.toggle('is-signal',remote&&!tape);
+    $('conversationTape').hidden=!tape;$('conversationPortrait').hidden=tape||remote;$('conversationSignal').hidden=tape||!remote;
     if(tape&&!$('conversationTape').firstElementChild)new window.CharacterCassette($('conversationTape'),'handoff',{decal:'execution/assets/ui/koharu-tape-decal.png'}).update(.35);
     $('conversationCounter').textContent=String(flow.index+1).padStart(2,'0')+' / '+String(flow.lines.length).padStart(2,'0');
     $('conversationPrev').disabled=flow.index===0&&!flow.parent;
@@ -368,6 +368,7 @@
     if(event.key.toLowerCase()==='n'){event.preventDefault();openNotebook();}
     if(['1','2','3'].includes(event.key)){event.preventDefault();switchScene(['studio','lobby','archive'][Number(event.key)-1]);}
   });
-  window.ChapterGame={unresolvedQuestions,debugInfer:(claim,sources)=>{if(!window.DebugInference?.enabled)return;const item=window.DebugInference.solutions(state,state.builder.topic).find(x=>x.claim===claim&&x.sources.every(id=>sources.includes(id)));if(!item)return;state.builder.claim=claim;state.builder.selected=[...item.sources];state.builder.source='mixed';submitArgument();},getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,reviewLastConversation,openEnding,openViewer,collect,progress,sound,openBuilder,renderBuilder,viewerId:()=>currentViewer};
+  function inferFromSources(claim,sources){const item=window.InferenceAssistant.solutions(state,state.builder.topic).find(x=>x.claim===claim&&x.sources.every(id=>sources.includes(id)));if(!item)return;state.builder.claim=claim;state.builder.selected=[...item.sources];state.builder.source='mixed';submitArgument();}
+  window.ChapterGame={unresolvedQuestions,inferFromSources,debugInfer:inferFromSources,getState:()=>state,save,render,notify,openDialog,closeDialog,playConversation,finishConversation,reviewLastConversation,openEnding,openViewer,collect,progress,sound,openBuilder,renderBuilder,viewerId:()=>currentViewer};
   render();$('startButton').focus();
 })();
