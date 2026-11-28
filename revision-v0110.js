@@ -1,6 +1,6 @@
 (function(){
   'use strict';const D=window.InquiryData;
-  D.version='0.11.0';D.chapterTitle='余声';D.characterId='koharu';D.expectedCharacters=['koharu'];D.campaignComplete=false;
+  D.version='0.11.0';D.chapterTitle='积隅';D.characterId='koharu';D.expectedCharacters=['koharu'];D.campaignComplete=false;
   const previousNew=D.newRadioState,previousRestore=D.restoreRadioState;
   D.newRadioState=()=>({...previousNew(),lifeReadings:{}});
   D.restoreRadioState=(value,ending)=>{

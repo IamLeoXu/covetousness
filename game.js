@@ -324,7 +324,7 @@
     $('endingResult').innerHTML='<span>'+(hold?'JUDGMENT RESERVED':'JUDGMENT STATED')+' / RECORDED</span><p>'+ (hold?'主持人：危险信息没有完整告知，这项事实应当公开。关于她今后是否还有可能重新获得信任，我保留判断。':'主持人：她把保住小楼放在了住客知情与自行决定之前。我反对今后再将需要临时住处的人交由她独立照料。')+'</p><p>'+ (hold?'小春：门还是不能开，对吧？……嗯。我知道。':'小春：最后这句，是你自己说的？……我听见了。')+'</p><p>END OF THE PILOT · 剧情止于此处。你的组合与仍未解决的问题已保存在记录里。</p>';
   }
   function openPlayerRecord() {
-    const lines=['DEAD AIR / 余声','播出结论：'+(state.ending==='good'?'正面定性':state.ending==='bad'?'负面定性':state.ending==='objective'?'全收集 / 完整客观播报':state.ending==='zero'?'材料不足 / 只有摘要':'尚未选择'),'','当前已知事实（可能含播出后的补查）：'];
+    const lines=['DEAD AIR / 积隅','播出结论：'+(state.ending==='good'?'正面定性':state.ending==='bad'?'负面定性':state.ending==='objective'?'全收集 / 完整客观播报':state.ending==='zero'?'材料不足 / 只有摘要':'尚未选择'),'','当前已知事实（可能含播出后的补查）：'];
     state.facts.forEach(id=>{const attempt=state.attempts.find(a=>a.fact===id&&a.result==='supported');lines.push('· '+D.facts[id].title,D.facts[id].body);if(attempt)lines.push('依据：'+attempt.materials.filter(id=>D.evidence[id]||D.facts[id]).map(materialTitle).join(' ＋ '));lines.push('');});
     lines.push('人物经历：',...D.lifeEpisodes.filter(event=>state.lifeSolved.includes(event.id)).map(event=>'· '+event.age+'岁 / '+event.name+'：'+event.options.find(option=>option[0]===event.answer)[1]),'','人生关系：',...D.lifeConnections.filter(link=>state.lifeLinks.includes(link.id)).map(link=>'· '+link.title+' '+link.note),'');
     if(state.radio.airScript?.length){lines.push('实际播出记录：','编排：'+(state.radio.order==='life-first'?'先人后事':'先事后人'));state.radio.airScript.forEach(part=>lines.push('· '+part.title,part.body,''));}
